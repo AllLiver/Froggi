@@ -1,2 +1,2 @@
-# RAOSS
-A simple and open scoreboard software
+# FOSSO
+Free and Open Source Scoreboard Overlay
