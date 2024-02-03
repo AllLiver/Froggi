@@ -19,21 +19,17 @@
         <h1>FOSSO Dashboard</h1>
         <div class="names">
             <h1>Scoreboard control</h1>
-            <form action="/" method="post" class="team-form">
+            <form action="/" method="post" id="team-form">
                 <div class="team-input">
-                    <label for="home">Home Team Name: </label>
-                    <input type="text" id="home" name="home">
+                    <label for="home">Home: </label>
+                    <input type="text" id="home" name="home" maxlength="8" onblur="submitForm()">
                 </div>
                 <div class="team-input">
-                    <label for="away">Away Team Name: </label>
-                    <input type="text" id="away" name="away">
-                </div>
-                <div class="team-input">
-                    <input type="submit" value="Submit">
+                    <label for="away">Away: </label>
+                    <input type="text" id="away" name="away" maxlength="8" onblur="submitForm()">
                 </div>
             </form>
         </div>
-
 
 
 
@@ -86,10 +82,10 @@
         </div>
         <div class="quarter-container">
             <h2>Quarter</h2>
-            <button hx-post="/q1" hx-swap="none">Quarter 1</button>
-            <button hx-post="/q2" hx-swap="none">Quarter 2</button>
-            <button hx-post="/q3" hx-swap="none">Quarter 3</button>
-            <button hx-post="/q4" hx-swap="none">Quarter 4</button>
+            <button id="quarter1" hx-post="/q1" hx-swap="none">Quarter 1</button>
+            <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
+            <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
+            <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
         </div>
         <script>
             htmx.on('#startButton', 'htmx:afterRequest', function() {
@@ -101,6 +97,37 @@
                 document.getElementById('stopButton').classList.add('selected');
                 document.getElementById('startButton').classList.remove('selected');
             });
+            function submitForm() {
+    var home = document.getElementById('home').value;
+    var away = document.getElementById('away').value;
+    if (home && away) {
+        document.getElementById('team-form').submit();
+    }
+}
+
+
+
+
+// Get all quarter buttons
+var quarters = document.querySelectorAll('.quarter-container button');
+
+// Function to remove active class from all quarters
+function removeActiveClass() {
+    quarters.forEach(function(quarter) {
+        quarter.classList.remove('active');
+    });
+}
+
+// Add click event listener to each quarter
+quarters.forEach(function(quarter) {
+    quarter.addEventListener('click', function() {
+        // Remove active class from all quarters
+        removeActiveClass();
+        
+        // Add active class to clicked quarter
+        this.classList.add('active');
+    });
+});
         </script>
         
     </body>

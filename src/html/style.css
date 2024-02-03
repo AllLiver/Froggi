@@ -41,7 +41,7 @@ body {
 .away {
     border-style: solid;
     border-width: 2px;
-    border-color: #ffe600; /* Blue border color */
+    border-color: #cd25d3; /* Blue border color */
     background-color: #1d1d1d; /* Dark background color */
     font-family: 'Open Sans', sans-serif;
     color: white; /* Changes h2 to white */
@@ -276,4 +276,27 @@ body .timer-controls .timer-button {
     font-size: 20px !important;
     padding: 10px 20px !important;
     width: 150px !important;
+}
+
+.team-form {
+    display: flex;
+    justify-content: space-between;
+}
+
+.team-input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.team-input:last-child {
+    margin-right: 0;
+}
+
+input[type="text"] {
+    width: 50px;
+}
+
+button.active {
+    /* Styles for the active quarter here, e.g. change the color */
+    background-color: rgb(44, 194, 194);
 }
