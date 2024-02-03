@@ -115,7 +115,6 @@ async fn read_or_create_config() {
 }
 
 // endregion: --- Config fn's
-
 // region: --- Page handlers
 
 async fn idx_handler() -> Html<&'static str> {
@@ -149,7 +148,6 @@ async fn htmx_handler() -> impl IntoResponse {
 }
 
 // endregion: --- Page handlers
-
 // region: --- Team names
 
 #[derive(Deserialize)]
@@ -207,7 +205,6 @@ async fn away_img_handler() -> impl IntoResponse {
 }
 
 // endregion: --- Team names
-
 // region: --- Home handlers
 
 async fn hu_handler() {
@@ -243,7 +240,6 @@ async fn hp_handler() -> Html<String> {
 }
 
 // endregion: --- Home handlers
-
 // region: --- Away handlers
 
 async fn au_handler() {
@@ -279,7 +275,6 @@ async fn ap_handler() -> Html<String> {
 }
 
 // endregion: --- Away Handlers
-
 // region: --- Clock handlers
 
 async fn time_handler() -> Html<String> {
@@ -358,7 +353,6 @@ async fn tstop_handler() {
 }
 
 // endregion: --- Clock handlers
-
 // region: --- Quarter handlers
 
 async fn quarter_handler() -> Html<String> {
@@ -387,7 +381,6 @@ async fn quarter4_change() {
 }
 
 // endregion: --- Quarter handlers
-
 // region: --- Misc handelers
 
 async fn chromargb_handler() -> Html<String> {
@@ -397,7 +390,5 @@ async fn chromargb_handler() -> Html<String> {
         chromakey.0, chromakey.1, chromakey.2
     ))
 }
-
-
 
 // endregion: --- Misc handelers
