@@ -49,6 +49,10 @@ async fn main() {
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
+        .route("/time_secs", put(secs_handler))
+        .route("/time_mins", put(mins_handler))
+        .route("/mins_up", post(mins_up_handler))
+        .route("/mins_down", post(mins_down_handler))
         .route("/", post(tname_handler))
         .route("/hdisp", put(hdisp_handler))
         .route("/adisp", put(adisp_handler))
@@ -253,6 +257,28 @@ async fn time_handler() -> Html<String> {
     let time_mins = TIME_MINS.lock().unwrap();
     let time_secs = TIME_SECS.lock().unwrap();
     Html(format!("{}:{:02?}", *time_mins, *time_secs))
+}
+
+async fn mins_handler() -> Html<String> {
+    let time_mins = TIME_MINS.lock().unwrap();
+    Html(format!("{}", *time_mins))
+}
+
+async fn secs_handler() -> Html<String> {
+    let time_secs = TIME_SECS.lock().unwrap();
+    Html(format!("{:02?}", *time_secs))
+}
+
+async fn mins_up_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    *time_mins += 1;
+}
+
+async fn mins_down_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    if *time_mins > 0 {
+        *time_mins -= 1;
+    }
 }
 
 async fn clock_ticker() {
