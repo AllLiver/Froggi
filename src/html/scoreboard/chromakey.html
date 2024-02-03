@@ -9,9 +9,13 @@
     </head>
     <body>
         <div class="white-boxes-container">
-            <div class="home-box" hx-put="/hname_score" hx-trigger="every 10ms"></div>
+            <div class="home-box" hx-put="/hname_score" hx-trigger="every 10ms">
+                <img src="home.png" alt="Home Logo">
+            </div>
             <div class="score-box" hx-put="/hp" hx-trigger="every 10ms"></div>
-            <div class="away-box" hx-put="/aname_score" hx-trigger="every 10ms"></div>
+            <div class="away-box" hx-put="/aname_score" hx-trigger="every 10ms">
+                <img src="away.png" alt="Girl in a jacket" width="500" height="600"> 
+            </div>
             <div class="clock-box" hx-put="/time" hx-trigger="every 10ms"></div>
         </div>
     </body>
