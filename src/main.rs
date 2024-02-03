@@ -23,7 +23,7 @@ lazy_static! {
     static ref HOME_POINTS: Mutex<i32> = Mutex::new(0);
     static ref AWAY_POINTS: Mutex<i32> = Mutex::new(0);
     static ref TIME_MINS: Mutex<i32> = Mutex::new(8);
-    static ref TIME_SECS: Mutex<i32> = Mutex::new(20);
+    static ref TIME_SECS: Mutex<i32> = Mutex::new(0);
     static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
 }
 
