@@ -52,7 +52,9 @@ async fn main() {
         .route("/", post(tname_handler))
         .route("/hdisp", put(hdisp_handler))
         .route("/adisp", put(adisp_handler))
-        .route("/chromargb", put(chromargb_handler));
+        .route("/chromargb", put(chromargb_handler))
+        .route("/hname_score", put(hname_scoreboard_handler))
+        .route("/aname_score", put(aname_scoreboard_handler));
 
     tokio::spawn(clock_ticker());
     tokio::spawn(read_or_create_config());
@@ -158,6 +160,17 @@ async fn hdisp_handler() -> Html<String> {
 async fn adisp_handler() -> Html<String> {
     let away_name = AWAY_NAME.lock().unwrap();
     Html(format!("<h2>Away: {}</h2>", away_name))
+}
+
+
+async fn hname_scoreboard_handler() -> Html<String> {
+    let home_name = HOME_NAME.lock().unwrap();
+    Html(format!("{}", home_name))
+}
+
+async fn aname_scoreboard_handler() -> Html<String> {
+    let away_name = AWAY_NAME.lock().unwrap();
+    Html(format!("{}", away_name))
 }
 
 // endregion: --- Team names
