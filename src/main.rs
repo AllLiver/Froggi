@@ -70,7 +70,7 @@ async fn read_or_create_config() {
         Ok(cfg) => cfg,
         Err(_) => {
             println!(" -> CREATE: config file");
-            tokio::fs::write(CONFIG_FILE, "# FOSSO config file\nchromakey=0, 255, 0")
+            tokio::fs::write(CONFIG_FILE, "# FOSSO config file\nchromakey=0, 177, 64")
                 .await
                 .unwrap();
             tokio::fs::read_to_string(CONFIG_FILE).await.unwrap()
