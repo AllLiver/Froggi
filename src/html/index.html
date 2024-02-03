@@ -2,6 +2,16 @@
 <html>
     <head>
         <script src="./htmx.min.js"></script>
+        <script>
+        async function ping() {
+            let start = performance.now();
+            await fetch('/ping', {method: 'HEAD'});
+            let end = performance.now();
+            let pingTime = end - start;
+            document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
+        }
+        setInterval(ping, 2000);
+        </script>
         <title>FOSSO Dashboard</title> 
         <meta charset="UTF-8">
         <style>
@@ -14,6 +24,7 @@
             <ul>
                 <a class="active" href="/">DASHBOARD</a>
                 <a href="/chromakey" target="_blank">CHROMAKEYPAGE</a>
+                <p id="ping">Ping: calculating...</p>
               </ul> 
             </div>
         <h1>FOSSO Dashboard</h1>
@@ -30,10 +41,6 @@
                 </div>
             </form>
         </div>
-
-
-
-        </script>
         <div class="score-container">
             <div class="home">
                 <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
