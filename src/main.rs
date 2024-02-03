@@ -28,6 +28,8 @@ lazy_static! {
     static ref TIME_SECS: Mutex<i32> = Mutex::new(0);
     static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
     static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
+    static ref QUARTER: Mutex<i32> = Mutex::new(1);
+    static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(true);
 }
 
 #[tokio::main]
@@ -63,7 +65,12 @@ async fn main() {
         .route("/adisp", put(adisp_handler))
         .route("/chromargb", put(chromargb_handler))
         .route("/hname_score", put(hname_scoreboard_handler))
-        .route("/aname_score", put(aname_scoreboard_handler));
+        .route("/aname_score", put(aname_scoreboard_handler))
+        .route("/quarter", put(quarter_handler))
+        .route("/q1", post(quarter1_change))
+        .route("/q2", post(quarter2_change))
+        .route("/q3", post(quarter3_change))
+        .route("/q4", post(quarter4_change));
 
     tokio::spawn(clock_ticker());
     tokio::spawn(read_or_create_config());
@@ -352,6 +359,35 @@ async fn tstop_handler() {
 
 // endregion: --- Clock handlers
 
+// region: --- Quarter handlers
+
+async fn quarter_handler() -> Html<String> {
+    let quarter = QUARTER.lock().unwrap();
+    Html(format!("{}", *quarter))
+}
+
+async fn quarter1_change() {
+    let mut quarter = QUARTER.lock().unwrap();
+    *quarter = 1;
+}
+
+async fn quarter2_change() {
+    let mut quarter = QUARTER.lock().unwrap();
+    *quarter = 2;
+}
+
+async fn quarter3_change() {
+    let mut quarter = QUARTER.lock().unwrap();
+    *quarter = 3;
+}
+
+async fn quarter4_change() {
+    let mut quarter = QUARTER.lock().unwrap();
+    *quarter = 4;
+}
+
+// endregion: --- Quarter handlers
+
 // region: --- Misc handelers
 
 async fn chromargb_handler() -> Html<String> {
@@ -361,5 +397,7 @@ async fn chromargb_handler() -> Html<String> {
         chromakey.0, chromakey.1, chromakey.2
     ))
 }
+
+
 
 // endregion: --- Misc handelers
