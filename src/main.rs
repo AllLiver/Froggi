@@ -56,6 +56,8 @@ async fn main() {
         .route("/time_mins", put(mins_handler))
         .route("/mins_up", post(mins_up_handler))
         .route("/mins_down", post(mins_down_handler))
+        .route("/secs_up", post(secs_up_handler))
+        .route("/secs_down", post(secs_down_handler))
         .route("/", post(tname_handler))
         .route("/hdisp", put(hdisp_handler))
         .route("/adisp", put(adisp_handler))
@@ -298,6 +300,20 @@ async fn mins_down_handler() {
     let mut time_mins = TIME_MINS.lock().unwrap();
     if *time_mins > 0 {
         *time_mins -= 1;
+    }
+}
+
+async fn secs_up_handler() {
+    let mut time_secs = TIME_SECS.lock().unwrap();
+    if *time_secs < 59 {
+        *time_secs += 1;
+    }
+}
+
+async fn secs_down_handler() {
+    let mut time_secs = TIME_SECS.lock().unwrap();
+    if *time_secs > 0 {
+        *time_secs -= 1;
     }
 }
 

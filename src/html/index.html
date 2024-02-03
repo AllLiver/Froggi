@@ -56,7 +56,11 @@
                     <div hx-put="/time_mins" hx-trigger="every 10ms"></div>
                     <button hx-post="/mins_down" hx-swap="none">-</button>
                 </div>
-                <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
+                <div class="secs-elements">
+                    <button hx-post="/secs_up" hx-swap="none">+</button>
+                    <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
+                    <button hx-post="/secs_down" hx-swap="none">-</button>
+                </div>
                 <button hx-post="/tstart" hx-swap="none">Start</button>
                 <button hx-post="/tstop" hx-swap="none">Stop</button>
             </div>
