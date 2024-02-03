@@ -41,7 +41,7 @@ body {
 .away {
     border-style: solid;
     border-width: 2px;
-    border-color: #58a2f7; /* Blue border color */
+    border-color: #ffe600; /* Blue border color */
     background-color: #1d1d1d; /* Dark background color */
     font-family: 'Open Sans', sans-serif;
     color: white; /* Changes h2 to white */
@@ -54,7 +54,7 @@ body {
 .home {
     border-style: solid;
     border-width: 2px;
-    border-color: #e9981f; /* Orange border color */
+    border-color: #5364c7; /* Orange border color */
     background-color: #1d1d1d; /* Dark background color */
     font-family: 'Open Sans', sans-serif;
     color: white; /* Changes h2 to white */
@@ -181,6 +181,9 @@ input[type="submit"] {
 
     border-radius: 4%; /* If it was my chpoice these boxes would be really round */
 
+    font-family: 'Protest Strike', sans-serif;
+    
+
   }
 
   .score-box {
@@ -194,6 +197,8 @@ input[type="submit"] {
     margin: 3px; /* Adjust spacing as needed */
 
     border-radius: 4%; /* If it was my chpoice these boxes would be really round */
+
+    font-family: 'Roboto', sans-serif;
 
   }
 
@@ -209,6 +214,8 @@ input[type="submit"] {
 
     border-radius: 4%; /* If it was my chpoice these boxes would be really round */
 
+    font-family: 'Protest Strike', sans-serif;
+
   }
 
   .clock-box {
@@ -223,9 +230,50 @@ input[type="submit"] {
 
     border-radius: 4%; /* If it was my chpoice these boxes would be really round */
 
+    font-family: 'Roboto', sans-serif;
+
   }
 
-  .home-box img, .away-box img {
-    width: 100%;  /* Set width to fill the container */
-    height: auto;  /* Set height to maintain aspect ratio */
+  .home-box, .away-box {
+    display: flex; /* Use Flexbox */
+    align-items: center; /* Vertically center the items */
+}
+
+ .timer {
+    text-align: center;
+}
+
+.timer-elements {
+    display: flex;
+    align-items: center;
+}
+
+.timer-elements .mins-elements,
+.timer-elements .secs-elements {
+    display: flex;
+    align-items: center;
+}
+
+.timer-elements .mins-elements button,
+.timer-elements .secs-elements button {
+    margin-top: 5px; /* Adjust the spacing between buttons */
+    padding: 8px 12px; /* Adjust button padding */
+}
+
+.timer-elements .secs-elements {
+    margin-left: 10px; /* Adjust the spacing between minutes and seconds as needed */
+}
+
+.colon {
+    margin: 0 5px; /* Adjust the spacing around the colon as needed */
+}
+
+
+.timer-button.selected {
+    background-color: rgb(44, 194, 194); /* color when selected */
+}
+body .timer-controls .timer-button {
+    font-size: 20px !important;
+    padding: 10px 20px !important;
+    width: 150px !important;
 }

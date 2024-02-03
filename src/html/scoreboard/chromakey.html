@@ -9,15 +9,21 @@
     </head>
     <body>
         <div class="white-boxes-container">
-            <div class="home-box" hx-put="/hname_score" hx-trigger="every 10ms">
-                <img src="home.png" alt="Home Logo">
+            <div class="home-box">
+                <img src="home_png" alt="Home Team Logo" width="25" height="30" > 
+                <div hx-put="/hname_score" hx-trigger="every 10ms"></div>
             </div>
+            
             <div class="score-box" hx-put="/hp" hx-trigger="every 10ms"></div>
-            <div class="away-box" hx-put="/aname_score" hx-trigger="every 10ms">
-                <img src="away.png" alt="Girl in a jacket" width="500" height="600"> 
+            
+            <div class="away-box">
+                <img src="away_png" alt="Away Team Logo" width="25" height="30"> 
+                <div hx-put="/aname_score" hx-trigger="every 10ms"></div>
             </div>
-            <div class="clock-box" hx-put="/time" hx-trigger="every 10ms"></div>
-            <div hx-put="/quarter" hx-trigger="every 10ms"></div>
+            <div class="clock-box">
+                <div hx-put="/time" hx-trigger="every 10ms"></div>
+                <div hx-put="/quarter" hx-trigger="every 10ms"></div>
+            </div>
         </div>
     </body>
 </html>
