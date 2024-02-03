@@ -16,6 +16,7 @@ use mime::TEXT_JAVASCRIPT;
 use serde::Deserialize;
 
 const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
+const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
 lazy_static! {
     static ref HOME_NAME: Mutex<String> = Mutex::new(String::from("home_name"));
@@ -25,6 +26,7 @@ lazy_static! {
     static ref TIME_MINS: Mutex<i32> = Mutex::new(8);
     static ref TIME_SECS: Mutex<i32> = Mutex::new(0);
     static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
+    static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
 }
 
 #[tokio::main]
@@ -49,9 +51,11 @@ async fn main() {
         .route("/time", put(time_handler))
         .route("/", post(tname_handler))
         .route("/hdisp", put(hdisp_handler))
-        .route("/adisp", put(adisp_handler));
+        .route("/adisp", put(adisp_handler))
+        .route("/chromargb", put(chromargb_handler));
 
     tokio::spawn(clock_ticker());
+    tokio::spawn(read_or_create_config());
 
     println!("Listening on: {}\n", ADDR);
     let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap(); // Binds the listener to the address
@@ -59,7 +63,40 @@ async fn main() {
     println!("Server stopped");
 }
 
+// region: --- Config fn's
 
+async fn read_or_create_config() {
+    let config = match tokio::fs::read_to_string(CONFIG_FILE).await {
+        Ok(cfg) => cfg,
+        Err(_) => {
+            println!(" -> CREATE: config file");
+            tokio::fs::write(CONFIG_FILE, "# FOSSO config file\nchromakey=0, 255, 0")
+                .await
+                .unwrap();
+            tokio::fs::read_to_string(CONFIG_FILE).await.unwrap()
+        }
+    };
+
+    let lines: Vec<&str> = config.split('\n').filter(|x| !x.starts_with("#")).collect();
+    println!(" -> CONFIG: {:?}", lines);
+
+    for i in lines {
+        let parts: Vec<&str> = i.split('=').collect();
+        match parts[0] {
+            "chromakey" => {
+                let rgb: Vec<&str> = parts[1].split(',').collect();
+                let r: u8 = rgb[0].trim().parse().unwrap();
+                let g: u8 = rgb[1].trim().parse().unwrap();
+                let b: u8 = rgb[2].trim().parse().unwrap();
+                let mut chromakey = CHROMAKEY.lock().unwrap();
+                *chromakey = (r, g, b);
+            }
+            _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
+        }
+    }
+}
+
+// endregion: --- Config fn's
 
 // region: --- Page handlers
 
@@ -156,7 +193,7 @@ async fn hu3_handler() {
 async fn hp_handler() -> Html<String> {
     // Displays home points
     let home_points = HOME_POINTS.lock().unwrap();
-    Html(format!("Points: {}", *home_points))
+    Html(format!("{}", *home_points))
 }
 
 // endregion: --- Home handlers
@@ -192,7 +229,7 @@ async fn au3_handler() {
 async fn ap_handler() -> Html<String> {
     // Displays home points
     let away_points = AWAY_POINTS.lock().unwrap();
-    Html(format!("Points: {}", *away_points))
+    Html(format!("{}", *away_points))
 }
 
 // endregion: --- Away Handlers
@@ -239,3 +276,12 @@ async fn tstop_handler() {
 }
 
 // endregion: --- Clock handlers
+
+// region: --- Misc handelers
+
+async fn chromargb_handler() -> Html<String> {
+    let chromakey = CHROMAKEY.lock().unwrap();
+    Html(format!("<style>body {{ background-color: rgb({}, {}, {}); }}</style>", chromakey.0, chromakey.1, chromakey.2))
+}
+
+// endregion: --- Misc handelers
