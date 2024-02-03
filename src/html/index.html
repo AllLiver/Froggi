@@ -10,43 +10,55 @@
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
+        <div class="topnav">
+            <ul>
+                <a class="active" href="index.html">DASHBOARD</a>
+                <a href="chromakey.html">CHROMAKEYPAGE</a>
+              </ul> 
+            </div>
         <h1>FOSSO Dashboard</h1>
         <div class="names">
-            <h1>Team info</h1>
-            <form action="/" method="post">
-                <label for="home">Home: </label>
-                <input type="text" id="home" name="home"><br>
-                <label for="away">Away: </label>
-                <input type="text" id="away" name="away"><br><br>
-                <input type="submit" value="Submit">
+            <h1>Scoreboard control</h1>
+            <form action="/" method="post" class="team-form">
+                <div class="team-input">
+                    <label for="home">Home Team Name: </label>
+                    <input type="text" id="home" name="home">
+                </div>
+                <div class="team-input">
+                    <label for="away">Away Team Name: </label>
+                    <input type="text" id="away" name="away">
+                </div>
+                <div class="team-input">
+                    <input type="submit" value="Submit">
+                </div>
             </form>
         </div>
-        <br>
-        <div class="home">
-            <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
-            <button hx-post="/hu" hx-swap="none">+</button>
-            <div hx-put="/hp" hx-trigger="every 10ms"></div>
-            <button hx-post="/hd" hx-swap="none">-</button><br><br>
-            <button hx-post="/hu" hx-swap="none">1 Point</button>
-            <button hx-post="/hu2" hx-swap="none">2 Points</button>
-            <button hx-post="/hu3" hx-swap="none">3 Points</button>
-        </div>
-        <br>
-        <div class="away">
-            <div hx-put="/adisp" hx-trigger="every 10ms"></div>
-            <button hx-post="/au" hx-swap="none">+</button>
-            <div hx-put="/ap" hx-trigger="every 10ms"></div>
-            <button hx-post="/ad" hx-swap="none">-</button><br><br>
-            <button hx-post="/au" hx-swap="none">1 Point</button>
-            <button hx-post="/au2" hx-swap="none">2 Points</button>
-            <button hx-post="/au3" hx-swap="none">3 Points</button>
-        </div>
-        <br>
-        <div class="timer">
-            <h2>Timer</h2>
-            <div hx-put="/time" hx-trigger="every 10ms"></div>
-            <button hx-post="/tstart" hx-swap="none">Start</button>
-            <button hx-post="/tstop" hx-swap="none">Stop</button>
+
+        <div class="score-container">
+            <div class="home">
+                <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
+                <button hx-post="/hu" hx-swap="none">+</button>
+                <div hx-put="/hp" hx-trigger="every 10ms"></div>
+                <button hx-post="/hd" hx-swap="none">-</button><br><br>
+                <button hx-post="/hu" hx-swap="none">1 Point</button>
+                <button hx-post="/hu2" hx-swap="none">2 Points</button>
+                <button hx-post="/hu3" hx-swap="none">3 Points</button>
+            </div>
+            <div class="timer">
+                <h2>Timer</h2>
+                <div hx-put="/time" hx-trigger="every 10ms"></div>
+                <button hx-post="/tstart" hx-swap="none">Start</button>
+                <button hx-post="/tstop" hx-swap="none">Stop</button>
+            </div>
+            <div class="away">
+                <div hx-put="/adisp" hx-trigger="every 10ms"></div>
+                <button hx-post="/au" hx-swap="none">+</button>
+                <div hx-put="/ap" hx-trigger="every 10ms"></div>
+                <button hx-post="/ad" hx-swap="none">-</button><br><br>
+                <button hx-post="/au" hx-swap="none">Add 1 Point</button>
+                <button hx-post="/au2" hx-swap="none">Add 2 Points</button>
+                <button hx-post="/au3" hx-swap="none">Add 3 Points</button>
+            </div>
         </div>
     </body>
 </html>

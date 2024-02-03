@@ -1,13 +1,153 @@
+ul li {
+    display: inline;
+    padding: 1px;
+}
+.topnav {
+    background-color: #1d1d1d;
+    overflow: hidden;
+    position: fixed; 
+    width: 100%; 
+    top: 0; 
+    line-height: 20px;  
+  }
+
+  .topnav a {
+    float: left;
+    color: #ffffff;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    line-height: 20px; 
+}
+  .topnav a:hover {
+    background-color: #ffffff;
+    color: black;
+  }
+  .topnav a.active {
+    background-color: #58a2f7;
+    color: white;
+  }
+
+
+
+
 body {
     font-family: 'Roboto', sans-serif;
+    background-color: #161617;
+    
 }
 
 .away {
     border-style: solid;
     border-width: 2px;
+    border-color: #58a2f7; /* Blue border color */
+    background-color: #1d1d1d; /* Dark background color */
+    font-family: 'Open Sans', sans-serif;
+    color: white; /* Changes h2 to white */
+    padding: 10px; /* Add some space around the content */
+    margin: 10px; /* Add some space around the element */
+    border-radius: 5px; /* Rounded corners */
 }
+
 
 .home {
     border-style: solid;
     border-width: 2px;
+    border-color: #e9981f; /* Orange border color */
+    background-color: #1d1d1d; /* Dark background color */
+    font-family: 'Open Sans', sans-serif;
+    color: white; /* Changes h2 to white */
+    padding: 10px; /* Add some space around the content */
+    margin: 10px; /* Add some space around the element */
+    border-radius: 5px; /* Rounded corners */
 }
+.home button:nth-child(n+5), .away button:nth-child(n+5) {
+    display: block; /* Stack the buttons vertically */
+    width: 100%; /* Make the buttons take the full width of the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    margin: 10px 0; /* Add some vertical space between the buttons */
+    padding: 10px; /* Add some space around the button text */
+    font-size: 16px; /* Adjust as needed */
+    /* Other styles... */
+}
+.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
+    display: block; /* Stack the buttons vertically */
+    width: 100%; /* Make the buttons take the full width of the container */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    margin: 10px 0; /* Add some vertical space between the buttons */
+    padding: 10px; /* Add some space around the button text */
+    font-size: 16px; /* Adjust as needed */
+}
+.timer {
+    width: 40%;
+    border: 2px solid #cf6a6a;
+    padding: 20px;
+    margin: 10px 0;
+    background-color: #242424;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+
+    /* Add these styles to center the content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.names {
+    font-size: 20px;
+    font-weight: bold;
+    color: white; /* Changes names class to white */
+}
+.score-container {
+    display: flex;
+    justify-content: space-around;
+}
+
+
+h3 {
+    color: white; /* Changes h2 to white */
+}
+h2 {
+    color: white; /* Changes h2 to white */
+}
+h1 {
+    color: white; /* Changes h1 to white */
+}
+button {
+    background-color: #e9981f; /* Background color of buttons */
+    border: none;
+    color: white;
+    padding:1% 5%; /* Using % will make it scale easier to screen sizes */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 100%; 
+    margin: 1.25% 0.625%;
+    cursor: pointer;
+    border-radius: 3%; /* Circular button */
+}
+
+.team-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* Align items vertically in the center */
+}
+
+.team-input {
+    flex: 1;
+    min-width: 200px; /* Adjust as needed */
+    margin: 10px;
+}
+
+input[type="text"] {
+    width: 100%; /* Full width of the parent div */
+    /* Other styles... */
+}
+
+input[type="submit"] {
+    width: 100%; /* Full width of the parent div */
+    /* Other styles... */
+}
+
+
