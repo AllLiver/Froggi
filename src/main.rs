@@ -169,7 +169,6 @@ async fn adisp_handler() -> Html<String> {
     Html(format!("<h2>Away: {}</h2>", away_name))
 }
 
-
 async fn hname_scoreboard_handler() -> Html<String> {
     let home_name = HOME_NAME.lock().unwrap();
     Html(format!("{}", home_name))
@@ -341,7 +340,10 @@ async fn tstop_handler() {
 
 async fn chromargb_handler() -> Html<String> {
     let chromakey = CHROMAKEY.lock().unwrap();
-    Html(format!("<style>body {{ background-color: rgb({}, {}, {}); }}</style>", chromakey.0, chromakey.1, chromakey.2))
+    Html(format!(
+        "<style>body {{ background-color: rgb({}, {}, {}); }}</style>",
+        chromakey.0, chromakey.1, chromakey.2
+    ))
 }
 
 // endregion: --- Misc handelers
