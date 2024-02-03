@@ -50,10 +50,17 @@ async fn main() {
         .route("/hdisp", put(hdisp_handler))
         .route("/adisp", put(adisp_handler));
 
+    tokio::spawn(clock_ticker());
+
     println!("Listening on: {}\n", ADDR);
     let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap(); // Binds the listener to the address
     axum::serve(listener, app).await.unwrap(); // Serves the app
+    println!("Server stopped");
 }
+
+
+
+// region: --- Page handlers
 
 async fn idx_handler() -> Html<&'static str> {
     println!(" -> SERVE: index.html");
@@ -79,6 +86,8 @@ async fn htmx_handler() -> impl IntoResponse {
         .body(body)
         .unwrap()
 }
+
+// endregion: --- Page handlers
 
 // region: --- Team names
 
@@ -187,7 +196,28 @@ async fn ap_handler() -> Html<String> {
 async fn time_handler() -> Html<String> {
     let time_mins = TIME_MINS.lock().unwrap();
     let time_secs = TIME_SECS.lock().unwrap();
-    Html(format!("{}:{}", *time_mins, *time_secs))
+    Html(format!("{}:{:02?}", *time_mins, *time_secs))
+}
+
+async fn clock_ticker() {
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        let mut time_started = TIME_STARTED.lock().unwrap();
+        if *time_started {
+            let mut time_mins = TIME_MINS.lock().unwrap();
+            let mut time_secs = TIME_SECS.lock().unwrap();
+            if *time_secs == 0 {
+                if *time_mins == 0 {
+                    *time_started = false;
+                } else {
+                    *time_mins -= 1;
+                    *time_secs = 59;
+                }
+            } else {
+                *time_secs -= 1;
+            }
+        }
+    }
 }
 
 async fn tstart_handler() {
