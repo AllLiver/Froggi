@@ -404,3 +404,8 @@ async fn chromargb_handler() -> Html<String> {
 }
 
 // endregion: --- Misc handelers
+// region: --- Misc fn's
+
+
+
+// endregion: --- Misc fn's
