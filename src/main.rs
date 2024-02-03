@@ -1,9 +1,9 @@
 use axum::{
     body::Body,
     http::Response,
-    response::{Html, IntoResponse},
+    response::{Html, IntoResponse, Redirect},
     routing::{get, post, put},
-    Router
+    Form, Router,
 };
 
 use lazy_static::lazy_static;
@@ -13,10 +13,18 @@ use hyper::header::CONTENT_TYPE;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
+use serde::Deserialize;
+
 const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
 
 lazy_static! {
-    static ref COUNTER: Mutex<i32> = Mutex::new(0);
+    static ref HOME_NAME: Mutex<String> = Mutex::new(String::from("home_name"));
+    static ref AWAY_NAME: Mutex<String> = Mutex::new(String::from("home_name"));
+    static ref HOME_POINTS: Mutex<i32> = Mutex::new(0);
+    static ref AWAY_POINTS: Mutex<i32> = Mutex::new(0);
+    static ref TIME_MINS: Mutex<i32> = Mutex::new(8);
+    static ref TIME_SECS: Mutex<i32> = Mutex::new(20);
+    static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
 }
 
 #[tokio::main]
@@ -24,9 +32,23 @@ async fn main() {
     let app = Router::new() // Creates a new router
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
-        .route("/htmx.min.js", get(htmx_handler))
-        .route("/hu", post(hu_handler)) // Handles get requests for the htmx library
-        .route("/hp", put(hp_handler));
+        .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
+        .route("/hu", post(hu_handler))
+        .route("/hd", post(hd_handler))
+        .route("/hu2", post(hu2_handler))
+        .route("/hu3", post(hu3_handler))
+        .route("/hp", put(hp_handler))
+        .route("/au", post(au_handler))
+        .route("/ad", post(ad_handler))
+        .route("/au2", post(au2_handler))
+        .route("/au3", post(au3_handler))
+        .route("/ap", put(ap_handler))
+        .route("/tstart", post(tstart_handler))
+        .route("/tstop", post(tstop_handler))
+        .route("/time", put(time_handler))
+        .route("/", post(tname_handler))
+        .route("/hdisp", put(hdisp_handler))
+        .route("/adisp", put(adisp_handler));
 
     println!("Listening on: {}\n", ADDR);
     let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap(); // Binds the listener to the address
@@ -34,6 +56,7 @@ async fn main() {
 }
 
 async fn idx_handler() -> Html<&'static str> {
+    println!(" -> SERVE: index.html");
     Html(include_str!("html/index.html")) // Serves the contents of index.html
 }
 
@@ -57,14 +80,126 @@ async fn htmx_handler() -> impl IntoResponse {
         .unwrap()
 }
 
+// region: --- Team names
+
+#[derive(Deserialize)]
+struct UpdNames {
+    home: String,
+    away: String,
+}
+
+async fn tname_handler(Form(names): Form<UpdNames>) -> Redirect {
+    println!(" -> TEAMS: update names: {} - {}", names.home, names.away);
+    let mut home_name = HOME_NAME.lock().unwrap();
+    let mut away_name = AWAY_NAME.lock().unwrap();
+    *home_name = names.home;
+    *away_name = names.away;
+
+    Redirect::to("/")
+}
+
+async fn hdisp_handler() -> Html<String> {
+    let home_name = HOME_NAME.lock().unwrap();
+    Html(format!("<h2>Home: {}</h2>", home_name))
+}
+
+async fn adisp_handler() -> Html<String> {
+    let away_name = AWAY_NAME.lock().unwrap();
+    Html(format!("<h2>Away: {}</h2>", away_name))
+}
+
+// endregion: --- Team names
+
+// region: --- Home handlers
 
 async fn hu_handler() {
-    let mut counter = COUNTER.lock().unwrap();
-    *counter += 1;
-    println!("Home point up, points: {}", *counter);
+    // Increments home points
+    let mut home_points = HOME_POINTS.lock().unwrap();
+    *home_points += 1;
+}
+
+async fn hd_handler() {
+    // Decrements home points
+    let mut home_points = HOME_POINTS.lock().unwrap();
+    if *home_points > 0 {
+        *home_points -= 1;
+    }
+}
+
+async fn hu2_handler() {
+    // Adds 2 home points
+    let mut home_points = HOME_POINTS.lock().unwrap();
+    *home_points += 2;
+}
+
+async fn hu3_handler() {
+    // Adds 3 home points
+    let mut home_points = HOME_POINTS.lock().unwrap();
+    *home_points += 3;
 }
 
 async fn hp_handler() -> Html<String> {
-    let counter = COUNTER.lock().unwrap();
-    Html(format!("Points: {}", *counter))
+    // Displays home points
+    let home_points = HOME_POINTS.lock().unwrap();
+    Html(format!("Points: {}", *home_points))
 }
+
+// endregion: --- Home handlers
+
+// region: --- Away handlers
+
+async fn au_handler() {
+    // Increments home points
+    let mut away_points = AWAY_POINTS.lock().unwrap();
+    *away_points += 1;
+}
+
+async fn ad_handler() {
+    // Decrements home points
+    let mut away_points = AWAY_POINTS.lock().unwrap();
+    if *away_points > 0 {
+        *away_points -= 1;
+    }
+}
+
+async fn au2_handler() {
+    // Adds 2 home points
+    let mut away_points = AWAY_POINTS.lock().unwrap();
+    *away_points += 2;
+}
+
+async fn au3_handler() {
+    // Adds 3 home points
+    let mut away_points = AWAY_POINTS.lock().unwrap();
+    *away_points += 3;
+}
+
+async fn ap_handler() -> Html<String> {
+    // Displays home points
+    let away_points = AWAY_POINTS.lock().unwrap();
+    Html(format!("Points: {}", *away_points))
+}
+
+// endregion: --- Away Handlers
+
+// region: --- Clock handlers
+
+async fn time_handler() -> Html<String> {
+    let time_mins = TIME_MINS.lock().unwrap();
+    let time_secs = TIME_SECS.lock().unwrap();
+    Html(format!("{}:{}", *time_mins, *time_secs))
+}
+
+async fn tstart_handler() {
+    println!(" -> TIMER: start");
+    let mut time_started = TIME_STARTED.lock().unwrap();
+    *time_started = true;
+}
+
+async fn tstop_handler() {
+    println!(" -> TIMER: stop");
+    let mut time_started = TIME_STARTED.lock().unwrap();
+    *time_started = false;
+}
+
+// endregion: --- Clock handlers
