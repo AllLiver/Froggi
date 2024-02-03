@@ -31,6 +31,7 @@ lazy_static! {
 async fn main() {
     let app = Router::new() // Creates a new router
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
+        .route("/chromakey", get(chroma_handler)) // Handles get requests for the chromakey page
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
         .route("/hu", post(hu_handler))
@@ -65,6 +66,11 @@ async fn main() {
 async fn idx_handler() -> Html<&'static str> {
     println!(" -> SERVE: index.html");
     Html(include_str!("html/index.html")) // Serves the contents of index.html
+}
+
+async fn chroma_handler() -> Html<&'static str> {
+    println!(" -> SERVE: chromakey.html");
+    Html(include_str!("html/scoreboard/chromakey.html"))
 }
 
 async fn css_handler() -> impl IntoResponse {
