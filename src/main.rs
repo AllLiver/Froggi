@@ -7,9 +7,10 @@ use axum::{
 };
 
 use lazy_static::lazy_static;
-use std::sync::Mutex;
+use std::{path::Path, sync::Mutex};
 
 use hyper::header::CONTENT_TYPE;
+use mime::IMAGE_PNG;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
@@ -41,11 +42,13 @@ async fn main() {
         .route("/hu2", post(hu2_handler))
         .route("/hu3", post(hu3_handler))
         .route("/hp", put(hp_handler))
+        .route("/home_png", get(home_img_handler))
         .route("/au", post(au_handler))
         .route("/ad", post(ad_handler))
         .route("/au2", post(au2_handler))
         .route("/au3", post(au3_handler))
         .route("/ap", put(ap_handler))
+        .route("/away_png", get(away_img_handler))
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
@@ -175,6 +178,24 @@ async fn hname_scoreboard_handler() -> Html<String> {
 async fn aname_scoreboard_handler() -> Html<String> {
     let away_name = AWAY_NAME.lock().unwrap();
     Html(format!("{}", away_name))
+}
+
+async fn home_img_handler() -> impl IntoResponse {
+    let home_image = tokio::fs::read(Path::new("home.png")).await.unwrap();
+    let body = Body::from(home_image);
+    Response::builder()
+        .header(CONTENT_TYPE, IMAGE_PNG.to_string())
+        .body(body)
+        .unwrap()
+}
+
+async fn away_img_handler() -> impl IntoResponse {
+    let away_image = tokio::fs::read(Path::new("away.png")).await.unwrap();
+    let body = Body::from(away_image);
+    Response::builder()
+        .header(CONTENT_TYPE, IMAGE_PNG.to_string())
+        .body(body)
+        .unwrap()
 }
 
 // endregion: --- Team names
