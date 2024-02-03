@@ -7,9 +7,10 @@ use axum::{
 };
 
 use lazy_static::lazy_static;
-use std::sync::Mutex;
+use std::{path::Path, sync::Mutex};
 
 use hyper::header::CONTENT_TYPE;
+use mime::IMAGE_PNG;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
@@ -41,14 +42,20 @@ async fn main() {
         .route("/hu2", post(hu2_handler))
         .route("/hu3", post(hu3_handler))
         .route("/hp", put(hp_handler))
+        .route("/home_png", get(home_img_handler))
         .route("/au", post(au_handler))
         .route("/ad", post(ad_handler))
         .route("/au2", post(au2_handler))
         .route("/au3", post(au3_handler))
         .route("/ap", put(ap_handler))
+        .route("/away_png", get(away_img_handler))
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
+        .route("/time_secs", put(secs_handler))
+        .route("/time_mins", put(mins_handler))
+        .route("/mins_up", post(mins_up_handler))
+        .route("/mins_down", post(mins_down_handler))
         .route("/", post(tname_handler))
         .route("/hdisp", put(hdisp_handler))
         .route("/adisp", put(adisp_handler))
@@ -162,7 +169,6 @@ async fn adisp_handler() -> Html<String> {
     Html(format!("<h2>Away: {}</h2>", away_name))
 }
 
-
 async fn hname_scoreboard_handler() -> Html<String> {
     let home_name = HOME_NAME.lock().unwrap();
     Html(format!("{}", home_name))
@@ -171,6 +177,24 @@ async fn hname_scoreboard_handler() -> Html<String> {
 async fn aname_scoreboard_handler() -> Html<String> {
     let away_name = AWAY_NAME.lock().unwrap();
     Html(format!("{}", away_name))
+}
+
+async fn home_img_handler() -> impl IntoResponse {
+    let home_image = tokio::fs::read(Path::new("home.png")).await.unwrap();
+    let body = Body::from(home_image);
+    Response::builder()
+        .header(CONTENT_TYPE, IMAGE_PNG.to_string())
+        .body(body)
+        .unwrap()
+}
+
+async fn away_img_handler() -> impl IntoResponse {
+    let away_image = tokio::fs::read(Path::new("away.png")).await.unwrap();
+    let body = Body::from(away_image);
+    Response::builder()
+        .header(CONTENT_TYPE, IMAGE_PNG.to_string())
+        .body(body)
+        .unwrap()
 }
 
 // endregion: --- Team names
@@ -255,6 +279,28 @@ async fn time_handler() -> Html<String> {
     Html(format!("{}:{:02?}", *time_mins, *time_secs))
 }
 
+async fn mins_handler() -> Html<String> {
+    let time_mins = TIME_MINS.lock().unwrap();
+    Html(format!("{}", *time_mins))
+}
+
+async fn secs_handler() -> Html<String> {
+    let time_secs = TIME_SECS.lock().unwrap();
+    Html(format!("{:02?}", *time_secs))
+}
+
+async fn mins_up_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    *time_mins += 1;
+}
+
+async fn mins_down_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    if *time_mins > 0 {
+        *time_mins -= 1;
+    }
+}
+
 async fn clock_ticker() {
     loop {
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
@@ -294,7 +340,10 @@ async fn tstop_handler() {
 
 async fn chromargb_handler() -> Html<String> {
     let chromakey = CHROMAKEY.lock().unwrap();
-    Html(format!("<style>body {{ background-color: rgb({}, {}, {}); }}</style>", chromakey.0, chromakey.1, chromakey.2))
+    Html(format!(
+        "<style>body {{ background-color: rgb({}, {}, {}); }}</style>",
+        chromakey.0, chromakey.1, chromakey.2
+    ))
 }
 
 // endregion: --- Misc handelers
