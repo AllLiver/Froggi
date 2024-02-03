@@ -34,23 +34,29 @@ lazy_static! {
 
 #[tokio::main]
 async fn main() {
+    // region: --- Routing
+
     let app = Router::new() // Creates a new router
+        // Routes for the html files, css, and lib files
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
         .route("/chromakey", get(chroma_handler)) // Handles get requests for the chromakey page
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
+        // Routes to update the home team's info
         .route("/hu", post(hu_handler))
         .route("/hd", post(hd_handler))
         .route("/hu2", post(hu2_handler))
         .route("/hu3", post(hu3_handler))
         .route("/hp", put(hp_handler))
         .route("/home_png", get(home_img_handler))
+        // Routes to update the away team's info
         .route("/au", post(au_handler))
         .route("/ad", post(ad_handler))
         .route("/au2", post(au2_handler))
         .route("/au3", post(au3_handler))
         .route("/ap", put(ap_handler))
         .route("/away_png", get(away_img_handler))
+        // Routes to update the clock
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
@@ -60,17 +66,23 @@ async fn main() {
         .route("/mins_down", post(mins_down_handler))
         .route("/secs_up", post(secs_up_handler))
         .route("/secs_down", post(secs_down_handler))
+        // Route to update the team name with a POST form
         .route("/", post(tname_handler))
+        // Routes to display the team names
         .route("/hdisp", put(hdisp_handler))
         .route("/adisp", put(adisp_handler))
+        // Routes for the scoreboard's info and configuration
         .route("/chromargb", put(chromargb_handler))
         .route("/hname_score", put(hname_scoreboard_handler))
         .route("/aname_score", put(aname_scoreboard_handler))
         .route("/quarter", put(quarter_handler))
+        // Routes to update the quarter
         .route("/q1", post(quarter1_change))
         .route("/q2", post(quarter2_change))
         .route("/q3", post(quarter3_change))
         .route("/q4", post(quarter4_change));
+
+    // endregion: --- Routing
 
     tokio::spawn(clock_ticker());
     tokio::spawn(read_or_create_config());
