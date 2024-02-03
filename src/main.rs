@@ -2,14 +2,22 @@ use axum::{
     body::Body,
     http::Response,
     response::{Html, IntoResponse},
-    routing::{get, post},
-    Router,
+    routing::{get, post, put},
+    Router
 };
+
+use lazy_static::lazy_static;
+use std::sync::Mutex;
+
 use hyper::header::CONTENT_TYPE;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
 const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
+
+lazy_static! {
+    static ref COUNTER: Mutex<i32> = Mutex::new(0);
+}
 
 #[tokio::main]
 async fn main() {
@@ -17,7 +25,8 @@ async fn main() {
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler))
-        .route("/hu", post(hu_handler)); // Handles get requests for the htmx library
+        .route("/hu", post(hu_handler)) // Handles get requests for the htmx library
+        .route("/hp", put(hp_handler));
 
     println!("Listening on: {}\n", ADDR);
     let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap(); // Binds the listener to the address
@@ -50,5 +59,12 @@ async fn htmx_handler() -> impl IntoResponse {
 
 
 async fn hu_handler() {
-    println!("Home point up");
+    let mut counter = COUNTER.lock().unwrap();
+    *counter += 1;
+    println!("Home point up, points: {}", *counter);
+}
+
+async fn hp_handler() -> Html<String> {
+    let counter = COUNTER.lock().unwrap();
+    Html(format!("Points: {}", *counter))
 }
