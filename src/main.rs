@@ -1,5 +1,5 @@
 use axum::{
-    body::Body, http::Response, response::{Html, IntoResponse, Redirect}, routing::{get, post, put}, Form, Router, extract::Multipart
+    body::Body, http::Response, response::{Html, IntoResponse}, routing::{get, post, put}, Form, Router, extract::Multipart
 };
 
 use lazy_static::lazy_static;
