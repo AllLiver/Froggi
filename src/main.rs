@@ -1,9 +1,5 @@
 use axum::{
-    body::Body,
-    http::Response,
-    response::{Html, IntoResponse, Redirect},
-    routing::{get, post, put},
-    Form, Router,
+    body::Body, http::Response, response::{Html, IntoResponse, Redirect}, routing::{get, post, put}, Form, Json, Router
 };
 
 use lazy_static::lazy_static;
@@ -57,6 +53,10 @@ async fn main() {
         .route("/ap", put(ap_handler))
         .route("/away_png", get(away_img_handler))
         // Routes to update the clock
+        .route("/qt8", post(quick_time8_handler))
+        .route("/qt5", post(quick_time5_handler))
+        .route("/qt3", post(quick_time3_handler))
+        .route("/qt1", post(quick_time1_handler))
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
@@ -293,6 +293,40 @@ async fn ap_handler() -> Html<String> {
 // endregion: --- Away Handlers
 // region: --- Clock handlers
 
+#[derive(Deserialize)]
+struct QuickTime {
+    mins: i32,
+    secs: i32
+}
+
+async fn quick_time8_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_secs = TIME_SECS.lock().unwrap();
+    *time_mins = 8;
+    *time_secs = 0;
+}
+
+async fn quick_time5_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_secs = TIME_SECS.lock().unwrap();
+    *time_mins = 5;
+    *time_secs = 0;
+}
+
+async fn quick_time3_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_secs = TIME_SECS.lock().unwrap();
+    *time_mins = 3;
+    *time_secs = 0;
+}
+
+async fn quick_time1_handler() {
+    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_secs = TIME_SECS.lock().unwrap();
+    *time_mins = 1;
+    *time_secs = 0;
+}
+
 async fn time_handler() -> Html<String> {
     let time_mins = TIME_MINS.lock().unwrap();
     let time_secs = TIME_SECS.lock().unwrap();
@@ -430,6 +464,10 @@ async fn quarter4_change() {
 
 // endregion: --- Quarter handlers
 // region: --- Misc handelers
+
+//async fn test_handler() {
+//    println!(" -> TEST: test");
+//}
 
 async fn chromargb_handler() -> Html<String> {
     let chromakey = CHROMAKEY.lock().unwrap();
