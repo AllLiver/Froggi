@@ -391,7 +391,7 @@ input[type="text"] {
 
 .logo-upload {
     max-width: 500px;
-    margin: 0 auto;
+    margin: 70px auto 0;
     background-color: #242424;
     padding: 20px;
     border-radius: 10px;
@@ -422,4 +422,44 @@ input[type="file"] {
 
 #file-submit:hover {
     background-color: #45a049;
+}
+
+#name-form {
+    margin-top: 50px; /* Adjust this value as needed */
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #242424;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#name-form label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+#name-form input[type="text"] {
+    margin-bottom: 10px;
+}
+
+#name-form .team-input {
+    margin-bottom: 15px;
+}
+
+#name-form #name-submit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#name-form #name-submit:hover {
+    background-color: #45a049;
+}
+
+#logo-form {
+    margin-bottom: 30px; 
 }
