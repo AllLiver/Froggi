@@ -29,7 +29,7 @@ lazy_static! {
     static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
     static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
     static ref QUARTER: Mutex<i32> = Mutex::new(1);
-    static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(true);
+    static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
 }
 
 #[tokio::main]
@@ -76,11 +76,13 @@ async fn main() {
         .route("/hname_score", put(hname_scoreboard_handler))
         .route("/aname_score", put(aname_scoreboard_handler))
         .route("/quarter", put(quarter_handler))
-        // Routes to update the quarter
+        .route("/show_quarter", post(quarter_show_handler))
+        // Routes to change quarter info
         .route("/q1", post(quarter1_change))
         .route("/q2", post(quarter2_change))
         .route("/q3", post(quarter3_change))
-        .route("/q4", post(quarter4_change));
+        .route("/q4", post(quarter4_change))
+        .route("/show_quarter_css", put(show_quarter_css_handler));
 
     // endregion: --- Routing
 
@@ -367,9 +369,41 @@ async fn tstop_handler() {
 // endregion: --- Clock handlers
 // region: --- Quarter handlers
 
-async fn quarter_handler() -> Html<String> {
+async fn quarter_handler() -> Html<&'static str> {
     let quarter = QUARTER.lock().unwrap();
-    Html(format!("{}", *quarter))
+    if *SHOW_QUARTER.lock().unwrap() {
+        if *quarter == 1 {
+            return Html("1st");
+        } else if *quarter == 2 {
+            return Html("2nd");
+        } else if *quarter == 3 {
+            return Html("3rd");
+        } else if *quarter == 4 {
+            return Html("4th");
+        } else {
+            return Html("Q");
+        }
+    } else {
+        return Html("");
+    }
+}
+
+async fn quarter_show_handler() {
+    let mut show_quarter = SHOW_QUARTER.lock().unwrap();
+    if *show_quarter {
+        *show_quarter = false;
+    } else {
+        *show_quarter = true;
+    }
+}
+
+async fn show_quarter_css_handler() -> Html<&'static str> {
+    let show_quarter = SHOW_QUARTER.lock().unwrap();
+    if *show_quarter {
+        return Html("<style> #show-quarter {background-color: rgb(44, 194, 194); } </style>");
+    } else {
+        return Html("<style> background-color: #e9981f; } </style>");
+    }
 }
 
 async fn quarter1_change() {
