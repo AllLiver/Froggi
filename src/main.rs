@@ -36,6 +36,7 @@ async fn main() {
         // Routes for the html files, css, and lib files
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
         .route("/chromakey", get(chroma_handler)) // Handles get requests for the chromakey page
+        .route("/upload", get(upload_page_handler)) // Handles get requests for the upload page
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
         // Routes to update the home team's info
@@ -141,6 +142,11 @@ async fn idx_handler() -> Html<&'static str> {
 async fn chroma_handler() -> Html<&'static str> {
     println!(" -> SERVE: chromakey.html");
     Html(include_str!("html/scoreboard/chromakey.html"))
+}
+
+async fn upload_page_handler() -> Html<&'static str> {
+    println!(" -> SERVE: upload.html");
+    Html(include_str!("html/logo_upload/upload.html"))
 }
 
 async fn css_handler() -> impl IntoResponse {
