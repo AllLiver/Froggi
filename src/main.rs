@@ -1,5 +1,5 @@
 use axum::{
-    body::Body, http::Response, response::{Html, IntoResponse, Redirect}, routing::{get, post, put}, Form, Json, Router
+    body::Body, http::Response, response::{Html, IntoResponse, Redirect}, routing::{get, post, put}, Form, Router
 };
 
 use lazy_static::lazy_static;
@@ -292,12 +292,6 @@ async fn ap_handler() -> Html<String> {
 
 // endregion: --- Away Handlers
 // region: --- Clock handlers
-
-#[derive(Deserialize)]
-struct QuickTime {
-    mins: i32,
-    secs: i32
-}
 
 async fn quick_time8_handler() {
     let mut time_mins = TIME_MINS.lock().unwrap();
