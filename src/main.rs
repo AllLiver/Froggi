@@ -136,7 +136,7 @@ async fn main() {
         });
 
     if let Err(err) = server.await {
-        eprintln!("server error: {}", err);
+        eprintln!(" -> ERROR: {}", err);
     }
     println!(" -> SERVER: gracefully shut down");
 }
