@@ -131,6 +131,7 @@
         <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
         <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
         <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
+        <button id="show-sponsor" hx-post="show_sponsor" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
     </div>
     <p id="ping">Ping: calculating...</p>
     <script>
@@ -156,11 +157,12 @@
         }
 
         quarters.forEach(function(quarter) {
-            quarter.addEventListener('click', function() {
-                removeActiveClass();
-                this.classList.add('active');
-            });
-        });
+    quarter.addEventListener('click', function() {
+        removeActiveClass();
+        this.classList.add('active');
+        document.getElementById('show_quarter').classList.remove('active');
+    });
+});
 
        document.querySelector('#name-form').addEventListener('submit', function (event) {
     event.preventDefault();
