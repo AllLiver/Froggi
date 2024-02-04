@@ -82,6 +82,7 @@ header li a:hover {
 
 /* Team Styles */
 .away, .home {
+    width: 200px; /* Set a fixed width for the boxes */
     border-style: solid;
     border-width: 2px;
     background-color: #1d1d1d;
@@ -91,6 +92,7 @@ header li a:hover {
     margin: 10px;
     border-radius: 5px;
 }
+
 
 .away {
     border-color: #cd25d3;
@@ -104,7 +106,16 @@ header li a:hover {
 .home button:nth-child(-n+4), .away button:nth-child(-n+4) {
     display: block;
     width: 100%;
-    box-sizing: border-box;
+    min-width: 100%; /* Set a minimum width for the boxes */
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
+.home button:nth-child(n+5), .away button:nth-child(n+5),
+.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
+    display: block;
+    width: 100%;
+    min-width: 100%; /* Set a minimum width for the boxes */
     margin: 10px 0;
     padding: 10px;
     font-size: 16px;
