@@ -181,6 +181,15 @@ input[type="text"], input[type="submit"] {
     color: white;
 }
 
+.logo-upload {
+    color: white;
+    display: block;
+}
+
+.logo-upload #file-submit {
+    display: block;
+}
+
 /* General Styles */
 body .timer-controls .timer-button {
     font-size: 20px !important;

@@ -20,5 +20,14 @@
         </ul>
     </header>
     <h1>File upload page</h1>
+    <form hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data">
+        <label for="home_img">Home Team Logo:</label>
+        <input type="file" name="home.png" id="home_img" accept="image/png"><br><br>
+
+        <label for="away_img">Away Team Logo:</label>
+        <input type="file" name="away.png" id="away_img" accept="image/png">
+
+        <input type="submit" value="Upload" id="file-submit">
+    </form>
 </body>
 </html>

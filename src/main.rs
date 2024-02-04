@@ -1,16 +1,18 @@
 use axum::{
-    body::Body, http::Response, response::{Html, IntoResponse, Redirect}, routing::{get, post, put}, Form, Router
+    body::Body, http::Response, response::{Html, IntoResponse, Redirect}, routing::{get, post, put}, Form, Router, extract::Multipart
 };
 
 use lazy_static::lazy_static;
 use std::{path::Path, sync::Mutex};
 
-use hyper::header::CONTENT_TYPE;
+use hyper::{header::CONTENT_TYPE, StatusCode};
 use mime::IMAGE_PNG;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
 use serde::Deserialize;
+
+use futures_util::stream::StreamExt;
 
 const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
@@ -85,7 +87,9 @@ async fn main() {
         .route("/q2", post(quarter2_change))
         .route("/q3", post(quarter3_change))
         .route("/q4", post(quarter4_change))
-        .route("/show_quarter_css", put(show_quarter_css_handler));
+        .route("/show_quarter_css", put(show_quarter_css_handler))
+        // Routes for the file upload
+        .route("/logo_upload", post(logo_upload_handler));
 
     // endregion: --- Routing
 
@@ -463,6 +467,28 @@ async fn quarter4_change() {
 }
 
 // endregion: --- Quarter handlers
+// region: --- File upload handlers
+
+#[derive(Deserialize)]
+struct FileUpload {
+    filename: String,
+    data: Vec<u8>
+}
+
+
+async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
+    while let Some(field) = payload.next_field().await.unwrap() {
+        let name = field.name().unwrap().to_string();
+        let data = field.bytes().await.unwrap();
+
+        println!("Length of {} is {} bytes", name, data.len());
+        tokio::fs::write(Path::new(&name), data).await.unwrap();
+    }
+
+    StatusCode::OK
+}
+
+// endregion: --- File upload handlers
 // region: --- Misc handelers
 
 //async fn test_handler() {
