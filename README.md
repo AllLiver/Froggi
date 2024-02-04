@@ -1,5 +1,5 @@
 # FOSSO
-FOSSO or Free & Open Source Scoreboard Overlay is an indev program that is designed to overlaying a clean customnizable overlay on a live stream.
+FOSSO or Free & Open Source Scoreboard Overlay is an indev program that is designed to overlay a clean customnizable overlay on a live stream.
 
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
@@ -13,3 +13,10 @@ Run this command in the same directory as the cloned repository
 cargo build --release
 ```
 The compiled binary will be in /target/release
+
+# Roadmap
+FOSSO is an indev project so there is lots likely to change
+Here are some features/updates planned
+ - Fix naming in API and frontend
+ - Add a sponsor roll in the bottom right (that can be turned on and off)
+ - Add savable school configurations with their pictures, names, and colors
