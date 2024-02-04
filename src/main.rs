@@ -522,7 +522,7 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
         let name = field.name().unwrap().to_string();
         let data = field.bytes().await.unwrap();
 
-        println!("Length of {} is {} bytes", name, data.len());
+        println!(" -> LOGO: recieved {}\n\tLENGTH: {}", name, data.len());
         tokio::fs::write(Path::new(&name), data).await.unwrap();
 
         let img = image::open(&name).unwrap();
