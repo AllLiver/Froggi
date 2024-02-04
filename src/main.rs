@@ -180,14 +180,12 @@ struct UpdNames {
     away: String,
 }
 
-async fn tname_handler(Form(names): Form<UpdNames>) -> Redirect {
+async fn tname_handler(Form(names): Form<UpdNames>)  {
     println!(" -> TEAMS: update names: {} - {}", names.home, names.away);
     let mut home_name = HOME_NAME.lock().unwrap();
     let mut away_name = AWAY_NAME.lock().unwrap();
     *home_name = names.home;
     *away_name = names.away;
-
-    Redirect::to("/")
 }
 
 async fn hdisp_handler() -> Html<String> {
@@ -475,8 +473,8 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
         println!("Length of {} is {} bytes", name, data.len());
         tokio::fs::write(Path::new(&name), data).await.unwrap();
 
-        let img_dimensions = image::image_dimensions(&name).unwrap();
-        println!(" -> IMG: {:?}", img_dimensions);
+        //let img_dimensions = image::image_dimensions(&name).unwrap();
+        //println!(" -> IMG: {:?}", img_dimensions);
     }
 
     StatusCode::OK
