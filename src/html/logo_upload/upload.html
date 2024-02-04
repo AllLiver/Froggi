@@ -76,7 +76,7 @@
     </header>
 
 <!-- Logo Upload Form -->
-<form id="logo-form" hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data"
+<form id="logo-form" hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none"
         onsubmit="return submitForm(event);">
         <label for="home_img">Home Team Logo:</label>
         <input type="file" name="home.png" id="home_img" accept="image/png"
