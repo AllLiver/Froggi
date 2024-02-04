@@ -26,42 +26,59 @@ button {
     cursor: pointer;
     border-radius: 3%;
 }
+/* Header Styles */
 
-/* Top Navigation Styles */
-.topnav {
-    background-color: #1d1d1d;
+header ul {
+    list-style-type: none;
+    margin: 10;
+    padding: 0;
     overflow: hidden;
-    position: fixed; 
-    width: 100%; 
-    top: 0; 
-    line-height: 20px;
+    position: fixed;
+    top: 0;
+    right: 0;
 }
 
-.topnav a {
+header li {
     float: left;
-    color: #ffffff;
+}
+
+header li a {
+    display: block;
+    color: white;
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-    font-size: 17px;
-    line-height: 20px; 
 }
 
-.topnav a:hover {
-    background-color: #ffffff;
-    color: black;
+header li a:hover {
+    background-color: #111;
 }
+  
 
-.topnav a.active {
-    background-color: #58a2f7;
-    color: white;
-}
-
-.topnav p {
-    text-align: right;
-    color: white;
-    padding-right: 30px;
-}
+  header ul {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  header ul li {
+    list-style: none;
+    margin-left: 20px;
+  }
+  
+  header ul li a {
+    text-decoration: none;
+    padding: 6px 15px;
+    color: #fff;
+    border-radius: 20px;
+  }
+  
+  header ul li a:hover,
+  header ul li a.active4 {
+    background: #fff;
+    color: #1e1e1e;
+  }
+  
 
 /* Team Styles */
 .away, .home {
@@ -192,11 +209,21 @@ button.active {
 
 .score-box {
     width: 5%;
+    display: flex;
+    font-family: 'Protest Strike', cursive;
+    justify-content: center;
+    align-items: center;
 }
 
 .clock-box {
-    width: 10%;
+    width: 7%;
+    display: flex;
+    font-family: 'Protest Strike', cursive;
+    justify-content: center;
+    align-items: center;
 }
+
+
 
 /* Timer Styles */
 .timer {
@@ -260,5 +287,10 @@ input[type="text"] {
 }
 
 .quarters {
-    display: inline;
+    width: 10%;
+    width: 7%;
+    display: flex;
+    font-family: 'Protest Strike', cursive;
+    justify-content: center;
+    align-items: center;
 }

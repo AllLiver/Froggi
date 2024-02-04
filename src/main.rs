@@ -402,9 +402,9 @@ async fn quarter_show_handler() {
 async fn show_quarter_css_handler() -> Html<&'static str> {
     let show_quarter = SHOW_QUARTER.lock().unwrap();
     if *show_quarter {
-        return Html("<style> #show-quarter { background-color: rgb(44, 194, 194); } </style>");
+        return Html("<style> #show-quarter { background-color: rgb(44, 194, 46); } </style>");
     } else {
-        return Html("<style> #show-quarter { background-color: #e9981f; } </style>");
+        return Html("<style> #show-quarter { background-color: #2cc22e; } </style>");
     }
 }
 
