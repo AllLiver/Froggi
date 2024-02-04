@@ -12,8 +12,6 @@ use mime::TEXT_JAVASCRIPT;
 
 use serde::Deserialize;
 
-use futures_util::stream::StreamExt;
-
 const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
@@ -468,13 +466,6 @@ async fn quarter4_change() {
 
 // endregion: --- Quarter handlers
 // region: --- File upload handlers
-
-#[derive(Deserialize)]
-struct FileUpload {
-    filename: String,
-    data: Vec<u8>
-}
-
 
 async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
     while let Some(field) = payload.next_field().await.unwrap() {
