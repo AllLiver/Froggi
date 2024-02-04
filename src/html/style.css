@@ -170,6 +170,15 @@ button.active {
     border-radius: 4%;
 }
 
+.score-box {
+    text-align: center;
+}
+
+.clock-box {
+    display: inline;
+    text-align: center;
+}
+
 .home-box, .away-box {
     width: 15%;
     font-family: 'Protest Strike', sans-serif;
@@ -248,4 +257,8 @@ input[type="text"] {
 
 .logo {
     margin-right: 20px;
+}
+
+.quarters {
+    display: inline;
 }

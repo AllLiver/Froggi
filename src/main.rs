@@ -20,8 +20,8 @@ const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
 lazy_static! {
-    static ref HOME_NAME: Mutex<String> = Mutex::new(String::from("home_name"));
-    static ref AWAY_NAME: Mutex<String> = Mutex::new(String::from("home_name"));
+    static ref HOME_NAME: Mutex<String> = Mutex::new(String::from("team_name"));
+    static ref AWAY_NAME: Mutex<String> = Mutex::new(String::from("team_name"));
     static ref HOME_POINTS: Mutex<i32> = Mutex::new(0);
     static ref AWAY_POINTS: Mutex<i32> = Mutex::new(0);
     static ref TIME_MINS: Mutex<i32> = Mutex::new(8);
@@ -73,6 +73,8 @@ async fn main() {
         .route("/adisp", put(adisp_handler))
         // Routes for the scoreboard's info and configuration
         .route("/chromargb", put(chromargb_handler))
+        .route("/score", put(score_handler))
+        .route("/time_and_quarter", put(time_and_quarter_handler))
         .route("/hname_score", put(hname_scoreboard_handler))
         .route("/aname_score", put(aname_scoreboard_handler))
         .route("/quarter", put(quarter_handler))
@@ -435,6 +437,34 @@ async fn chromargb_handler() -> Html<String> {
         "<style>body {{ background-color: rgb({}, {}, {}); }}</style>",
         chromakey.0, chromakey.1, chromakey.2
     ))
+}
+
+async fn score_handler() -> Html<String> {
+    let home_points = HOME_POINTS.lock().unwrap();
+    let away_points = AWAY_POINTS.lock().unwrap();
+    Html(format!("{} - {}", home_points, away_points))
+}
+
+async fn time_and_quarter_handler() -> Html<String> {
+    let time_mins = TIME_MINS.lock().unwrap();
+    let time_secs = TIME_SECS.lock().unwrap();
+    let quarter = QUARTER.lock().unwrap();
+    let show_quarter = SHOW_QUARTER.lock().unwrap();
+    if *show_quarter {
+        if *quarter == 1 {
+            return Html(format!("{}:{:02?} - 1st", time_mins, time_secs));
+        } else if *quarter == 2 {
+            return Html(format!("{}:{:02?} - 2nd", time_mins, time_secs));
+        } else if *quarter == 3 {
+            return Html(format!("{}:{:02?} - 3rd", time_mins, time_secs));
+        } else if *quarter == 4 {
+            return Html(format!("{}:{:02?} - 4th", time_mins, time_secs));
+        } else {
+            return Html(format!("{}:{:02?} - q{}", time_mins, time_secs, quarter));
+        }
+    } else {
+        return Html(format!("{}:{:02?}", time_mins, time_secs));
+    } 
 }
 
 // endregion: --- Misc handelers
