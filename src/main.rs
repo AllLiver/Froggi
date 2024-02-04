@@ -114,7 +114,7 @@ async fn main() {
 
     let listen_addr: String = listen_addr.clone();
 
-    println!("Listening on: {}\nType \"exit\" to do shut down the server", listen_addr);
+    println!("Listening on: {}\nType \"stop\" to do shut down the server gracefully\n", listen_addr);
     let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
 
     let (tx, rx) = tokio::sync::oneshot::channel();
