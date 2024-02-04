@@ -7,6 +7,21 @@
     <link rel="stylesheet" type="text/css" href="./style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+        .white-boxes-container {
+          transform: translateY(-90px);
+        }
+             /* Hide scrollbar for Chrome, Safari and Opera */
+    ::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Hide scrollbar for IE, Edge and Firefox */
+    * {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    </style>
+    
     </style>
     <script src="./htmx.min.js"></script>
     <script>
@@ -27,23 +42,9 @@
             <li><a href="#" class="active4">Dashboard</a></li>
             <li><a href="/chromakey" target="_blank">Overlay</a></li>
             <li><a href="#">Upload Logos</a></li>
-            <p id="ping">Ping: calculating...</p>
           </ul>
       </header>
 
-
-    <div class="names">
-        <form action="/" method="post" id="team-form">
-            <div class="team-input">
-                <label for="home">Home: </label>
-                <input type="text" id="home" name="home" maxlength="8" onblur="submitForm()">
-            </div>
-            <div class="team-input">
-                <label for="away">Away: </label>
-                <input type="text" id="away" name="away" maxlength="8" onblur="submitForm()">
-            </div>
-        </form>
-    </div>
 
     <div class="score-container">
         <div class="home">
@@ -56,7 +57,6 @@
             <button hx-post="/hu2" hx-swap="none">2 Points</button>
             <button hx-post="/hu3" hx-swap="none">3 Points</button>
         </div>
-        
    
         <div class="timer">
             <div class="quick-timer-buttons">
@@ -102,7 +102,43 @@
             <button hx-post="/au3" hx-swap="none">Add 3 Points</button>
         </div>
     </div>
-    <h2>Quarter</h2>
+
+        
+    <div class="score-container">
+        <div class="team-container">
+            <div class="team-input">
+                <label for="home">Home Name: </label>
+                <input type="text" id="home" name="home" maxlength="8" onblur="submitForm()">
+            </div>
+        </div>
+    
+        <div class="team-container">
+            <div class="team-input">
+                <label for="away">Away Name: </label>
+                <input type="text" id="away" name="away" maxlength="8" onblur="submitForm()">
+            </div>
+        </div>
+    </div>
+
+    <div class="white-boxes-container">
+    <div class="home-box">
+        <img class="logo" src="home_png" alt="Home Team Logo" width="40" height="30"> 
+        <div class="team-name" hx-put="/hname_score" hx-trigger="every 10ms"></div>
+    </div>
+    
+    <div class="score-box" hx-put="/score" hx-trigger="every 10ms"></div>
+    
+    <div class="away-box">
+        <img class="logo" src="away_png" alt="Away Team Logo" width="25" height="25"> 
+        <div class="team-name" hx-put="/aname_score" hx-trigger="every 10ms"></div>
+    </div>
+    
+    <div class="clock-box">
+        <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
+    </div>
+</div>
+
+
     <div class="quarter-container">
         <button id="show-quarter" hx-post="show_quarter" hx-swap="none">Show quarter</button>
         <button id="quarter1" hx-post="/q1" hx-swap="none">Quarter 1</button>
@@ -110,7 +146,7 @@
         <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
         <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
     </div>
-
+    <p id="ping">Ping: calculating...</p>
     <script>
         htmx.on('#startButton', 'htmx:afterRequest', function() {
             document.getElementById('startButton').classList.add('selected');

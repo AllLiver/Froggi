@@ -95,11 +95,11 @@ header li a:hover {
 
 
 .away {
-    border-color: #cd25d3;
+    border-color: #d32559;
 }
 
 .home {
-    border-color: #5364c7;
+    border-color: #5393c7;
 }
 
 .home button:nth-child(n+5), .away button:nth-child(n+5),
@@ -124,7 +124,7 @@ header li a:hover {
 /* Timer Styles */
 .timer {
     width: 40%;
-    border: 2px solid #cf6a6a;
+    border: 2px solid #e99d3a;
     padding: 20px;
     margin: 10px 0;
     background-color: #242424;
@@ -148,6 +148,7 @@ header li a:hover {
 .score-container {
     display: flex;
     justify-content: space-around;
+    margin-top: 40px;
 }
 
 .team-form {
@@ -167,9 +168,18 @@ input[type="text"], input[type="submit"] {
 }
 
 
+#ping {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: for better visibility */
+    color: white; /* Optional: for better visibility */
+}
 
-
-
+.team-input label {
+    color: white;
+}
 
 /* General Styles */
 body .timer-controls .timer-button {
@@ -235,7 +245,16 @@ button.active {
     align-items: center;
 }
 
+.score-container {
+    display: flex;
+    justify-content: space-between;
+}
 
+.team-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 /* Timer Styles */
 .timer {
@@ -272,7 +291,7 @@ button.active {
 
 .quick-timer-buttons button {
     font-size: 1.2em;
-    margin: 0 15px;
+    margin: 0 15px 10px 15px; /* Add margin to the right and bottom of each button */
 }
 
 
