@@ -106,22 +106,26 @@
 
 
     <div class="white-boxes-container">
-    <div class="home-box">
-        <img class="logo" src="home_png" alt="Home Team Logo" width="40" height="30"> 
-        <div class="team-name" hx-put="/hname_score" hx-trigger="every 10ms"></div>
+        <div class="home-box">
+            <img class="logo" src="home_png" alt="Home Team Logo" width="40" height="30"> 
+            <div class="team-name" hx-put="/hname_score" hx-trigger="every 10ms"></div>
+        </div>
+        
+        <div class="score-box" hx-put="/score" hx-trigger="every 10ms"></div>
+        
+        <form id="name-form" hx-post="/" hx-swap="none">
+        </form>
+        
+        <div class="away-box">
+            <img class="logo" src="away_png" alt="Away Team Logo" width="25" height="25"> 
+            <div class="team-name" hx-put="/aname_score" hx-trigger="every 10ms"></div>
+        </div>
+        
+        <div class="clock-box">
+            <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
+        </div>
     </div>
     
-    <div class="score-box" hx-put="/score" hx-trigger="every 10ms"></div>
-    
-    <div class="away-box">
-        <img class="logo" src="away_png" alt="Away Team Logo" width="25" height="25"> 
-        <div class="team-name" hx-put="/aname_score" hx-trigger="every 10ms"></div>
-    </div>
-    
-    <div class="clock-box">
-        <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
-    </div>
-</div>
 
 
     <div class="quarter-container">
@@ -133,32 +137,26 @@
     </div>
     <p id="ping">Ping: calculating...</p>
     <script>
-        htmx.on('#startButton', 'htmx:afterRequest', function() {
-            document.getElementById('startButton').classList.add('selected');
-            document.getElementById('stopButton').classList.remove('selected');
-        });
+       document.querySelector('#name-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var homeName = document.getElementById('homeName').value;
+    var awayName = document.getElementById('awayName').value;
+    if (homeName && awayName) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/name_submit", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function () {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                console.log("Name submit request finished and response is ready.");
 
-        htmx.on('#stopButton', 'htmx:afterRequest', function() {
-            document.getElementById('stopButton').classList.add('selected');
-            document.getElementById('startButton').classList.remove('selected');
-        });
-
-       
-        
-        var quarters = document.querySelectorAll('.quarter-container button');
-
-        function removeActiveClass() {
-            quarters.forEach(function(quarter) {
-                quarter.classList.remove('active');
-            });
-        }
-
-        quarters.forEach(function(quarter) {
-            quarter.addEventListener('click', function() {
-                removeActiveClass();
-                this.classList.add('active');
-            });
-        });
+                // Update the names on the page.
+                document.getElementById('homeNameDisplay').textContent = homeName;
+                document.getElementById('awayNameDisplay').textContent = awayName;
+            }
+        };
+        xhr.send("homeName=" + homeName + "&awayName=" + awayName);
+    }
+});
     </script>
 </body>
 </html>
