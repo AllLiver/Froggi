@@ -232,7 +232,7 @@ button.active {
     font-family: 'Protest Strike', sans-serif;
     display: flex;
     align-items: center;
-    margin-right: 20px;
+
 }
 
 .score-box, .clock-box {
