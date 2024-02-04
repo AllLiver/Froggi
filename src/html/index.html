@@ -8,7 +8,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
         .white-boxes-container {
-          transform: translateY(-90px);
+          transform: translateY(-10px);
         }
         
         /* Hide scrollbar for Chrome, Safari and Opera */
@@ -42,7 +42,7 @@
         <ul>
             <li><a href="#" class="active4">Dashboard</a></li>
             <li><a href="/chromakey" target="_blank">Overlay</a></li>
-            <li><a href="/upload">Upload Logos</a></li>
+            <li><a href="/upload" target="_blank">Upload</a></li>
         </ul>
     </header>
 
@@ -104,22 +104,6 @@
         </div>
     </div>
 
-        
-    <div class="score-container">
-        <div class="team-container">
-            <div class="team-input">
-                <label for="home">Home Name: </label>
-                <input type="text" id="home" name="home" maxlength="8" onblur="submitForm()">
-            </div>
-        </div>
-    
-        <div class="team-container">
-            <div class="team-input">
-                <label for="away">Away Name: </label>
-                <input type="text" id="away" name="away" maxlength="8" onblur="submitForm()">
-            </div>
-        </div>
-    </div>
 
     <div class="white-boxes-container">
     <div class="home-box">
@@ -159,13 +143,7 @@
             document.getElementById('startButton').classList.remove('selected');
         });
 
-        function submitForm() {
-            var home = document.getElementById('home').value;
-            var away = document.getElementById('away').value;
-            if (home && away) {
-                document.getElementById('team-form').submit();
-            }
-        }
+       
 
         var quarters = document.querySelectorAll('.quarter-container button');
 

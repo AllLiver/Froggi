@@ -173,8 +173,8 @@ input[type="text"], input[type="submit"] {
     bottom: 0;
     right: 0;
     padding: 10px;
-    background-color: rgba(0, 0, 0, 0.5); /* Optional: for better visibility */
-    color: white; /* Optional: for better visibility */
+    background-color: rgba(0, 0, 0, 0.5); 
+    color: white; 
 }
 
 .team-input label {
@@ -232,6 +232,7 @@ button.active {
     font-family: 'Protest Strike', sans-serif;
     display: flex;
     align-items: center;
+    margin-right: 20px;
 }
 
 .score-box, .clock-box {
@@ -263,6 +264,8 @@ button.active {
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    z-index: 1000;
 }
 
 /* Timer Styles */
@@ -346,9 +349,6 @@ button.active {
 }
 
 
-
-
-
 /* Team Styles */
 .team-form {
     display: flex;
@@ -374,6 +374,7 @@ input[type="text"] {
 
 .logo {
     margin-right: 20px;
+    margin-left: 20px;
 }
 
 .quarters {
@@ -383,4 +384,42 @@ input[type="text"] {
     font-family: 'Anton', sans-serif;
     justify-content: center;
     align-items: center;
+}
+
+/* File Upload */
+
+
+.logo-upload {
+    max-width: 500px;
+    margin: 0 auto;
+    background-color: #242424;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="file"] {
+    margin-bottom: 10px;
+}
+
+.team-input {
+    margin-bottom: 15px;
+}
+
+#file-submit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#file-submit:hover {
+    background-color: #45a049;
 }
