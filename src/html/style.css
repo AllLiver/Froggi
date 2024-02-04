@@ -360,7 +360,7 @@ input[type="text"] {
 }
 
 .team-name {
-    font-family: 'Protest Strike', cursive;
+    font-family: 'Anton', sans-serif;
 }
 
 .logo {
@@ -371,7 +371,7 @@ input[type="text"] {
     width: 10%;
     width: 7%;
     display: flex;
-    font-family: 'Protest Strike', cursive;
+    font-family: 'Anton', sans-serif;
     justify-content: center;
     align-items: center;
 }
