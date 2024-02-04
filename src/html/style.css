@@ -126,6 +126,7 @@ header li a:hover {
     justify-content: center;
 }
 
+
 /* Other Styles */
 .names {
     font-size: 20px;
@@ -227,37 +228,87 @@ button.active {
 
 /* Timer Styles */
 .timer {
-    text-align: center;
+    width: 60%;
+    padding: 30px;
+    margin: 20px 0;
+    background-color: #242424;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }
+
+.timer-controls {
+    display: flex;
+    justify-content: center; 
+    margin-bottom: 20px;
+}
+
+.timer-controls + .timer-controls {
+    margin-top: 10px; 
+}
+
+.quick-timer-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px; /* Add margin between quick boxes */
+}
+
+.quick-timer-buttons button {
+    font-size: 1.2em;
+    margin: 0 15px;
+}
+
 
 .timer-elements {
     display: flex;
     align-items: center;
 }
 
-.timer-elements .mins-elements,
-.timer-elements .secs-elements {
-    display: flex;
-    align-items: center;
-}
-
-.timer-elements .mins-elements button,
-.timer-elements .secs-elements button {
-    margin-top: 5px;
-    padding: 8px 12px;
-}
-
-.timer-elements .secs-elements {
-    margin-left: 10px;
+.mins-elements,
+.secs-elements {
+    margin-right: 15px;
 }
 
 .colon {
-    margin: 0 5px;
+    font-size: 2em;
+    margin-right: 15px;
 }
 
-.timer-button.selected {
+.timer-button,
+.min-button,
+.min-minus-button {
+    font-size: 1.5em;
+    padding: 10px 20px;
+    margin: 0 5px; 
+}
+
+.timer-button.selected,
+.min-button.selected,
+.min-minus-button.selected {
     background-color: rgb(44, 194, 194);
 }
+
+.timer-controls .min-button,
+.timer-controls .min-minus-button {
+    font-size: 1.5em;
+    padding: 10px 15px;
+    margin: 0 5px; /* Add margin to the buttons */
+}
+
+.timer-controls .min-button.selected,
+.timer-controls .min-minus-button.selected {
+    background-color: rgb(44, 194, 194);
+}
+
+
+
+
 
 /* Team Styles */
 .team-form {
