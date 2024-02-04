@@ -19,15 +19,63 @@
             <li><a href="#" class="active4">Upload Logos</a></li>
         </ul>
     </header>
-    <h1>File upload page</h1>
-    <form hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none">
+    <form hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" onsubmit="return submitForm(event);" hx-swap="none">
         <label for="home_img">Home Team Logo:</label>
-        <input type="file" name="home.png" id="home_img" accept="image/png"><br><br>
+        <input type="file" name="home.png" id="home_img" accept="image/png" onchange="previewImage(this, 'home_preview')"><br>
+        <img id="home_preview" src="#" alt="Home Team Logo Preview" style="display:none; max-height: 50px; max-width: 50px;"><br>
 
         <label for="away_img">Away Team Logo:</label>
-        <input type="file" name="away.png" id="away_img" accept="image/png">
+        <input type="file" name="away.png" id="away_img" accept="image/png" onchange="previewImage(this, 'away_preview')">
+        <img id="away_preview" src="#" alt="Away Team Logo Preview" style="display:none; max-height: 50px; max-width: 50px;">
 
-        <input type="submit" value="Upload" id="file-submit">
+        <div class="team-input">
+            <label for="home">Home Name: </label>
+            <input type="text" id="home" name="home" maxlength="8">
+        </div>
+        <div class="team-input">
+            <label for="away">Away Name: </label>
+            <input type="text" id="away" name="away" maxlength="8">
+        </div>
+
+        <input type="submit" value="Submit" id="file-submit">
     </form>
+
+    <script>
+        function previewImage(input, previewId) {
+            var preview = document.getElementById(previewId);
+            var file = input.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+            }
+        }
+
+        function submitForm(event) {
+            event.preventDefault();
+            console.log("submitForm function called");
+            var home = document.getElementById('home').value;
+            var away = document.getElementById('away').value;
+            if (home && away) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.onreadystatechange = function() {
+                    if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                        console.log("Request finished and response is ready.");
+                    }
+                };
+                xhr.send("home=" + home + "&away=" + away);
+            }
+        }
+    </script>
 </body>
 </html>
