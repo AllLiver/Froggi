@@ -11,7 +11,20 @@
     </style>
     <script src="./htmx.min.js"></script>
     <script>
+        // NO TOUCHY ZONE
         document.addEventListener('DOMContentLoaded', function () {
+            // Define the previewImage function
+            window.previewImage = function(input, previewId) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        document.getElementById(previewId).src = e.target.result;
+                        document.getElementById(previewId).style.display = 'block';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+    
             document.querySelector('#logo-form').addEventListener('submit', function (event) {
                 event.preventDefault();
                 var home = document.getElementById('home_img').value;
@@ -28,7 +41,7 @@
                     xhr.send("home=" + home + "&away=" + away);
                 }
             });
-
+    
             document.querySelector('#name-form').addEventListener('submit', function (event) {
                 event.preventDefault();
                 var homeName = document.getElementById('homeName').value;
@@ -64,20 +77,21 @@
 
 <!-- Logo Upload Form -->
 <form id="logo-form" hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data"
-    onsubmit="return submitForm(event);">
-    <label for="home_img">Home Team Logo:</label>
-    <input type="file" name="home.png" id="home_img" accept="image/png"
-        onchange="previewImage(this, 'home_preview')"><br>
-    <img id="home_preview" src="#" alt="Home Team Logo Preview"
-        style="display:none; max-height: 50px; max-width: 50px;"><br>
+        onsubmit="return submitForm(event);">
+        <label for="home_img">Home Team Logo:</label>
+        <input type="file" name="home.png" id="home_img" accept="image/png"
+            onchange="previewImage(this, 'home_preview')"><br>
+        <img id="home_preview" src="#" alt="Home Team Logo Preview"
+            style="display:none; max-height: 50px; max-width: 50px;"><br>
 
-    <label for="away_img">Away Team Logo:</label>
-    <input type="file" name="away.png" id="away_img" accept="image/png"
-        onchange="previewImage(this, 'away_preview')">
-    <img id="away_preview" src="#" alt="Away Team Logo Preview"
-        style="display:none; max-height: 50px; max-width: 50px;">
-    <input type="submit" value="Submit" id="file-submit">
-</form>
+        <label for="away_img">Away Team Logo:</label>
+        <input type="file" name="away.png" id="away_img" accept="image/png"
+            onchange="previewImage(this, 'away_preview')">
+        <img id="away_preview" src="#" alt="Away Team Logo Preview"
+            style="display:none; max-height: 50px; max-width: 50px;">
+        <input type="submit" value="Submit" id="file-submit">
+    </form>
+
 
 <!-- Team Name Form -->
 <form id="name-form" hx-post="/name_submit" hx-swap="none">
