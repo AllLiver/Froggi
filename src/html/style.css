@@ -200,6 +200,10 @@ body .timer-controls .timer-button {
 button.active {
     background-color: rgb(44, 194, 194);
 }
+.active {
+    background-color:rgb(44, 194, 194);
+    color: white;
+}
 
 /* Box Styles */
 .white-boxes-container {
