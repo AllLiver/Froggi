@@ -19,6 +19,7 @@
         }
         setInterval(ping, 2000);
     </script>
+    <div hx-put="/show_quarter_css" hx-trigger="every 10ms"></div>
 </head>
 <body>
     <div class="topnav">
@@ -90,8 +91,9 @@
         </div>
     </div>
 
+    <h2>Quarter</h2>
+    <button id="show_quarter" hx-post="show_quarter" hx-swap="none">Show quarter</button>
     <div class="quarter-container">
-        <h2>Quarter</h2>
         <button id="quarter1" hx-post="/q1" hx-swap="none">Quarter 1</button>
         <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
         <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
