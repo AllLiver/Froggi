@@ -1,5 +1,10 @@
 use axum::{
-    body::Body, http::Response, response::{Html, IntoResponse}, routing::{get, post, put}, Form, Router, extract::Multipart
+    body::Body,
+    extract::Multipart,
+    http::Response,
+    response::{Html, IntoResponse},
+    routing::{get, post, put},
+    Form, Router,
 };
 
 use lazy_static::lazy_static;
@@ -12,7 +17,6 @@ use mime::TEXT_JAVASCRIPT;
 
 use serde::Deserialize;
 
-const ADDR: &'static str = "127.0.0.1:8080"; // Sets the address to listen on
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
 lazy_static! {
@@ -26,6 +30,7 @@ lazy_static! {
     static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
     static ref QUARTER: Mutex<i32> = Mutex::new(1);
     static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
+    static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
 }
 
 #[tokio::main]
@@ -92,10 +97,14 @@ async fn main() {
     // endregion: --- Routing
 
     tokio::spawn(clock_ticker());
-    tokio::spawn(read_or_create_config());
+    tokio::spawn(read_or_create_config()).await.unwrap();
 
-    println!("Listening on: {}\n", ADDR);
-    let listener = tokio::net::TcpListener::bind(ADDR).await.unwrap(); // Binds the listener to the address
+    let listen_addr = ADDR.lock().unwrap();
+
+    let listen_addr: String = listen_addr.clone();
+
+    println!("Listening on: {}\n", listen_addr);
+    let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
     axum::serve(listener, app).await.unwrap(); // Serves the app
     println!("Server stopped");
 }
@@ -107,14 +116,21 @@ async fn read_or_create_config() {
         Ok(cfg) => cfg,
         Err(_) => {
             println!(" -> CREATE: config file");
-            tokio::fs::write(CONFIG_FILE, "# FOSSO config file\nchromakey=0, 177, 64")
-                .await
-                .unwrap();
+            tokio::fs::write(
+                CONFIG_FILE,
+                "# FOSSO config file\nchromakey=0, 177, 64\nlisten_addr=0.0.0.0:8080",
+            )
+            .await
+            .unwrap();
             tokio::fs::read_to_string(CONFIG_FILE).await.unwrap()
         }
     };
 
-    let lines: Vec<&str> = config.split('\n').filter(|x| !x.starts_with("#")).collect();
+    let lines: Vec<String> = config
+        .split('\n')
+        .filter(|x| !x.starts_with("#"))
+        .map(|x| x.to_string())
+        .collect();
     println!(" -> CONFIG: {:?}", lines);
 
     for i in lines {
@@ -127,6 +143,10 @@ async fn read_or_create_config() {
                 let b: u8 = rgb[2].trim().parse().unwrap();
                 let mut chromakey = CHROMAKEY.lock().unwrap();
                 *chromakey = (r, g, b);
+            }
+            "listen_addr" => {
+                let mut addr = ADDR.lock().unwrap();
+                *addr = parts[1].trim().to_string();
             }
             _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
         }
@@ -180,7 +200,7 @@ struct UpdNames {
     away: String,
 }
 
-async fn tname_handler(Form(names): Form<UpdNames>)  {
+async fn tname_handler(Form(names): Form<UpdNames>) {
     println!(" -> TEAMS: update names: {} - {}", names.home, names.away);
     let mut home_name = HOME_NAME.lock().unwrap();
     let mut away_name = AWAY_NAME.lock().unwrap();
@@ -475,20 +495,21 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
 
         let img = image::open(&name).unwrap();
         let img_dimensions = image::image_dimensions(&name).unwrap();
-        
+
         println!(" -> IMG: {:?}", img_dimensions);
 
         let height = img_dimensions.1 as f32;
         let width = img_dimensions.0 as f32;
 
-        let resize_ratio = 30.0 / height; 
+        let resize_ratio = 30.0 / height;
         println!(" -> RESIZE: {}%", resize_ratio * 100.0);
 
         let height: u32 = (height * resize_ratio) as u32;
         let width: u32 = (width * resize_ratio) as u32;
 
         println!(" -> RESIZE {}x{}", height, width);
-        let resized = image::imageops::resize(&img, width, height, image::imageops::FilterType::Lanczos3);
+        let resized =
+            image::imageops::resize(&img, width, height, image::imageops::FilterType::Lanczos3);
 
         resized.save(Path::new(&name)).unwrap();
 
@@ -538,12 +559,10 @@ async fn time_and_quarter_handler() -> Html<String> {
         }
     } else {
         return Html(format!("{}:{:02?}", time_mins, time_secs));
-    } 
+    }
 }
 
 // endregion: --- Misc handelers
 // region: --- Misc fn's
-
-
 
 // endregion: --- Misc fn's
