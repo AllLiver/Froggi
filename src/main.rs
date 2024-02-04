@@ -473,8 +473,26 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
         println!("Length of {} is {} bytes", name, data.len());
         tokio::fs::write(Path::new(&name), data).await.unwrap();
 
-        //let img_dimensions = image::image_dimensions(&name).unwrap();
-        //println!(" -> IMG: {:?}", img_dimensions);
+        let img = image::open(&name).unwrap();
+        let img_dimensions = image::image_dimensions(&name).unwrap();
+        
+        println!(" -> IMG: {:?}", img_dimensions);
+
+        let height = img_dimensions.1 as f32;
+        let width = img_dimensions.0 as f32;
+
+        let resize_ratio = 30.0 / height; 
+        println!(" -> RESIZE: {}%", resize_ratio * 100.0);
+
+        let height: u32 = (height * resize_ratio) as u32;
+        let width: u32 = (width * resize_ratio) as u32;
+
+        println!(" -> RESIZE {}x{}", height, width);
+        let resized = image::imageops::resize(&img, width, height, image::imageops::FilterType::Lanczos3);
+
+        resized.save(Path::new(&name)).unwrap();
+
+        println!(" -> RESIZE: done");
     }
 
     StatusCode::OK
