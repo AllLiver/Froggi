@@ -3,7 +3,7 @@ use axum::{
     extract::Multipart,
     http::Response,
     response::{Html, IntoResponse},
-    routing::{get, post, put},
+    routing::{get, head, post, put},
     Form, Router,
 };
 
@@ -16,6 +16,8 @@ use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
 use serde::Deserialize;
+
+use std::io::{self, BufRead};
 
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
@@ -92,7 +94,16 @@ async fn main() {
         .route("/q4", post(quarter4_change))
         .route("/show_quarter_css", put(show_quarter_css_handler))
         // Routes for the file upload
-        .route("/logo_upload", post(logo_upload_handler));
+        .route("/logo_upload", post(logo_upload_handler))
+        .route("/ping", head(|| async { StatusCode::OK }))
+        // Route the 404 page
+        .fallback_service(get(|| async { 
+            println!(" -> 404: not found");
+            ( 
+                StatusCode::NOT_FOUND, 
+                Html("<h1>404 - Not Found</h1>"),
+            ) 
+        }));
 
     // endregion: --- Routing
 
@@ -103,10 +114,31 @@ async fn main() {
 
     let listen_addr: String = listen_addr.clone();
 
-    println!("Listening on: {}\n", listen_addr);
+    println!("Listening on: {}\nType \"exit\" to do shut down the server", listen_addr);
     let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
-    axum::serve(listener, app).await.unwrap(); // Serves the app
-    println!("Server stopped");
+
+    let (tx, rx) = tokio::sync::oneshot::channel();
+
+    tokio::spawn(async move {
+        let stdin = io::stdin();
+        for line in stdin.lock().lines() {
+            if line.unwrap() == "stop" {
+                let _ = tx.send(());
+                return;
+            }
+        }
+    });
+
+    let server = axum::serve(listener, app)
+        .with_graceful_shutdown(async {
+            let _ = rx.await;
+            println!(" -> SERVER: shutting down");
+        });
+
+    if let Err(err) = server.await {
+        eprintln!("server error: {}", err);
+    }
+    println!(" -> SERVER: gracefully shut down");
 }
 
 // region: --- Config fn's
