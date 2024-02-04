@@ -6,7 +6,7 @@ Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO
 If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
 
 # Compilation 
-Clone the github repository
+Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases")
 Install [Rust](https://rustup.rs/ "rustup") if you have not 
 Run this command in the same directory as the cloned repository
 ```

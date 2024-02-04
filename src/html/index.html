@@ -1,143 +1,136 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script src="./htmx.min.js"></script>
-        <script>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOSSO Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    </style>
+    <script src="./htmx.min.js"></script>
+    <script>
         async function ping() {
             let start = performance.now();
-            await fetch('/ping', {method: 'HEAD'});
+            await fetch('/ping', { method: 'HEAD' });
             let end = performance.now();
             let pingTime = end - start;
             document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
         }
         setInterval(ping, 2000);
-        </script>
-        <title>FOSSO Dashboard</title> 
-        <meta charset="UTF-8">
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-        </style>
-        <link rel="stylesheet" type="text/css" href="./style.css">
-        <div hx-put="/show_quarter_css" hx-trigger="every 10ms"></div>
-    </head>
-    <body>
-        <div class="topnav">
-            <ul>
-                <a class="active" href="/">DASHBOARD</a>
-                <a href="/chromakey" target="_blank">CHROMAKEYPAGE</a>
-                <p id="ping">Ping: calculating...</p>
-              </ul> 
+    </script>
+</head>
+<body>
+    <div class="topnav">
+        <ul>
+            <a class="active" href="/">DASHBOARD</a>
+            <a href="/chromakey" target="_blank">CHROMAKEYPAGE</a>
+            <p id="ping">Ping: calculating...</p>
+        </ul>
+    </div>
+
+    <h1>FOSSO Dashboard</h1>
+
+    <div class="names">
+        <h1>Scoreboard control</h1>
+        <form action="/" method="post" id="team-form">
+            <div class="team-input">
+                <label for="home">Home: </label>
+                <input type="text" id="home" name="home" maxlength="8" onblur="submitForm()">
             </div>
-        <h1>FOSSO Dashboard</h1>
-        <div class="names">
-            <h1>Scoreboard control</h1>
-            <form action="/" method="post" id="team-form">
-                <div class="team-input">
-                    <label for="home">Home: </label>
-                    <input type="text" id="home" name="home" maxlength="8" onblur="submitForm()">
-                </div>
-                <div class="team-input">
-                    <label for="away">Away: </label>
-                    <input type="text" id="away" name="away" maxlength="8" onblur="submitForm()">
-                </div>
-            </form>
+            <div class="team-input">
+                <label for="away">Away: </label>
+                <input type="text" id="away" name="away" maxlength="8" onblur="submitForm()">
+            </div>
+        </form>
+    </div>
+
+    <div class="score-container">
+        <div class="home">
+            <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
+            <button hx-post="/hu" hx-swap="none">+</button>
+            <p>Points:</p>
+            <div hx-put="/hp" hx-trigger="every 10ms"></div>
+            <button hx-post="/hd" hx-swap="none">-</button><br><br>
+            <button hx-post="/hu" hx-swap="none">1 Point</button>
+            <button hx-post="/hu2" hx-swap="none">2 Points</button>
+            <button hx-post="/hu3" hx-swap="none">3 Points</button>
         </div>
-        <div class="score-container">
-            <div class="home">
-                <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
-                <button hx-post="/hu" hx-swap="none">+</button>
-                <p>Points:</p>
-                <div hx-put="/hp" hx-trigger="every 10ms"></div>
-                <button hx-post="/hd" hx-swap="none">-</button><br><br>
-                <button hx-post="/hu" hx-swap="none">1 Point</button>
-                <button hx-post="/hu2" hx-swap="none">2 Points</button>
-                <button hx-post="/hu3" hx-swap="none">3 Points</button>
-            </div>
-            <div class="timer">
-                <h2>Timer</h2>
-                <div class="timer-elements">
-                    <div class="mins-elements">
-                        <div hx-put="/time_mins" hx-trigger="every 10ms"></div>
-                       
-                    </div>
-                    <span class="colon">:</span>
-                    <div class="secs-elements">
-                        <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
-                      
-                    </div>
-                    <button hx-post="/mins_up" hx-swap="none">Min+</button>
-                    <button hx-post="/mins_down" hx-swap="none">Min-</button>
-                    <button hx-post="/secs_up" hx-swap="none">Sec+</button>
-                    <button hx-post="/secs_down" hx-swap="none">Sec-</button>
+
+        <div class="timer">
+            <h2>Timer</h2>
+            <div class="timer-elements">
+                <div class="mins-elements">
+                    <div hx-put="/time_mins" hx-trigger="every 10ms"></div>
                 </div>
-                <div class="timer-controls">
-                    <button id="startButton" hx-post="/tstart" hx-swap="none" hx-trigger="click" class="timer-button">Start</button>
-                    <button id="stopButton" hx-post="/tstop" hx-swap="none" hx-trigger="click" class="timer-button">Stop</button>
+                <span class="colon">:</span>
+                <div class="secs-elements">
+                    <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
                 </div>
+                <button hx-post="/mins_up" hx-swap="none">Min+</button>
+                <button hx-post="/mins_down" hx-swap="none">Min-</button>
+                <button hx-post="/secs_up" hx-swap="none">Sec+</button>
+                <button hx-post="/secs_down" hx-swap="none">Sec-</button>
             </div>
-            
-            
-            <div class="away">
-                <div hx-put="/adisp" hx-trigger="every 10ms"></div>
-                <button hx-post="/au" hx-swap="none">+</button>
-                <p>Points:</p>
-                <div hx-put="/ap" hx-trigger="every 10ms"></div>
-                <button hx-post="/ad" hx-swap="none">-</button><br><br>
-                <button hx-post="/au" hx-swap="none">Add 1 Point</button>
-                <button hx-post="/au2" hx-swap="none">Add 2 Points</button>
-                <button hx-post="/au3" hx-swap="none">Add 3 Points</button>
+            <div class="timer-controls">
+                <button id="startButton" hx-post="/tstart" hx-swap="none" hx-trigger="click" class="timer-button">Start</button>
+                <button id="stopButton" hx-post="/tstop" hx-swap="none" hx-trigger="click" class="timer-button">Stop</button>
             </div>
         </div>
+
+        <div class="away">
+            <div hx-put="/adisp" hx-trigger="every 10ms"></div>
+            <button hx-post="/au" hx-swap="none">+</button>
+            <p>Points:</p>
+            <div hx-put="/ap" hx-trigger="every 10ms"></div>
+            <button hx-post="/ad" hx-swap="none">-</button><br><br>
+            <button hx-post="/au" hx-swap="none">Add 1 Point</button>
+            <button hx-post="/au2" hx-swap="none">Add 2 Points</button>
+            <button hx-post="/au3" hx-swap="none">Add 3 Points</button>
+        </div>
+    </div>
+
+    <div class="quarter-container">
         <h2>Quarter</h2>
-        <button id="show-quarter" hx-post="/show_quarter" hx-swap="none">Show quarter</button>
-        <div class="quarter-container">
-            <button id="quarter1" hx-post="/q1" hx-swap="none">Quarter 1</button>
-            <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
-            <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
-            <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
-        </div>
-        <script>
-            htmx.on('#startButton', 'htmx:afterRequest', function() {
-                document.getElementById('startButton').classList.add('selected');
-                document.getElementById('stopButton').classList.remove('selected');
+        <button id="quarter1" hx-post="/q1" hx-swap="none">Quarter 1</button>
+        <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
+        <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
+        <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
+    </div>
+
+    <script>
+        htmx.on('#startButton', 'htmx:afterRequest', function() {
+            document.getElementById('startButton').classList.add('selected');
+            document.getElementById('stopButton').classList.remove('selected');
+        });
+
+        htmx.on('#stopButton', 'htmx:afterRequest', function() {
+            document.getElementById('stopButton').classList.add('selected');
+            document.getElementById('startButton').classList.remove('selected');
+        });
+
+        function submitForm() {
+            var home = document.getElementById('home').value;
+            var away = document.getElementById('away').value;
+            if (home && away) {
+                document.getElementById('team-form').submit();
+            }
+        }
+
+        var quarters = document.querySelectorAll('.quarter-container button');
+
+        function removeActiveClass() {
+            quarters.forEach(function(quarter) {
+                quarter.classList.remove('active');
             });
-        
-            htmx.on('#stopButton', 'htmx:afterRequest', function() {
-                document.getElementById('stopButton').classList.add('selected');
-                document.getElementById('startButton').classList.remove('selected');
+        }
+
+        quarters.forEach(function(quarter) {
+            quarter.addEventListener('click', function() {
+                removeActiveClass();
+                this.classList.add('active');
             });
-            function submitForm() {
-    var home = document.getElementById('home').value;
-    var away = document.getElementById('away').value;
-    if (home && away) {
-        document.getElementById('team-form').submit();
-    }
-}
-
-
-
-
-// Get all quarter buttons
-var quarters = document.querySelectorAll('.quarter-container button');
-
-// Function to remove active class from all quarters
-function removeActiveClass() {
-    quarters.forEach(function(quarter) {
-        quarter.classList.remove('active');
-    });
-}
-
-// Add click event listener to each quarter
-quarters.forEach(function(quarter) {
-    quarter.addEventListener('click', function() {
-        // Remove active class from all quarters
-        removeActiveClass();
-        
-        // Add active class to clicked quarter
-        this.classList.add('active');
-    });
-});
-        </script>
-        
-    </body>
+        });
+    </script>
+</body>
 </html>

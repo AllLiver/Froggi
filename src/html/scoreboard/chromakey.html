@@ -1,29 +1,36 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <script src="./htmx.min.js"></script>
-        <title>FOSSO CHROMAKEYPAGE</title> 
-        <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="./style.css">
-        <div hx-put="/chromargb" hx-trigger="load"></div>
-    </head>
-    <body>
-        <div class="white-boxes-container">
-            <div class="home-box">
-                <img src="home_png" alt="Home Team Logo" width="25" height="30" > 
-                <div hx-put="/hname_score" hx-trigger="every 10ms"></div>
-            </div>
-            
-            <div class="score-box" hx-put="/hp" hx-trigger="every 10ms"></div>
-            
-            <div class="away-box">
-                <img src="away_png" alt="Away Team Logo" width="25" height="30"> 
-                <div hx-put="/aname_score" hx-trigger="every 10ms"></div>
-            </div>
-            <div class="clock-box">
-                <div hx-put="/time" hx-trigger="every 10ms"></div>
-                <div hx-put="/quarter" hx-trigger="every 10ms"></div>
-            </div>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FOSSO CHROMAKEYPAGE</title>
+    <script src="./htmx.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./style.css">
+
+    <div hx-put="/chromargb" hx-trigger="load"></div>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&family=Protest+Strike&family=Roboto&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="white-boxes-container">
+        <div class="home-box">
+            <img class="logo" src="home_png" alt="Home Team Logo" width="25" height="30"> 
+            <div class="team-name" hx-put="/hname_score" hx-trigger="every 10ms"></div>
         </div>
-    </body>
+        
+        <div class="score-box" hx-put="/hp" hx-trigger="every 10ms"></div>
+        
+        <div class="away-box">
+            <img class="logo" src="away_png" alt="Away Team Logo" width="25" height="30"> 
+            <div class="team-name" hx-put="/aname_score" hx-trigger="every 10ms"></div>
+        </div>
+        
+        <div class="clock-box">
+            <div hx-put="/time" hx-trigger="every 10ms"></div>
+            <div hx-put="/quarter" hx-trigger="every 10ms"></div>
+        </div>
+    </div>
+</body>
 </html>
