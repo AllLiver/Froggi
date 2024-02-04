@@ -20,7 +20,7 @@
         </ul>
     </header>
     <h1>File upload page</h1>
-    <form hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data">
+    <form hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none">
         <label for="home_img">Home Team Logo:</label>
         <input type="file" name="home.png" id="home_img" accept="image/png"><br><br>
 
