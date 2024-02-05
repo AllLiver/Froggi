@@ -52,6 +52,7 @@ async fn main() {
         .route("/upload", get(upload_page_handler)) // Handles get requests for the upload page
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
+        .route("/favicon_png", get(home_img_handler))
         // Routes to update the home team's info
         .route("/hu", post(hu_handler))
         .route("/hd", post(hd_handler))
