@@ -548,7 +548,7 @@ async fn show_quarter_css_handler() -> Html<&'static str> {
     if *show_quarter {
         return Html("<style> #show-quarter { background-color: rgb(227, 45, 32); } </style>");
     } else {
-        return Html("<style> #show-quarter { background-color: #e32d20; } </style>");
+        return Html("<style> #show-quarter { background-color: #e9981f; } </style>");
     }
 }
 
