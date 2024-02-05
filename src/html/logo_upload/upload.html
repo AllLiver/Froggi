@@ -113,5 +113,28 @@
         <div id="awayNameDisplay"></div>
     </div>
 </body>
+<script>
+    document.querySelector('#logo-form').addEventListener('htmx:afterOnLoad', function () {
+        var submitButton = document.getElementById('file-submit');
+        submitButton.style.backgroundColor = 'green'; 
+        submitButton.value = 'Success'; 
 
+        setTimeout(function() {
+            submitButton.style.backgroundColor = ''; 
+            submitButton.value = 'Submit'; 
+        }, 10000);
+
+    document.querySelector('#name-form').addEventListener('htmx:afterOnLoad', function () {
+        var submitButton = document.getElementById('name-submit');
+        submitButton.style.backgroundColor = 'green';
+        submitButton.value = 'Success';
+
+       
+        setTimeout(function() {
+            submitButton.style.backgroundColor = ''; 
+            submitButton.value = 'Submit'; 
+        }, 10000); 
+    }); });
+</script>
 </html>
+  
