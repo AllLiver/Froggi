@@ -20,3 +20,4 @@ Here are some features/updates planned
  - Fix naming in API and frontend
  - Add a sponsor roll in the bottom right (that can be turned on and off)
  - Add savable school configurations with their pictures, names, and colors
+ - A countdown clock for halftime or delays
