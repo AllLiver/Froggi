@@ -101,6 +101,8 @@ async fn main() {
         .route("/show_quarter_css", put(show_quarter_css_handler))
         // Routes for the file upload
         .route("/logo_upload", post(logo_upload_handler))
+        // Routes for the favicon
+        .route("/favicon.ico", get(favicon_handler))
         // Routes head requests for calculating latency
         .route("/ping", head(|| async { StatusCode::OK }))
         // Route the 404 page
@@ -246,6 +248,16 @@ async fn htmx_handler() -> impl IntoResponse {
         .unwrap()
 }
 
+async fn favicon_handler() -> impl IntoResponse {
+    println!(" -> SERVE: favicon.ico");
+    let body = include_bytes!("html/favicon.png");
+    let body = Body::from(body.to_vec());
+    Response::builder()
+        .header(CONTENT_TYPE, "image/x-icon".to_string())
+        .body(body)
+        .unwrap()
+}
+
 // endregion: --- Page handlers
 // region: --- Team names
 
@@ -291,7 +303,7 @@ async fn aname_scoreboard_handler() -> Html<String> {
 
 // Handles and returns requests for the home team's logo
 async fn home_img_handler() -> impl IntoResponse {
-    let home_image = tokio::fs::read(Path::new("home.png")).await.unwrap();
+    let home_image = tokio::fs::read(Path::new("home.png")).await.expect("Could not open home.png");
     let body = Body::from(home_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -301,7 +313,7 @@ async fn home_img_handler() -> impl IntoResponse {
 
 // Handles and returns requests for the away team's logo
 async fn away_img_handler() -> impl IntoResponse {
-    let away_image = tokio::fs::read(Path::new("away.png")).await.unwrap();
+    let away_image = tokio::fs::read(Path::new("away.png")).await.expect("Could not open away.png");
     let body = Body::from(away_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
