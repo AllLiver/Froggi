@@ -1,3 +1,6 @@
+/* Fonts */
+  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Open+Sans&display=swap');
+
 /* General Styles */
 body {
     font-family: 'Roboto', sans-serif;
@@ -89,10 +92,9 @@ header li a:hover {
     font-family: 'Open Sans', sans-serif;
     color: white;
     padding: 10px;
-    margin: 10px;
+    margin: 20px;
     border-radius: 5px;
 }
-
 
 .away {
     border-color: #d32559;
@@ -241,13 +243,13 @@ button.active {
 }
 
 .score-box, .clock-box {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Lato', sans-serif;
 }
 
 .score-box {
     width: 5%;
     display: flex;
-    font-family: 'Protest Strike', cursive;
+    font-family: 'Protest Strike', sans-serif;
     justify-content: center;
     align-items: center;
 }
@@ -417,7 +419,7 @@ input[type="file"] {
 }
 
 #file-submit {
-    background-color: #4CAF50;
+    background-color: #e9981f;
     color: white;
     padding: 10px;
     border: none;
@@ -426,7 +428,7 @@ input[type="file"] {
 }
 
 #file-submit:hover {
-    background-color: #45a049;
+    background-color: #e9981f;
 }
 
 #name-form {
@@ -453,7 +455,7 @@ input[type="file"] {
 }
 
 #name-form #name-submit {
-    background-color: #4CAF50;
+    background-color: #e9981f;
     color: white;
     padding: 10px;
     border: none;
@@ -462,7 +464,7 @@ input[type="file"] {
 }
 
 #name-form #name-submit:hover {
-    background-color: #45a049;
+    background-color: #e9981f;
 }
 
 #logo-form {
