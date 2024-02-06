@@ -47,7 +47,7 @@ lazy_static! {
     static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
     static ref SHOW_SPONSOR: Mutex<bool> = Mutex::new(false);
     static ref LAST_SPONSOR: AtomicUsize = AtomicUsize::from(0);
-}
+} 
 
 #[tokio::main]
 async fn main() {
