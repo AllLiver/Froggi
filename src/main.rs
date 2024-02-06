@@ -10,7 +10,10 @@ use axum::{
 
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
-use std::{path::Path, sync::Mutex};
+use std::{
+    path::Path,
+    sync::{atomic::{AtomicUsize, Ordering}, Mutex},
+};
 
 // Brings libraries needed for the server headers into scope
 use hyper::{header::CONTENT_TYPE, StatusCode};
@@ -23,6 +26,10 @@ use serde::Deserialize;
 
 // Brings standard libraries needed for many things into scope
 use std::io::{self, BufRead};
+use tokio::fs;
+
+// Used for sponsor roll
+use base64::prelude::*;
 
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
@@ -39,10 +46,13 @@ lazy_static! {
     static ref QUARTER: Mutex<i32> = Mutex::new(1);
     static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
     static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
+    static ref LAST_SPONSOR: AtomicUsize = AtomicUsize::from(0);
 }
 
 #[tokio::main]
 async fn main() {
+    std::fs::create_dir_all("./sponsors").unwrap();
+
     // region: --- Routing
 
     let app = Router::new() // Creates a new router
@@ -102,17 +112,16 @@ async fn main() {
         .route("/show_quarter_css", put(show_quarter_css_handler))
         // Routes for the file upload
         .route("/logo_upload", post(logo_upload_handler))
+        // Routes for the sponsor roll
+        .route("/sponsor_roll", put(sponsor_roll_handler))
         // Routes for the favicon
         .route("/favicon.ico", get(favicon_handler))
         // Routes head requests for calculating latency
         .route("/ping", head(|| async { StatusCode::OK }))
         // Route the 404 page
-        .fallback_service(get(|| async { 
+        .fallback_service(get(|| async {
             println!(" -> 404: not found");
-            ( 
-                StatusCode::NOT_FOUND, 
-                Html("<h1>404 - Not Found</h1>"),
-            ) 
+            (StatusCode::NOT_FOUND, Html("<h1>404 - Not Found</h1>"))
         }));
 
     // endregion: --- Routing
@@ -125,14 +134,17 @@ async fn main() {
     // Gets address from the ADDR mutex
     let listen_addr = ADDR.lock().unwrap();
     let listen_addr: String = listen_addr.clone();
-    
+
     // Bind the server to the address
-    println!("Listening on: {}\nType \"stop\" to do shut down the server gracefully\n", listen_addr);
+    println!(
+        "Listening on: {}\nType \"stop\" to do shut down the server gracefully\n",
+        listen_addr
+    );
     let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
-    
+
     // Creates a oneshot channel to be able to shut down the server gracefully
     let (tx, rx) = tokio::sync::oneshot::channel();
-    
+
     // Spawns a task to listen for the "stop" command which shuts down the server
     tokio::spawn(async move {
         let stdin = io::stdin();
@@ -145,11 +157,10 @@ async fn main() {
     });
 
     // Start the server
-    let server = axum::serve(listener, app)
-        .with_graceful_shutdown(async {
-            let _ = rx.await;
-            println!(" -> SERVER: shutting down");
-        });
+    let server = axum::serve(listener, app).with_graceful_shutdown(async {
+        let _ = rx.await;
+        println!(" -> SERVER: shutting down");
+    });
 
     // Prints an error if an error occurs whie starting the server
     if let Err(err) = server.await {
@@ -304,7 +315,9 @@ async fn aname_scoreboard_handler() -> Html<String> {
 
 // Handles and returns requests for the home team's logo
 async fn home_img_handler() -> impl IntoResponse {
-    let home_image = tokio::fs::read(Path::new("home.png")).await.expect("Could not open home.png");
+    let home_image = tokio::fs::read(Path::new("home.png"))
+        .await
+        .expect("Could not open home.png");
     let body = Body::from(home_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -314,7 +327,9 @@ async fn home_img_handler() -> impl IntoResponse {
 
 // Handles and returns requests for the away team's logo
 async fn away_img_handler() -> impl IntoResponse {
-    let away_image = tokio::fs::read(Path::new("away.png")).await.expect("Could not open away.png");
+    let away_image = tokio::fs::read(Path::new("away.png"))
+        .await
+        .expect("Could not open away.png");
     let body = Body::from(away_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -680,6 +695,32 @@ async fn time_and_quarter_handler() -> Html<String> {
     } else {
         return Html(format!("{}:{:02?}", time_mins, time_secs));
     }
+}
+
+async fn sponsor_roll_handler() -> Html<String> {
+    
+    let mut entries = fs::read_dir("./sponsors").await.unwrap();
+    let mut sponsor_imgs: Vec<tokio::fs::DirEntry> = Vec::new();
+
+    while let Ok(Some(res)) = entries.next_entry().await {
+        let entry = res;
+        if let Some(extension) = entry.path().extension() {
+            if extension == "png" {
+                sponsor_imgs.push(entry);
+            }
+        }
+    }
+
+    let last_sponsor = LAST_SPONSOR.fetch_add(1, Ordering::SeqCst) % sponsor_imgs.len();
+
+    let img_bytes = fs::read(sponsor_imgs[last_sponsor].path())
+        .await
+        .unwrap();
+
+    Html(format!(
+        "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\"/>",
+        BASE64_STANDARD.encode(&img_bytes)
+    ))
 }
 
 // endregion: --- Misc handelers
