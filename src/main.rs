@@ -717,11 +717,12 @@ async fn sponsor_roll_handler() -> Html<String> {
         .await
         .unwrap();
 
-    Html(format!(
-        "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\"/>",
-        BASE64_STANDARD.encode(&img_bytes)
-    ))
-}
+        Html(format!(
+            "<img src=\"data:image/png;base64,{}\" style=\"position: fixed; right: 5px; bottom: 5px; width: 10%;\"/>",
+            BASE64_STANDARD.encode(&img_bytes)
+        
+        ))}
+
 
 // endregion: --- Misc handelers
 // region: --- Misc fn's
