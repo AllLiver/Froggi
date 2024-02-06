@@ -7,7 +7,6 @@ use axum::{
     routing::{get, head, post, put},
     Form, Router,
 };
-
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
 use std::{
@@ -46,6 +45,7 @@ lazy_static! {
     static ref QUARTER: Mutex<i32> = Mutex::new(1);
     static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
     static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
+    static ref SHOW_SPONSOR: Mutex<bool> = Mutex::new(false);
     static ref LAST_SPONSOR: AtomicUsize = AtomicUsize::from(0);
 }
 
@@ -114,6 +114,8 @@ async fn main() {
         .route("/logo_upload", post(logo_upload_handler))
         // Routes for the sponsor roll
         .route("/sponsor_roll", put(sponsor_roll_handler))
+        .route("/show_sponsor_roll", post(show_sponsor_roll_handler))
+        .route("/sponsor_roll_css", put(sponsor_roll_css_handler))
         // Routes for the favicon
         .route("/favicon.ico", get(favicon_handler))
         // Routes head requests for calculating latency
@@ -618,39 +620,61 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
         // Writes the data to a .png file
         println!(" -> LOGO: recieved {}\n\tLENGTH: {}", name, data.len());
         tokio::fs::write(Path::new(&name), data).await.unwrap();
-
-        // Opens the image and gets its dimension
-        let img = image::open(&name).unwrap();
-        let img_dimensions = image::image_dimensions(&name).unwrap();
-
-        println!(" -> IMG: {:?}", img_dimensions);
-
-        // Gets width and height as a float
-        let height = img_dimensions.1 as f32;
-        let width = img_dimensions.0 as f32;
-
-        // Finds the ratio to resize the image to 30px height
-        let resize_ratio = 30.0 / height;
-        println!(" -> RESIZE: {}%", resize_ratio * 100.0);
-
-        // Finds new image dimensions
-        let height: u32 = (height * resize_ratio) as u32;
-        let width: u32 = (width * resize_ratio) as u32;
-
-        // Resizes and saves the resized image
-        println!(" -> RESIZE {}x{}", height, width);
-        let resized =
-            image::imageops::resize(&img, width, height, image::imageops::FilterType::Lanczos3);
-
-        resized.save(Path::new(&name)).unwrap();
-
-        println!(" -> RESIZE: done");
     }
 
     StatusCode::OK
 }
 
 // endregion: --- File upload handlers
+// region: --- Sponsor roll
+
+async fn sponsor_roll_handler() -> Html<String> {
+    
+    let mut entries = fs::read_dir("./sponsors").await.unwrap();
+    let mut sponsor_imgs: Vec<tokio::fs::DirEntry> = Vec::new();
+
+    while let Ok(Some(res)) = entries.next_entry().await {
+        let entry = res;
+        if let Some(extension) = entry.path().extension() {
+            if extension == "png" {
+                sponsor_imgs.push(entry);
+            }
+        }
+    }
+
+    let last_sponsor = LAST_SPONSOR.fetch_add(1, Ordering::SeqCst) % sponsor_imgs.len();
+
+    let img_bytes = fs::read(sponsor_imgs[last_sponsor].path())
+        .await
+        .unwrap();
+
+    Html(format!(
+        "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
+        BASE64_STANDARD.encode(&img_bytes)
+    ))
+}
+
+async fn show_sponsor_roll_handler() {
+    let mut show_sponsor = SHOW_SPONSOR.lock().unwrap();
+
+    if *show_sponsor {
+        *show_sponsor = false;
+    } else {
+        *show_sponsor = true;
+    }
+}
+
+async fn sponsor_roll_css_handler() -> Html<&'static str> {
+    let show_sponsor = SHOW_SPONSOR.lock().unwrap();
+
+    if *show_sponsor {
+        return Html("<style> #show-sponsor-toggle { background-color: rgb(227, 45, 32); }</style>");
+    } else {
+        return Html("<style> #sponsor_roll_img { display: none; } #show-sponsor-toggle { background-color: #e9981f; }</style>");
+    }
+}
+
+// endregion: --- Misc handelers
 // region: --- Misc handelers
 
 // Function for testing http requests
@@ -697,33 +721,8 @@ async fn time_and_quarter_handler() -> Html<String> {
     }
 }
 
-async fn sponsor_roll_handler() -> Html<String> {
-    
-    let mut entries = fs::read_dir("./sponsors").await.unwrap();
-    let mut sponsor_imgs: Vec<tokio::fs::DirEntry> = Vec::new();
+// endregion: -- Sponsor roll
 
-    while let Ok(Some(res)) = entries.next_entry().await {
-        let entry = res;
-        if let Some(extension) = entry.path().extension() {
-            if extension == "png" {
-                sponsor_imgs.push(entry);
-            }
-        }
-    }
-
-    let last_sponsor = LAST_SPONSOR.fetch_add(1, Ordering::SeqCst) % sponsor_imgs.len();
-
-    let img_bytes = fs::read(sponsor_imgs[last_sponsor].path())
-        .await
-        .unwrap();
-
-    Html(format!(
-        "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\"/>",
-        BASE64_STANDARD.encode(&img_bytes)
-    ))
-}
-
-// endregion: --- Misc handelers
 // region: --- Misc fn's
 
 // endregion: --- Misc fn's

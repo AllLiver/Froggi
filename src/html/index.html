@@ -43,6 +43,7 @@
         setInterval(ping, 2000);
     </script>
     <div hx-put="/show_quarter_css" hx-trigger="every 10ms"></div>
+    <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
 </head>
 <body>
     <header>
@@ -114,14 +115,14 @@
 
  <div class="white-boxes-container">
         <div class="home-box">
-            <img class="logo" src="home_png" alt="Home Team Logo"> 
+            <img class="logo" src="/home_png" alt="Home Team Logo" height="28px" width="auto"> 
             <div class="team-name" hx-put="/hname_score" hx-trigger="every 10ms"></div>
         </div>
         
         <div class="score-box" hx-put="/score" hx-trigger="every 10ms"></div>
         
         <div class="away-box">
-            <img class="logo" src="away_png" alt="Away Team Logo"> 
+            <img class="logo" src="/away_png" alt="Away Team Logo" height="28px" width="auto"> 
             <div class="team-name" hx-put="/aname_score" hx-trigger="every 10ms"></div>
         </div>
         
@@ -136,7 +137,7 @@
         <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
         <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
         <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
-        <button id="show-sponsor" hx-post="show_sponsor" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
+        <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none" id="show-sponsor-toggle">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
     </div>
 
     

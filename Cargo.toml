@@ -11,7 +11,6 @@ base64 = "0.21.7"
 futures = "0.3.30"
 futures-util = "0.3.30"
 hyper = "1.1.0"
-image = "0.24.8"
 lazy_static = "1.4.0"
 mime = "0.3.17"
 serde = { version = "1.0.196", features = ["derive"] }
