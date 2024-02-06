@@ -1,5 +1,5 @@
 /* Fonts */
-  @import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Open+Sans&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Open+Sans&display=swap');
 
 /* General Styles */
 body {
@@ -381,7 +381,7 @@ input[type="text"] {
 
 .logo {
     margin-right: 20px;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 
 .quarters {
