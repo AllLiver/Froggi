@@ -1,3 +1,4 @@
+<!-- cargo watch -q -c -w src/ -x run  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +29,6 @@
         .white-boxes-container {
           transform: translateY(-10px);
         }
-    </style>
     
     </style>
     <script src="./htmx.min.js"></script>
@@ -138,6 +138,13 @@
         <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
         <button id="show-sponsor" hx-post="show_sponsor" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
     </div>
+
+    
+   <!-- <div class="extra-buttons">
+        <div id="show_logs" class="logs">
+            <button hx-post="show_logs" hx-swap="none">Show logs</button>
+            <div id="logs" hx-get="/logs" hx-trigger="show_logs"></div>
+        </div>  --> <!-- Planned: Show logs, needs backend -->
     <div hx-put="/sponsor_roll" hx-trigger="every 5s"></div>
     <p id="ping">Ping: calculating...</p>
     <script>
@@ -191,8 +198,38 @@
     }
 });
 
+let logs = [];
 
+// Function to update the score
+function updateScore() {
+    // Perform your scoreboard logic here
+    // For example, incrementing the score
+    let newScore = Math.floor(Math.random() * 100);
+    
+    // Log the update
+    log(`Score updated: ${newScore}`);
 
+    // Update the HTML display (this is just a placeholder)
+    document.getElementById('logs').innerHTML = logs.join('<br>');
+}
+
+// Function to add logs and update HTML display
+function log(message) {
+    // Add the log to the array
+    logs.push(`[${getCurrentTime()}] ${message}`);
+
+    // Update the HTML display
+    document.getElementById('logs').innerHTML = logs.join('<br>');
+}
+
+// Function to get current time in HH:mm:ss format
+function getCurrentTime() {
+    const now = new Date();
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+}
 
     </script>
 </body>
