@@ -91,6 +91,7 @@
         <img id="away_preview" src="#" alt="Away Team Logo Preview"
             style="display:none; max-height: 50px; max-width: 50px;">
         <input type="submit" value="Submit" id="file-submit">
+        
     </form>
 
 
@@ -112,6 +113,7 @@
         <div id="homeNameDisplay"></div>
         <div id="awayNameDisplay"></div>
     </div>
+    <button hx-post="/reset_scoreboard" hx-swap="none">Reset Scoreboard</button>
 </body>
 <script>
     document.querySelector('#logo-form').addEventListener('htmx:afterOnLoad', function () {

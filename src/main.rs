@@ -116,6 +116,8 @@ async fn main() {
         .route("/sponsor_roll", put(sponsor_roll_handler))
         .route("/show_sponsor_roll", post(show_sponsor_roll_handler))
         .route("/sponsor_roll_css", put(sponsor_roll_css_handler))
+        // Routes to reset the scoreboard
+        .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
         .route("/favicon.ico", get(favicon_handler))
         // Routes head requests for calculating latency
@@ -719,6 +721,22 @@ async fn time_and_quarter_handler() -> Html<String> {
     } else {
         return Html(format!("{}:{:02?}", time_mins, time_secs));
     }
+}
+
+async fn reset_scoreboard_handler() {
+    println!(" -> SCOREBOARD: reset");
+    *HOME_NAME.lock().unwrap() = String::from("team_name");
+    *AWAY_NAME.lock().unwrap() = String::from("team_name");
+
+    *HOME_POINTS.lock().unwrap() = 0;
+    *AWAY_POINTS.lock().unwrap() = 0;
+
+    *TIME_MINS.lock().unwrap() = 0;
+    *TIME_SECS.lock().unwrap() = 0;
+
+    *TIME_STARTED.lock().unwrap() = false;
+
+    *QUARTER.lock().unwrap() = 1;
 }
 
 // endregion: -- Sponsor roll
