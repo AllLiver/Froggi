@@ -113,7 +113,9 @@
         <div id="homeNameDisplay"></div>
         <div id="awayNameDisplay"></div>
     </div>
-    <button hx-post="/reset_scoreboard" hx-swap="none">Reset Scoreboard</button>
+    <div style="display: flex; justify-content: center;">
+        <button hx-post="/reset_scoreboard" hx-swap="none">Reset Scoreboard</button>
+    </div>
 </body>
 <script>
     document.querySelector('#logo-form').addEventListener('htmx:afterOnLoad', function () {
