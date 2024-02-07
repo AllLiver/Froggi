@@ -210,7 +210,7 @@ button.active {
 
 /* Box Styles */
 .white-boxes-container {
-    display: flex;
+    /* display: flex; */
     justify-content: center;
     width: 100%;
     position: fixed;

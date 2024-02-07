@@ -47,6 +47,10 @@ lazy_static! {
     static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
     static ref SHOW_SPONSOR: Mutex<bool> = Mutex::new(false);
     static ref LAST_SPONSOR: AtomicUsize = AtomicUsize::from(0);
+    static ref SHOW_COUNTDOWN: Mutex<bool> = Mutex::new(false);
+    static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
+    static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(8);
+    static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
 } 
 
 #[tokio::main]
@@ -116,6 +120,10 @@ async fn main() {
         .route("/sponsor_roll", put(sponsor_roll_handler))
         .route("/show_sponsor_roll", post(show_sponsor_roll_handler))
         .route("/sponsor_roll_css", put(sponsor_roll_css_handler))
+        // Routes for the countdown
+        .route("/show_countdown", post(show_countdown_handler))
+        .route("/countdown_css", put(countdown_css_handler))
+        .route("/countdown_display", put(countdown_display_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -130,8 +138,9 @@ async fn main() {
 
     // endregion: --- Routing
 
-    // Starts the clock ticker
+    // Starts the clock tickers
     tokio::spawn(clock_ticker());
+    tokio::spawn(countdown_ticker());
     // Opens the config (or creates it if it doesnt exist) file and load configurations
     tokio::spawn(read_or_create_config()).await.unwrap();
 
@@ -670,13 +679,67 @@ async fn sponsor_roll_css_handler() -> Html<&'static str> {
     let show_sponsor = SHOW_SPONSOR.lock().unwrap();
 
     if *show_sponsor {
-        return Html("<style> #show-sponsor-toggle { background-color: rgb(227, 45, 32); }</style>");
+        return Html("<style> #show-sponsor { background-color: rgb(227, 45, 32); } </style>");
     } else {
-        return Html("<style> #sponsor_roll_img { display: none; } #show-sponsor-toggle { background-color: #e9981f; }</style>");
+        return Html("<style> #sponsor_roll_img { display: none; } #show-sponsor { background-color: #e9981f; } </style>");
     }
 }
 
-// endregion: --- Misc handelers
+// endregion: --- Sponsor roll
+// region: --- Countdown
+
+async fn countdown_ticker() {
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        let mut countdown_started = COUNTDOWN_STARTED.lock().unwrap();
+        if *countdown_started {
+            let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+            let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+            if *countdown_secs == 0 {
+                if *countdown_mins == 0 {
+                    *countdown_started = false;
+                } else {
+                    *countdown_mins -= 1;
+                    *countdown_secs = 59;
+                }
+            } else {
+                *countdown_secs -= 1;
+            }
+        }
+    }
+}
+
+async fn start_countdown_handler() {
+    let mut countdown_started = COUNTDOWN_STARTED.lock().unwrap();
+    if *countdown_started {
+        *countdown_started = false;
+    } else {
+        *countdown_started = true;
+    }
+}
+
+async fn countdown_display_handler() -> Html<String> {
+    Html(format!("{}:{:02?}", *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+}
+
+async fn show_countdown_handler() {
+    let mut show_countdown = SHOW_COUNTDOWN.lock().unwrap();
+    if *show_countdown {
+        *show_countdown = false;
+    } else {
+        *show_countdown = true;
+    }
+}
+
+async fn countdown_css_handler() -> Html<&'static str> {
+    if *SHOW_COUNTDOWN.lock().unwrap() {
+        return Html("<style> .white-boxes-container { display: none; } #show-countdown { background-color: rgb(227, 45, 32); } </style>");
+    } else {
+        return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } </style>");
+    }
+}
+
+// endregion: --- Countdown
 // region: --- Misc handelers
 
 // Function for testing http requests

@@ -44,6 +44,7 @@
     </script>
     <div hx-put="/show_quarter_css" hx-trigger="every 10ms"></div>
     <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
+    <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
 </head>
 <body>
     <header>
@@ -137,8 +138,9 @@
         <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
         <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
         <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
-        <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none" id="show-sponsor-toggle">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
+        <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
     </div>
+    <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Show countdown</button>
 
     
    <!-- <div class="extra-buttons">
