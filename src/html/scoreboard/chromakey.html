@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon_png" type="image/x-icon">
-    <title>FOSSO chromakey</title>
+    <title>FOSSO Overlay</title>
     <script src="./htmx.min.js"></script>
     <link rel="stylesheet" type="text/css" href="./style.css">
 
     <div hx-put="/chromargb" hx-trigger="load"></div>
+    <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
+    <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
