@@ -51,6 +51,7 @@ lazy_static! {
     static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(8);
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
+    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from(""));
 } 
 
 #[tokio::main]
@@ -124,6 +125,16 @@ async fn main() {
         .route("/show_countdown", post(show_countdown_handler))
         .route("/countdown_css", put(countdown_css_handler))
         .route("/countdown_display", put(countdown_display_handler))
+        .route("/qtc20", post(qtc20_handler))
+        .route("/qtc15", post(qtc15_handler))
+        .route("/qtc10", post(qtc10_handler))
+        .route("/qtc5", post(qtc5_handler))
+        .route("/countdown_mins_up", post(countdown_mins_up_handler))
+        .route("/countdown_mins_down", post(countdown_mins_down_handler))
+        .route("/countdown_secs_up", post(countdown_secs_up_handler))
+        .route("/countdown_secs_down", post(countdown_secs_down_handler))
+        .route("/start_countdown", post(start_countdown_handler))
+        .route("/update_countdown_title", post(countdown_title_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -737,6 +748,55 @@ async fn countdown_css_handler() -> Html<&'static str> {
     } else {
         return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } </style>");
     }
+}
+
+async fn qtc20_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 20;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn qtc15_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 15;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn qtc10_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 10;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn qtc5_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 5;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn countdown_mins_up_handler() {
+    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    *countdown_mins = *countdown_mins + 1;
+}
+
+async fn countdown_mins_down_handler() {
+    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    *countdown_mins = *countdown_mins - 1;
+}
+
+async fn countdown_secs_up_handler() {
+    let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+    *countdown_secs = *countdown_secs + 1;
+}
+
+async fn countdown_secs_down_handler() {
+    let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+    *countdown_secs = *countdown_secs - 1;
+}
+
+#[derive(Deserialize)]
+struct CountdownTitle {
+    title: String
+}
+
+async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) {
+    *COUNTDOWN_TITLE.lock().unwrap() = title_data.title;
 }
 
 // endregion: --- Countdown
