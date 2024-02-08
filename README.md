@@ -16,9 +16,8 @@ The compiled binary will be in /target/release
 # Roadmap
 FOSSO is an indev project so there is lots likely to change  
 Here are some features/updates planned
- - Fix naming in API and frontend
- - Add a sponsor roll in the bottom right (that can be turned on and off)
+ - More consistent naming in API and frontend code
  - Add savable school configurations with their pictures, names, and colors
- - A countdown clock for halftime or delays
  - Logs
+ - Automatic fullscreen & cursor hiding on overlay page.
 
