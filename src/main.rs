@@ -52,11 +52,16 @@ lazy_static! {
     static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(8);
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
     static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("title_name"));
+    static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
 } 
 
 #[tokio::main]
 async fn main() {
     std::fs::create_dir_all("./sponsors").unwrap();
+
+    *SPONSOR_IMG_TAGS.lock().unwrap() = tokio::spawn(load_sponsors()).await.unwrap();
+
+    tokio::spawn(sponsor_roll_ticker());
 
     // region: --- Routing
 
@@ -653,8 +658,7 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
 // endregion: --- File upload handlers
 // region: --- Sponsor roll
 
-async fn sponsor_roll_handler() -> Html<String> {
-    
+async fn load_sponsors() -> Vec<Html<String>> {
     let mut entries = fs::read_dir("./sponsors").await.unwrap();
     let mut sponsor_imgs: Vec<tokio::fs::DirEntry> = Vec::new();
 
@@ -667,16 +671,40 @@ async fn sponsor_roll_handler() -> Html<String> {
         }
     }
 
-    let last_sponsor = LAST_SPONSOR.fetch_add(1, Ordering::SeqCst) % sponsor_imgs.len();
+    let mut img_tags: Vec<Html<String>> = Vec::new();
 
-    let img_bytes = fs::read(sponsor_imgs[last_sponsor].path())
+    for i in 0..sponsor_imgs.len() {
+        let img_bytes = fs::read(sponsor_imgs[i].path())
         .await
         .unwrap();
 
-    Html(format!(
-        "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
-        BASE64_STANDARD.encode(&img_bytes)
-    ))
+        img_tags.push(Html(format!(
+            "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
+            BASE64_STANDARD.encode(&img_bytes)
+        )));
+    }
+
+    return img_tags;
+}
+
+async fn sponsor_roll_ticker() {
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+        let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+
+        if last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().unwrap().len() - 1 {
+            LAST_SPONSOR.store(0, Ordering::SeqCst);
+        } else {
+            LAST_SPONSOR.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+}
+
+async fn sponsor_roll_handler() -> Html<String> {
+    let sponsor_imgs = SPONSOR_IMG_TAGS.lock().unwrap();
+    let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+
+    sponsor_imgs[last_sponsor].clone()
 }
 
 async fn show_sponsor_roll_handler() {
