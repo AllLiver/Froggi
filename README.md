@@ -14,10 +14,12 @@ cargo build --release
 The compiled binary will be in /target/release
 
 # Roadmap
-FOSSO is an indev project so there is lots likely to change  
+FOSSO is an indev project so change is very likley.
 Here are some features/updates planned
  - More consistent naming in API and frontend code
  - Add savable school configurations with their pictures, names, and colors
  - Logs
  - Automatic fullscreen & cursor hiding on overlay page.
+# Contribute
+If you would like to contribute, and you know rust, html, css, js, please feel free to create a pull request.
 
