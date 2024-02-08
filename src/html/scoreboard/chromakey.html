@@ -37,14 +37,8 @@
             <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
         </div>
     </div>
-    <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5s">
-
-
-        <div id="countdown" style="position: fixed; bottom: 0; right: 0; background-color: black; color: white; padding: 10px; border-radius: 4px; opacity: 0.5;">
-            <h2>RAIN DELAY</h2> <br>
-            Time: 10:00
-            <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
-        </div>
+    <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5s"></div>
+    <div hx-put="/countdown_display" hx-trigger="every 10ms" id="countdown" style="position: fixed; bottom: 0; right: 0; background-color: black; color: white; padding: 10px; border-radius: 4px; opacity: 0.5;">
     </div>
 </body>
 </html>

@@ -51,7 +51,7 @@ lazy_static! {
     static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(8);
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
-    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from(""));
+    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("title_name"));
 } 
 
 #[tokio::main]
@@ -133,7 +133,10 @@ async fn main() {
         .route("/countdown_mins_down", post(countdown_mins_down_handler))
         .route("/countdown_secs_up", post(countdown_secs_up_handler))
         .route("/countdown_secs_down", post(countdown_secs_down_handler))
+        .route("/countdown_time_mins", put(countdown_time_mins_handler))
+        .route("/countdown_time_secs", put(countdown_time_secs_handler))
         .route("/start_countdown", post(start_countdown_handler))
+        .route("/stop_countdown", post(stop_countdown_handler))
         .route("/update_countdown_title", post(countdown_title_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
@@ -721,16 +724,25 @@ async fn countdown_ticker() {
 }
 
 async fn start_countdown_handler() {
-    let mut countdown_started = COUNTDOWN_STARTED.lock().unwrap();
-    if *countdown_started {
-        *countdown_started = false;
-    } else {
-        *countdown_started = true;
-    }
+    *COUNTDOWN_STARTED.lock().unwrap() = true;
+}
+
+async fn stop_countdown_handler() {
+    *COUNTDOWN_STARTED.lock().unwrap() = false;
 }
 
 async fn countdown_display_handler() -> Html<String> {
-    Html(format!("{}:{:02?}", *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+    Html(format!("<h2>{}</h2> <br>
+    Time: {}:{:02?}
+    ", *COUNTDOWN_TITLE.lock().unwrap(), *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+}
+
+async fn countdown_time_mins_handler() -> Html<String> {
+    Html(format!("{}", *COUNTDOWN_MINS.lock().unwrap()))
+}
+
+async fn countdown_time_secs_handler() -> Html<String> {
+    Html(format!("{:02?}", *COUNTDOWN_SECS.lock().unwrap()))
 }
 
 async fn show_countdown_handler() {
@@ -746,7 +758,7 @@ async fn countdown_css_handler() -> Html<&'static str> {
     if *SHOW_COUNTDOWN.lock().unwrap() {
         return Html("<style> .white-boxes-container { display: none; } #show-countdown { background-color: rgb(227, 45, 32); } </style>");
     } else {
-        return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } </style>");
+        return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } #countdown { display: none; }</style>");
     }
 }
 
@@ -777,17 +789,23 @@ async fn countdown_mins_up_handler() {
 
 async fn countdown_mins_down_handler() {
     let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
-    *countdown_mins = *countdown_mins - 1;
+    if *countdown_mins > 0 {
+        *countdown_mins = *countdown_mins - 1;
+    }
 }
 
 async fn countdown_secs_up_handler() {
     let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
-    *countdown_secs = *countdown_secs + 1;
+    if *countdown_secs < 59 {
+        *countdown_secs = *countdown_secs + 1;
+    }
 }
 
 async fn countdown_secs_down_handler() {
     let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
-    *countdown_secs = *countdown_secs - 1;
+    if *countdown_secs > 0 {
+        *countdown_secs = *countdown_secs - 1;
+    }
 }
 
 #[derive(Deserialize)]
