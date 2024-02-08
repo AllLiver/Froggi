@@ -123,22 +123,6 @@ header li a:hover {
     font-size: 16px;
 }
 
-/* Timer Styles */
-.timer {
-    width: 40%;
-    border: 2px solid #e99d3a;
-    padding: 20px;
-    margin: 10px 0;
-    background-color: #242424;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
 
 /* Other Styles */
 .names {
@@ -210,7 +194,6 @@ button.active {
 
 /* Box Styles */
 .white-boxes-container {
-    /* display: flex; */
     justify-content: center;
     width: 100%;
     position: fixed;
@@ -276,43 +259,39 @@ button.active {
 }
 
 /* Timer Styles */
-.timer {
+.timer-container {
     width: 60%;
-    padding: 30px;
-    margin: 20px 0;
+    border: 2px solid #e99d3a;
+    padding: 20px;
+    margin: 10px 0;
     background-color: #242424;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
     display: flex;
+    flex-direction: row; /* Align items horizontally */
+    justify-content: space-between; /* Distribute items along the main axis */
+    align-items: center; /* Align items vertically */
+    position: relative; /* Make the parent container a relative container */
+}
+
+.timer {
+    color: white;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: flex;
 }
 
 .timer-controls {
     display: flex;
-    justify-content: center; 
-    margin-bottom: 20px;
+    flex-direction: row; /* Align buttons horizontally */
 }
 
-.timer-controls + .timer-controls {
-    margin-top: 10px; 
+.timer-controls button {
+    font-size: 1.5em;
+    padding: 10px 20px;
+    margin: 0 5px;
+    margin: 5px;
 }
-
-.quick-timer-buttons {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px; /* Add margin between quick boxes */
-}
-
-.quick-timer-buttons button {
-    font-size: 1.2em;
-    margin: 0 15px 10px 15px; /* Add margin to the right and bottom of each button */
-}
-
 
 .timer-elements {
     display: flex;
@@ -329,30 +308,36 @@ button.active {
     margin-right: 15px;
 }
 
-.timer-button,
-.min-button,
-.min-minus-button {
+.countdown-elements {
+    position: absolute; /* Position the elements absolutely within the relative parent */
+    top: 10px; /* Position at the top of the parent */
+    right: 10px; /* Position at the right of the parent */
+}
+
+.countdown-controls {
+    display: flex;
+    flex-direction: row; /* Align buttons horizontally */
+}
+
+.countdown-controls button {
     font-size: 1.5em;
     padding: 10px 20px;
-    margin: 0 5px; 
+    margin: 0 5px;
+    margin: 5px;
 }
 
-.timer-button.selected,
-.min-button.selected,
-.min-minus-button.selected {
-    background-color: rgb(44, 194, 194);
+.countdown-elements {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 10px;
+    right: 10px;
 }
 
-.timer-controls .min-button,
-.timer-controls .min-minus-button {
-    font-size: 1.5em;
-    padding: 10px 15px;
-    margin: 0 5px; /* Add margin to the buttons */
-}
 
-.timer-controls .min-button.selected,
-.timer-controls .min-minus-button.selected {
-    background-color: rgb(44, 194, 194);
+.countdown-mins-elements,
+.countdown-secs-elements {
+    margin-right: 15px;
 }
 
 
