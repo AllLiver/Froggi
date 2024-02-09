@@ -106,20 +106,6 @@ input[type="text"], input[type="submit"] {
     width: 100%;
 }
 
-body.ipad .countdown button, body.ipad .countdown-clock, body.ipad .countdown-title, body.ipad .countdown-elements {
-    display: none;
-}
-
-body.ipad .countdown button.showcountdown, body.ipad .countdown-clock.showcountdown, body.ipad .countdown-title.showcountdown, body.ipad .countdown-elements.showcountdown {
-    display: inline-block;
-}
-
-body.ipad .countdown-clock {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
 /* Overlay Styles */
 
 .white-boxes-container {
@@ -188,10 +174,8 @@ body.ipad .countdown-clock {
     z-index: 1000;
 }
 
-/* Timer Styles */
-
+/* Timer & Countdown Styles */
 .timer-container {
-    position: relative;
     width: 60%;
     border: 2px solid;
     padding: 20px;
@@ -201,7 +185,7 @@ body.ipad .countdown-clock {
     color: white;
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     border: 2px solid; 
     border-image-source: linear-gradient(to right, #2f54f7, #8C2FF7); 
@@ -209,44 +193,26 @@ body.ipad .countdown-clock {
     border-image-width: 2px;
     border-image-outset: 0;
     border-image-repeat: round;
-    border-radius: 100px; 
 }
 
-.timer-container,
-.countdown-container {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center;
-    padding: 20px;
-    background-color: #242424;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    color: white;
-}
-
-.timer-container h2,
-.countdown-container h2 {
+.timer-container h2 {
     padding: 2% 8%; 
     font-size: 120%; 
 }
 
-.timer-controls,
-.countdown-controls {
+.timer-controls {
     display: flex;
     align-items: center;
     margin: 0; 
 }
 
-
-.timer-elements,
-.countdown-elements {
+.timer-elements {
     padding: 4% 8%;
     font-size: 120%; 
     text-align: center;
 }
 
-.quick-timer-buttons,
-.quick-countdown-buttons {
+.quick-timer-buttons {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
@@ -255,23 +221,83 @@ body.ipad .countdown-clock {
     font-size: 120%; 
 }
 
-.countdown {
-    position: absolute;
-    top: 100px; 
-    left: 65%;
-}
-
 .timer-controls button,
-.countdown-controls button,
-.timer-elements button,
-.countdown-elements button,
-.timer-controls {
+.timer-elements button {
     padding: 2px 8px; 
-    margin: 5px !important; 
-    font-size: 120% !important; 
-    width: 200px !important;
+    margin: 5px; 
+    font-size: 120%; 
+    width: 200px;
 }
 
+.countdown-container {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Align vertically */
+    align-items: center; /* Align horizontally */
+    padding: 20px;
+    background-color: #242424;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    color: white;
+    width: 50%; /* Adjust width as needed */
+    margin: 0 auto; /* Center horizontally */
+}
+
+.countdown-container h2 {
+    padding: 2% 8%;
+    font-size: 120%;
+}
+
+.countdown-controls, .show-countdown {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+
+.countdown-elements {
+    padding: 4% 8%;
+    text-align: center;
+    font-size: 2em; /* Adjust as needed */
+    font-weight: bold;
+
+}
+
+.quick-countdown-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px;
+    padding: 4% 8%;
+    font-size: 120%;
+    
+}
+
+.countdown {
+    position: relative; /* Change to relative */
+    top: 0; /* Remove top positioning */
+    left: 0; /* Remove left positioning */
+}
+
+.countdown-controls button,
+.countdown-elements button, .show-countdown {
+    padding: 2px 8px;
+    margin: 5px;
+    font-size: 120%;
+    width: 200px;
+}
+
+.show-countdown-button {
+    text-align: center;
+}
+
+#show-countdown.on {
+    background-color: #e32d20; 
+    color: white;
+}
 /* Team Styles */
 
 .away, .home {
