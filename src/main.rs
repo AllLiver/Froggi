@@ -74,6 +74,7 @@ async fn main() {
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
         .route("/overlay", get(chroma_handler)) // Handles get requests for the overlay page
         .route("/teaminfo", get(upload_page_handler)) // Handles get requests for the upload page
+        .route("/countdown", get(countdown_handler))
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
         .route("/favicon_png", get(favicon_handler))
@@ -274,6 +275,13 @@ async fn upload_page_handler() -> Html<&'static str> {
     println!(" -> SERVE: teaminfo.html");
     Html(include_str!("html/logo_upload/teaminfo.html"))
 }
+
+
+async fn countdown_handler() -> Html<&'static str> {
+    println!(" -> SERVE: countdown.html");
+    Html(include_str!("html/countdown/countdown.html"))
+}
+
 
 // Serves the main css file
 async fn css_handler() -> impl IntoResponse {
