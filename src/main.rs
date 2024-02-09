@@ -523,14 +523,22 @@ async fn secs_up_handler() {
     let mut time_secs = TIME_SECS.lock().unwrap();
     if *time_secs < 59 {
         *time_secs += 1;
+    } else {
+        let mut time_mins = TIME_MINS.lock().unwrap();
+        *time_mins = *time_mins + 1;
+        *time_secs = 0;
     }
 }
 
 // Decreases the seconds of the time by 1
 async fn secs_down_handler() {
     let mut time_secs = TIME_SECS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().unwrap();
     if *time_secs > 0 {
         *time_secs -= 1;
+    } else if *time_mins - 1 > 0 {
+        *time_mins = *time_mins - 1;
+        *time_secs = 59;
     }
 }
 
@@ -830,13 +838,21 @@ async fn countdown_secs_up_handler() {
     let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
     if *countdown_secs < 59 {
         *countdown_secs = *countdown_secs + 1;
+    } else {
+        let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+        *countdown_mins = *countdown_mins + 1;
+        *countdown_secs = 0;
     }
 }
 
 async fn countdown_secs_down_handler() {
     let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
     if *countdown_secs > 0 {
         *countdown_secs = *countdown_secs - 1;
+    } else if *countdown_mins - 1 > 0 {
+        *countdown_mins = *countdown_mins - 1;
+        *countdown_secs = 59;
     }
 }
 
