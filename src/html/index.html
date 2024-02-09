@@ -226,6 +226,27 @@
         document.getElementById('show_quarter').classList.remove('active');
     });
 });
+window.onload = function() {
+    var isiPad = navigator.userAgent.match(/iPad/i) != null;
+    if (isiPad) {
+        document.body.classList.add('ipad');
+    }
+}
+
+function toggleCountdown() {
+    if (document.body.classList.contains('ipad')) {
+        var countdownElements = document.querySelectorAll('.countdown button, .countdown-clock, .countdown-elements');
+        countdownElements.forEach(function(element) {
+            if (element.classList.contains('showcountdown')) {
+                element.classList.remove('showcountdown');
+            } else {
+                element.classList.add('showcountdown');
+            }
+        });
+    }
+}
+
+document.getElementById('show-countdown').addEventListener('click', toggleCountdown);
     </script>
 </body>
 </html>

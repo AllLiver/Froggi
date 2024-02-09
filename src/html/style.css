@@ -106,6 +106,20 @@ input[type="text"], input[type="submit"] {
     width: 100%;
 }
 
+body.ipad .countdown button, body.ipad .countdown-clock, body.ipad .countdown-title, body.ipad .countdown-elements {
+    display: none;
+}
+
+body.ipad .countdown button.showcountdown, body.ipad .countdown-clock.showcountdown, body.ipad .countdown-title.showcountdown, body.ipad .countdown-elements.showcountdown {
+    display: inline-block;
+}
+
+body.ipad .countdown-clock {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 /* Overlay Styles */
 
 .white-boxes-container {
@@ -179,17 +193,23 @@ input[type="text"], input[type="submit"] {
 .timer-container {
     position: relative;
     width: 60%;
-    border: 2px solid #e99d3a;
+    border: 2px solid;
     padding: 20px;
     margin: 10px 0; 
     background-color: #242424;
-    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    border: 2px solid; 
+    border-image-source: linear-gradient(to right, #2f54f7, #8C2FF7); 
+    border-image-slice: 1;
+    border-image-width: 2px;
+    border-image-outset: 0;
+    border-image-repeat: round;
+    border-radius: 100px; 
 }
 
 .timer-container,
@@ -198,7 +218,6 @@ input[type="text"], input[type="submit"] {
     justify-content: space-between; 
     align-items: center;
     padding: 20px;
-    border: 2px solid #e99d3a;
     background-color: #242424;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
@@ -268,11 +287,11 @@ input[type="text"], input[type="submit"] {
 }
 
 .away {
-    border-color: #d32559;
+    border-color: #8C2FF7;
 }
 
 .home {
-    border-color: #5393c7;
+    border-color: #2f54f7;
 }
 
 .home button:nth-child(n+5), .away button:nth-child(n+5),
