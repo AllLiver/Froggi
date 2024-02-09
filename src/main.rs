@@ -6,6 +6,7 @@ use axum::{
     response::{Html, IntoResponse},
     routing::{get, head, post, put},
     Form, Router,
+    response::Redirect
 };
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
@@ -861,8 +862,10 @@ struct CountdownTitle {
     title: String,
 }
 
-async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) {
+async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> Redirect {
+    println!(" -> COUNTDOWN: title set to {}", title_data.title);
     *COUNTDOWN_TITLE.lock().unwrap() = title_data.title;
+    Redirect::to("/")
 }
 
 // endregion: --- Countdown
