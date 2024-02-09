@@ -42,7 +42,7 @@ lazy_static! {
     static ref AWAY_NAME: Mutex<String> = Mutex::new(String::from("team_name"));
     static ref HOME_POINTS: Mutex<i32> = Mutex::new(0);
     static ref AWAY_POINTS: Mutex<i32> = Mutex::new(0);
-    static ref TIME_MINS: Mutex<i32> = Mutex::new(8);
+    static ref TIME_MINS: Mutex<i32> = Mutex::new(0);
     static ref TIME_SECS: Mutex<i32> = Mutex::new(0);
     static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
     static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
@@ -53,9 +53,9 @@ lazy_static! {
     static ref LAST_SPONSOR: AtomicUsize = AtomicUsize::from(0);
     static ref SHOW_COUNTDOWN: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
-    static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(8);
+    static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(0);
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
-    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("title_name"));
+    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("countdown_title"));
     static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
 }
 
@@ -937,6 +937,12 @@ async fn reset_scoreboard_handler() {
     *TIME_STARTED.lock().unwrap() = false;
 
     *QUARTER.lock().unwrap() = 1;
+
+    *COUNTDOWN_TITLE.lock().unwrap() = String::from("countdown_title");
+
+    *COUNTDOWN_MINS.lock().unwrap() = 0;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+    *COUNTDOWN_STARTED.lock().unwrap() = false;
 }
 
 // endregion: -- Sponsor roll
