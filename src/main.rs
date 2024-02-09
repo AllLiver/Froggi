@@ -95,8 +95,7 @@ async fn main() {
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
-        .route("/time_secs", put(secs_handler))
-        .route("/time_mins", put(mins_handler))
+        .route("/time_dashboard", put(dashboard_time_display_handler))
         .route("/mins_up", post(mins_up_handler))
         .route("/mins_down", post(mins_down_handler))
         .route("/secs_up", post(secs_up_handler))
@@ -138,11 +137,10 @@ async fn main() {
         .route("/countdown_mins_down", post(countdown_mins_down_handler))
         .route("/countdown_secs_up", post(countdown_secs_up_handler))
         .route("/countdown_secs_down", post(countdown_secs_down_handler))
-        .route("/countdown_time_mins", put(countdown_time_mins_handler))
-        .route("/countdown_time_secs", put(countdown_time_secs_handler))
         .route("/start_countdown", post(start_countdown_handler))
         .route("/stop_countdown", post(stop_countdown_handler))
         .route("/update_countdown_title", post(countdown_title_handler))
+        .route("/countdown_dashboard", put(dashboard_countdown_display_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -492,15 +490,8 @@ async fn time_handler() -> Html<String> {
 }
 
 // Handles and returns the minutes of the time
-async fn mins_handler() -> Html<String> {
-    let time_mins = TIME_MINS.lock().unwrap();
-    Html(format!("{}", *time_mins))
-}
-
-// Handles and returns the seconds of the time
-async fn secs_handler() -> Html<String> {
-    let time_secs = TIME_SECS.lock().unwrap();
-    Html(format!("{:02?}", *time_secs))
+async fn dashboard_time_display_handler() -> Html<String> {
+    Html(format!("{}:{:02?}", *TIME_MINS.lock().unwrap(), *TIME_SECS.lock().unwrap()))
 }
 
 // Increases the minutes of the time by 1
@@ -765,12 +756,8 @@ async fn countdown_display_handler() -> Html<String> {
     ", *COUNTDOWN_TITLE.lock().unwrap(), *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
 }
 
-async fn countdown_time_mins_handler() -> Html<String> {
-    Html(format!("{}", *COUNTDOWN_MINS.lock().unwrap()))
-}
-
-async fn countdown_time_secs_handler() -> Html<String> {
-    Html(format!("{:02?}", *COUNTDOWN_SECS.lock().unwrap()))
+async fn dashboard_countdown_display_handler() -> Html<String> {
+    Html(format!("{}:{:02?}", *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
 }
 
 async fn show_countdown_handler() {

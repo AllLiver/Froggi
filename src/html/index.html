@@ -60,7 +60,7 @@
         <ul>
             <li><a href="#" class="active4">Dashboard</a></li>
             <li><a href="/overlay" target="_blank">Overlay</a></li>
-            <li><a href="/teaminfo" target="_blank">Team Info</a></li>
+            <li><a href="/teaminfo">Team Info</a></li>
         </ul>
     </header>
 
@@ -88,13 +88,7 @@
         
                 <h2>Timer</h2>
                 <div class="timer-elements">
-                    <div class="mins-elements">
-                        <div hx-put="/time_mins" hx-trigger="every 10ms"></div>
-                    </div>
-                    <span class="colon">:</span>
-                    <div class="secs-elements">
-                        <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
-                    </div>
+                    <div hx-put="/time_dashboard" hx-trigger="every 10ms"></div>
                 </div>
         
                 <div class="timer-controls">
@@ -129,14 +123,7 @@
                     </div>
                     
                     <div class="countdown-elements">
-                        <div class="countdown-mins-elements">
-                            <div hx-put="/countdownemins" hx-trigger="every 10ms"></div> 
-                        </div>
-                        <p>:</p>
-                        <span class="countdown_colon">:</span>
-                        <div class="countdown-secs-elements">
-                            <div hx-put="/countdown_secs" hx-trigger="every 10ms"></div>
-                        </div>
+                        <div hx-put="/countdown_dashboard" hx-trigger="every 10ms"></div>
                    
                         <br>
                     <div hx-put="/countdown_time_mins" hx-trigger="every 10ms"></div>
@@ -215,7 +202,6 @@
             <button hx-post="show_logs" hx-swap="none">Show logs</button>
             <div id="logs" hx-get="/logs" hx-trigger="show_logs"></div>
         </div>  --> <!-- Planned: Show logs, needs backend -->
-    <div hx-put="/sponsor_roll" hx-trigger="every 5s"></div>
     <p id="ping">Ping: calculating...</p>
 
 <!-- Javascript -->
