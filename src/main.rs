@@ -51,19 +51,25 @@ lazy_static! {
     static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(8);
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
+    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("title_name"));
+    static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
 } 
 
 #[tokio::main]
 async fn main() {
     std::fs::create_dir_all("./sponsors").unwrap();
 
+    *SPONSOR_IMG_TAGS.lock().unwrap() = tokio::spawn(load_sponsors()).await.unwrap();
+
+    tokio::spawn(sponsor_roll_ticker());
+
     // region: --- Routing
 
     let app = Router::new() // Creates a new router
         // Routes for the html files, css, and lib files
         .route("/", get(idx_handler)) // Handles get requests for the index of the app
-        .route("/chromakey", get(chroma_handler)) // Handles get requests for the chromakey page
-        .route("/upload", get(upload_page_handler)) // Handles get requests for the upload page
+        .route("/overlay", get(chroma_handler)) // Handles get requests for the overlay page
+        .route("/teaminfo", get(upload_page_handler)) // Handles get requests for the upload page
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
         .route("/favicon_png", get(favicon_handler))
@@ -124,6 +130,19 @@ async fn main() {
         .route("/show_countdown", post(show_countdown_handler))
         .route("/countdown_css", put(countdown_css_handler))
         .route("/countdown_display", put(countdown_display_handler))
+        .route("/qtc20", post(qtc20_handler))
+        .route("/qtc15", post(qtc15_handler))
+        .route("/qtc10", post(qtc10_handler))
+        .route("/qtc5", post(qtc5_handler))
+        .route("/countdown_mins_up", post(countdown_mins_up_handler))
+        .route("/countdown_mins_down", post(countdown_mins_down_handler))
+        .route("/countdown_secs_up", post(countdown_secs_up_handler))
+        .route("/countdown_secs_down", post(countdown_secs_down_handler))
+        .route("/countdown_time_mins", put(countdown_time_mins_handler))
+        .route("/countdown_time_secs", put(countdown_time_secs_handler))
+        .route("/start_countdown", post(start_countdown_handler))
+        .route("/stop_countdown", post(stop_countdown_handler))
+        .route("/update_countdown_title", post(countdown_title_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -239,16 +258,16 @@ async fn idx_handler() -> Html<&'static str> {
     Html(include_str!("html/index.html")) // Serves the contents of index.html
 }
 
-// Serves the chromakey.html file
+// Serves the overlay.html file
 async fn chroma_handler() -> Html<&'static str> {
-    println!(" -> SERVE: chromakey.html");
-    Html(include_str!("html/scoreboard/chromakey.html"))
+    println!(" -> SERVE: overlay.html");
+    Html(include_str!("html/scoreboard/overlay.html"))
 }
 
-// Serve the upload.html file
+// Serve the teaminfo.html file
 async fn upload_page_handler() -> Html<&'static str> {
-    println!(" -> SERVE: upload.html");
-    Html(include_str!("html/logo_upload/upload.html"))
+    println!(" -> SERVE: teaminfo.html");
+    Html(include_str!("html/logo_upload/teaminfo.html"))
 }
 
 // Serves the main css file
@@ -639,8 +658,7 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
 // endregion: --- File upload handlers
 // region: --- Sponsor roll
 
-async fn sponsor_roll_handler() -> Html<String> {
-    
+async fn load_sponsors() -> Vec<Html<String>> {
     let mut entries = fs::read_dir("./sponsors").await.unwrap();
     let mut sponsor_imgs: Vec<tokio::fs::DirEntry> = Vec::new();
 
@@ -653,16 +671,40 @@ async fn sponsor_roll_handler() -> Html<String> {
         }
     }
 
-    let last_sponsor = LAST_SPONSOR.fetch_add(1, Ordering::SeqCst) % sponsor_imgs.len();
+    let mut img_tags: Vec<Html<String>> = Vec::new();
 
-    let img_bytes = fs::read(sponsor_imgs[last_sponsor].path())
+    for i in 0..sponsor_imgs.len() {
+        let img_bytes = fs::read(sponsor_imgs[i].path())
         .await
         .unwrap();
 
-    Html(format!(
-        "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
-        BASE64_STANDARD.encode(&img_bytes)
-    ))
+        img_tags.push(Html(format!(
+            "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
+            BASE64_STANDARD.encode(&img_bytes)
+        )));
+    }
+
+    return img_tags;
+}
+
+async fn sponsor_roll_ticker() {
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+        let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+
+        if last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().unwrap().len() - 1 {
+            LAST_SPONSOR.store(0, Ordering::SeqCst);
+        } else {
+            LAST_SPONSOR.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+}
+
+async fn sponsor_roll_handler() -> Html<String> {
+    let sponsor_imgs = SPONSOR_IMG_TAGS.lock().unwrap();
+    let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+
+    sponsor_imgs[last_sponsor].clone()
 }
 
 async fn show_sponsor_roll_handler() {
@@ -710,16 +752,25 @@ async fn countdown_ticker() {
 }
 
 async fn start_countdown_handler() {
-    let mut countdown_started = COUNTDOWN_STARTED.lock().unwrap();
-    if *countdown_started {
-        *countdown_started = false;
-    } else {
-        *countdown_started = true;
-    }
+    *COUNTDOWN_STARTED.lock().unwrap() = true;
+}
+
+async fn stop_countdown_handler() {
+    *COUNTDOWN_STARTED.lock().unwrap() = false;
 }
 
 async fn countdown_display_handler() -> Html<String> {
-    Html(format!("{}:{:02?}", *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+    Html(format!("<h2>{}</h2> <br>
+    Time: {}:{:02?}
+    ", *COUNTDOWN_TITLE.lock().unwrap(), *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+}
+
+async fn countdown_time_mins_handler() -> Html<String> {
+    Html(format!("{}", *COUNTDOWN_MINS.lock().unwrap()))
+}
+
+async fn countdown_time_secs_handler() -> Html<String> {
+    Html(format!("{:02?}", *COUNTDOWN_SECS.lock().unwrap()))
 }
 
 async fn show_countdown_handler() {
@@ -735,8 +786,63 @@ async fn countdown_css_handler() -> Html<&'static str> {
     if *SHOW_COUNTDOWN.lock().unwrap() {
         return Html("<style> .white-boxes-container { display: none; } #show-countdown { background-color: rgb(227, 45, 32); } </style>");
     } else {
-        return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } </style>");
+        return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } #countdown { display: none; }</style>");
     }
+}
+
+async fn qtc20_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 20;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn qtc15_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 15;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn qtc10_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 10;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn qtc5_handler() {
+    *COUNTDOWN_MINS.lock().unwrap() = 5;
+    *COUNTDOWN_SECS.lock().unwrap() = 0;
+}
+
+async fn countdown_mins_up_handler() {
+    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    *countdown_mins = *countdown_mins + 1;
+}
+
+async fn countdown_mins_down_handler() {
+    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    if *countdown_mins > 0 {
+        *countdown_mins = *countdown_mins - 1;
+    }
+}
+
+async fn countdown_secs_up_handler() {
+    let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+    if *countdown_secs < 59 {
+        *countdown_secs = *countdown_secs + 1;
+    }
+}
+
+async fn countdown_secs_down_handler() {
+    let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+    if *countdown_secs > 0 {
+        *countdown_secs = *countdown_secs - 1;
+    }
+}
+
+#[derive(Deserialize)]
+struct CountdownTitle {
+    title: String
+}
+
+async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) {
+    *COUNTDOWN_TITLE.lock().unwrap() = title_data.title;
 }
 
 // endregion: --- Countdown

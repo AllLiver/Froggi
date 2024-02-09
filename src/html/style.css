@@ -20,7 +20,7 @@ button {
     background-color: #e9981f;
     border: none;
     color: white;
-    padding:1% 5%;
+    padding: 1% 5%;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -123,22 +123,6 @@ header li a:hover {
     font-size: 16px;
 }
 
-/* Timer Styles */
-.timer {
-    width: 40%;
-    border: 2px solid #e99d3a;
-    padding: 20px;
-    margin: 10px 0;
-    background-color: #242424;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
 
 /* Other Styles */
 .names {
@@ -193,7 +177,7 @@ input[type="text"], input[type="submit"] {
 }
 
 /* General Styles */
-body .timer-controls .timer-button {
+body .timer-controls .timer-button, .countdown-controls {
     font-size: 20px !important;
     padding: 10px 20px !important;
     width: 150px !important;
@@ -210,7 +194,6 @@ button.active {
 
 /* Box Styles */
 .white-boxes-container {
-    display: flex; 
     justify-content: center;
     width: 100%;
     position: fixed;
@@ -276,102 +259,72 @@ button.active {
 }
 
 /* Timer Styles */
-.timer {
+.timer-container {
+    position: relative;
     width: 60%;
-    padding: 30px;
-    margin: 20px 0;
+    border: 2px solid #e99d3a;
+    padding: 20px;
+    margin: 10px 0;
     background-color: #242424;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
-    justify-content: center;
-}
-
-.timer-controls {
-    display: flex;
-    justify-content: center; 
-    margin-bottom: 20px;
-}
-
-.timer-controls + .timer-controls {
-    margin-top: 10px; 
-}
-
-.countdown {
-
-    width: 60%;
-    padding: 30px;
-    margin: 20px 0;
-    background-color: #242424;
-    border-radius: 15px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Align items to the left */
-    justify-content: center;
-}
-
-
-
-
-
-.quick-timer-buttons {
-    display: flex;
-    justify-content: center;
+    flex-direction: row;
+    justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    margin-bottom: 20px; /* Add margin between quick boxes */
 }
 
-.quick-timer-buttons button {
-    font-size: 1.2em;
-    margin: 0 15px 10px 15px; /* Add margin to the right and bottom of each button */
+.timer-controls button {
+    font-size: 1.5em;
+    padding: 10px 20px;
+    margin: 0 5px;
+    margin: 5px;
+    border-radius: 5px; /* Add border radius */
 }
 
-
-.timer-elements {
+.timer-elements,
+.countdown-elements {
     display: flex;
     align-items: center;
 }
 
 .mins-elements,
-.secs-elements {
+.secs-elements,
+.countdown_time_mins,
+.countdown_time_secs {
     margin-right: 15px;
 }
 
-.colon {
+.colon,
+.countdown-colon {
     font-size: 2em;
-    margin-right: 15px;
+    margin: 0 5px;
+    position: relative;
 }
 
-.timer-button,
-.min-button,
-.min-minus-button {
+/* Additional Styles for Countdown */
+.countdown-controls button {
     font-size: 1.5em;
     padding: 10px 20px;
-    margin: 0 5px; 
+    margin: 0 5px;
+    margin: 5px;
+    border-radius: 5px; /* Add border radius */
 }
 
-.timer-button.selected,
-.min-button.selected,
-.min-minus-button.selected {
-    background-color: rgb(44, 194, 194);
+.countdown-elements {
+    display: flex;
+    align-items: center;
 }
 
-.timer-controls .min-button,
-.timer-controls .min-minus-button {
-    font-size: 1.5em;
-    padding: 10px 15px;
-    margin: 0 5px; /* Add margin to the buttons */
+.countdown-elements p {
+    font-size: 1.5em; /* Adjust font size */
+    margin: 0 5px; /* Add margin */
 }
 
-.timer-controls .min-button.selected,
-.timer-controls .min-minus-button.selected {
-    background-color: rgb(44, 194, 194);
+.countdown-mins-elements,
+.countdown-secs-elements {
+    margin-right: 15px;
 }
 
 

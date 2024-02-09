@@ -27,21 +27,18 @@
                 }
                 
         .white-boxes-container {
-          transform: translateY(-10px);
+          transform: translateY(-5px);
+          position: relative; /* Should put sponsor bar behind the buttons */
+    z-index: 1; /* Should put sponsor bar behind the buttons */
         }
 
-        .timer-countdown-container {
-      display: flex;
-     align-items: center; /* Align items vertically */
-    }
+        .button {
+    position: relative; /* Should put sponsor bar behind the buttons */
+    z-index: 2; /* Should put sponsor bar behind the buttons */
+}
 
-    .timer,
-    .countdown {
-    flex: 1; /* Equal width for both elements */
-    text-align: center; /* Center content horizontally */
-    }
 
-    
+
     </style>
     <script src="./htmx.min.js"></script>
     <script>
@@ -62,12 +59,12 @@
     <header>
         <ul>
             <li><a href="#" class="active4">Dashboard</a></li>
-            <li><a href="/chromakey" target="_blank">Overlay</a></li>
-            <li><a href="/upload">Team Info</a></li>
+            <li><a href="/overlay" target="_blank">Overlay</a></li>
+            <li><a href="/teaminfo" target="_blank">Team Info</a></li>
         </ul>
     </header>
 
-
+<!-- Home Score Content -->
     <div class="score-container">
         <div class="home">
             <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
@@ -79,60 +76,90 @@
             <button hx-post="/hu2" hx-swap="none">2 Points</button>
             <button hx-post="/hu3" hx-swap="none">3 Points</button>
         </div>
-   
-        <div class="timer">
-            <div class="quick-timer-buttons">
-                <button hx-post="/qt8" hx-swap="none">8 Min</button>
-                <button hx-post="/qt5" hx-swap="none">5 Min</button>
-                <button hx-post="/qt3" hx-swap="none">3 Min</button>
-                <button hx-post="/qt1" hx-swap="none">1 Min</button>
-            </div>
-            <h2>Timer</h2>
-            <div class="timer-elements">
-                <div class="mins-elements">
-                    <div hx-put="/time_mins" hx-trigger="every 10ms"></div>
+<!-- Timer & Countdown Content -->
+        <div class="timer-container">
+            <div class="timer">
+                <div class="quick-timer-buttons">
+                    <button hx-post="/qt8" hx-swap="none">8 Min</button>
+                    <button hx-post="/qt5" hx-swap="none">5 Min</button>
+                    <button hx-post="/qt3" hx-swap="none">3 Min</button>
+                    <button hx-post="/qt1" hx-swap="none">1 Min</button>
                 </div>
-                <span class="colon">:</span>
-                <div class="secs-elements">
-                    <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
-                </div>
-            </div>
-            <!-- I made your life very difficult with the variable names!!!! :D -->
-            <div class="timer-controls">
-                <button id="startButton" hx-post="/tstart" hx-swap="none" hx-trigger="click" class="timer-button">Start</button>
-                <button id="stopButton" hx-post="/tstop" hx-swap="none" hx-trigger="click" class="timer-button">Stop</button>
-            </div>
-            <div class="timer-controls">
-                <button hx-post="/mins_up" hx-swap="none" class="timer-button min-button">Min+</button>
-                <button hx-post="/mins_down" hx-swap="none" class="timer-button min-minus-button">Min-</button>
-            </div>
-            <div class="timer-controls">
-                <button hx-post="/secs_up" hx-swap="none" class="timer-button min-button">Sec+</button>
-                <button hx-post="/secs_down" hx-swap="none" class="timer-button min-minus-button">Sec-</button>
-            </div>
-            <div class="Countdownn">
-            <h2>Countdown</h2>
-            <div class="timer-elements">
-                <div class="mins-elements">
-                    <div hx-put="/countdown_mins" hx-trigger="every 10ms"></div>
-                </div>
-                <span class="colon">:</span>
-                <div class="secs-elements">
-                    <div hx-put="/countdown_secs" hx-trigger="every 10ms"></div>
-                </div>
-            </div>
-            <div class="timer-controls">
-                <button id="startButton_count" hx-post="/cstart" hx-swap="none" hx-trigger="click" class="timer-button">Start</button>
-                <button id="stopButton_count" hx-post="/cstop" hx-swap="none" hx-trigger="click" class="timer-button">Stop</button>
-            </div>
-            <div class="timer-controls">
-                <button hx-post="/mins_down_count" hx-swap="none" class="timer-button min-button">Min-</button>
-                <button hx-post="/secs_down_count" hx-swap="none" class="timer-button min-minus-button">Sec-</button>
-            </div>
-        </div>
-        </div>
         
-
+                <h2>Timer</h2>
+                <div class="timer-elements">
+                    <div class="mins-elements">
+                        <div hx-put="/time_mins" hx-trigger="every 10ms"></div>
+                    </div>
+                    <span class="colon">:</span>
+                    <div class="secs-elements">
+                        <div hx-put="/time_secs" hx-trigger="every 10ms"></div>
+                    </div>
+                </div>
+        
+                <div class="timer-controls">
+                    <button id="startButton" hx-post="/tstart" hx-swap="none" hx-trigger="click" class="timer-button">Start</button>
+                    <button id="stopButton" hx-post="/tstop" hx-swap="none" hx-trigger="click" class="timer-button">Stop</button>
+                </div>
+                <div class="timer-controls">
+                    <button hx-post="/mins_up" hx-swap="none" class="timer-button min-button">Min+</button>
+                    <button hx-post="/mins_down" hx-swap="none" class="timer-button min-minus-button">Min-</button>
+                </div>
+                <div class="timer-controls">
+                    <button hx-post="/secs_up" hx-swap="none" class="timer-button min-button">Sec+</button>
+                    <button hx-post="/secs_down" hx-swap="none" class="timer-button min-minus-button">Sec-</button>
+                </div>
+        
+                <div class="countdown-elements">
+                    <div class="countdown_mins-elements">
+                        <div hx-put="/countdown_mins" hx-trigger="every 10ms"></div>
+                        <div class="countdown_secs-elements">
+                            <div hx-put="/countdown_secs" hx-trigger="every 10ms"></div>
+                        </div>
+                    </div>
+                </div>
+        
+                <h2>Countdown</h2>
+                <div class="countdown">
+                    <div class="quick-countdown-buttons">
+                        <button hx-post="/qtc20" hx-swap="none">20 Min</button>
+                        <button hx-post="/qtc15" hx-swap="none">15 Min</button>
+                        <button hx-post="/qtc10" hx-swap="none">10 Min</button>
+                        <button hx-post="/qtc5" hx-swap="none">5 Min</button>
+                    </div>
+                    
+                    <div class="countdown-elements">
+                        <div class="countdown-mins-elements">
+                            <div hx-put="/countdownemins" hx-trigger="every 10ms"></div> 
+                        </div>
+                        <p>:</p>
+                        <span class="countdown_colon">:</span>
+                        <div class="countdown-secs-elements">
+                            <div hx-put="/countdown_secs" hx-trigger="every 10ms"></div>
+                        </div>
+                   
+                        <br>
+                    <div hx-put="/countdown_time_mins" hx-trigger="every 10ms"></div>
+                    <div hx-put="/countdown_time_secs" hx-trigger="every 10ms"></div>
+                        <br>
+                    <div class="countdown-controls">
+                        <button id="cdstartButton" hx-post="/start_countdown" hx-swap="none" hx-trigger="click" class="start_countdown">Start</button>
+                        <button id="cdstopButton" hx-post="/stop_countdown" hx-swap="none" hx-trigger="click" class="stop">Stop</button>
+                    </div>
+                    <div class="countdown-controls">
+                        <button hx-post="/countdown_mins_up" hx-swap="none" class="timer-button min-button">Min+</button>
+                        <button hx-post="/countdown_mins_down" hx-swap="none" class="timer-button min-minus-button">Min-</button>
+                    </div>
+                    <div class="countdown-controls">
+                        <button hx-post="/countdown_secs_up" hx-swap="none" class="countdown-button min-button">Sec+</button>
+                        <button hx-post="/countdown_secs_down" hx-swap="none" class="countdown-button min-minus-button">Sec-</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        
+<!-- Away Score Content -->
 
         <div class="away">
             <div hx-put="/adisp" hx-trigger="every 10ms"></div>
@@ -146,6 +173,7 @@
         </div>
     </div>
 
+<!-- Overlay Bar Preview -->
 
  <div class="white-boxes-container">
         <div class="home-box">
@@ -165,16 +193,22 @@
         </div>
     </div>
 
+<!--Quarter Content -->
+
     <div class="quarter-container">
         <button id="show-quarter" hx-post="show_quarter" hx-swap="none">Show quarter</button>
         <button id="quarter1" hx-post="/q1" hx-swap="none">Quarter 1</button>
         <button id="quarter2" hx-post="/q2" hx-swap="none">Quarter 2</button>
         <button id="quarter3" hx-post="/q3" hx-swap="none">Quarter 3</button>
         <button id="quarter4" hx-post="/q4" hx-swap="none">Quarter 4</button>
-        <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
     </div>
-    <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Show countdown</button>
 
+<!-- Extra Button Content -->
+
+    <div class="extra-buttons"></div>
+    <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Show countdown</button>
+    <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
+    </div>
     
    <!-- <div class="extra-buttons">
         <div id="show_logs" class="logs">
@@ -183,8 +217,10 @@
         </div>  --> <!-- Planned: Show logs, needs backend -->
     <div hx-put="/sponsor_roll" hx-trigger="every 5s"></div>
     <p id="ping">Ping: calculating...</p>
+
+<!-- Javascript -->
+
     <script>
- 
         htmx.on('#startButton', 'htmx:afterRequest', function() {
             document.getElementById('startButton').classList.add('selected');
             document.getElementById('stopButton').classList.remove('selected');
@@ -193,10 +229,7 @@
         htmx.on('#stopButton', 'htmx:afterRequest', function() {
             document.getElementById('stopButton').classList.add('selected');
             document.getElementById('startButton').classList.remove('selected');
-        });
-
-       
-
+        });    
         var quarters = document.querySelectorAll('.quarter-container button');
 
         function removeActiveClass() {
@@ -204,7 +237,6 @@
                 quarter.classList.remove('active');
             });
         }
-
         quarters.forEach(function(quarter) {
     quarter.addEventListener('click', function() {
         removeActiveClass();
@@ -212,28 +244,6 @@
         document.getElementById('show_quarter').classList.remove('active');
     });
 });
-
-       document.querySelector('#name-form').addEventListener('submit', function (event) {
-    event.preventDefault();
-    var homeName = document.getElementById('homeName').value;
-    var awayName = document.getElementById('awayName').value;
-    if (homeName && awayName) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/name_submit", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.onreadystatechange = function () {
-            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-                console.log("Name submit request finished and response is ready.");
-
-                // Update the names on the page.
-                document.getElementById('homeNameDisplay').textContent = homeName;
-                document.getElementById('awayNameDisplay').textContent = awayName;
-            }
-        };
-        xhr.send("homeName=" + homeName + "&awayName=" + awayName);
-    }
-});
-
     </script>
 </body>
 </html>
