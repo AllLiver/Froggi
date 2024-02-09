@@ -11,7 +11,10 @@ use axum::{
 use lazy_static::lazy_static;
 use std::{
     path::Path,
-    sync::{atomic::{AtomicUsize, Ordering}, Mutex},
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Mutex,
+    },
 };
 
 // Brings libraries needed for the server headers into scope
@@ -53,7 +56,7 @@ lazy_static! {
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
     static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("title_name"));
     static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
-} 
+}
 
 #[tokio::main]
 async fn main() {
@@ -140,7 +143,10 @@ async fn main() {
         .route("/start_countdown", post(start_countdown_handler))
         .route("/stop_countdown", post(stop_countdown_handler))
         .route("/update_countdown_title", post(countdown_title_handler))
-        .route("/countdown_dashboard", put(dashboard_countdown_display_handler))
+        .route(
+            "/countdown_dashboard",
+            put(dashboard_countdown_display_handler),
+        )
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -491,7 +497,11 @@ async fn time_handler() -> Html<String> {
 
 // Handles and returns the minutes of the time
 async fn dashboard_time_display_handler() -> Html<String> {
-    Html(format!("{}:{:02?}", *TIME_MINS.lock().unwrap(), *TIME_SECS.lock().unwrap()))
+    Html(format!(
+        "{}:{:02?}",
+        *TIME_MINS.lock().unwrap(),
+        *TIME_SECS.lock().unwrap()
+    ))
 }
 
 // Increases the minutes of the time by 1
@@ -665,9 +675,7 @@ async fn load_sponsors() -> Vec<Html<String>> {
     let mut img_tags: Vec<Html<String>> = Vec::new();
 
     for i in 0..sponsor_imgs.len() {
-        let img_bytes = fs::read(sponsor_imgs[i].path())
-        .await
-        .unwrap();
+        let img_bytes = fs::read(sponsor_imgs[i].path()).await.unwrap();
 
         img_tags.push(Html(format!(
             "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
@@ -751,13 +759,22 @@ async fn stop_countdown_handler() {
 }
 
 async fn countdown_display_handler() -> Html<String> {
-    Html(format!("<h2>{}</h2> <br>
+    Html(format!(
+        "<h2>{}</h2> <br>
     Time: {}:{:02?}
-    ", *COUNTDOWN_TITLE.lock().unwrap(), *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+    ",
+        *COUNTDOWN_TITLE.lock().unwrap(),
+        *COUNTDOWN_MINS.lock().unwrap(),
+        *COUNTDOWN_SECS.lock().unwrap()
+    ))
 }
 
 async fn dashboard_countdown_display_handler() -> Html<String> {
-    Html(format!("{}:{:02?}", *COUNTDOWN_MINS.lock().unwrap(), *COUNTDOWN_SECS.lock().unwrap()))
+    Html(format!(
+        "{}:{:02?}",
+        *COUNTDOWN_MINS.lock().unwrap(),
+        *COUNTDOWN_SECS.lock().unwrap()
+    ))
 }
 
 async fn show_countdown_handler() {
@@ -825,7 +842,7 @@ async fn countdown_secs_down_handler() {
 
 #[derive(Deserialize)]
 struct CountdownTitle {
-    title: String
+    title: String,
 }
 
 async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) {
