@@ -873,7 +873,7 @@ struct CountdownTitle {
 async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> Redirect {
     println!(" -> COUNTDOWN: title set to {}", title_data.title);
     *COUNTDOWN_TITLE.lock().unwrap() = title_data.title;
-    Redirect::to("/")
+    Redirect::to("/countdown")
 }
 
 // endregion: --- Countdown
