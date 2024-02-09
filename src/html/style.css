@@ -59,6 +59,7 @@ header li a:hover {
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #161617;
+    touch-action: manipulation
 }
 
 ul li {
