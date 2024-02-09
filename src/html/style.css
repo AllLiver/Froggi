@@ -177,11 +177,6 @@ input[type="text"], input[type="submit"] {
 }
 
 /* General Styles */
-body .timer-controls .timer-button, .countdown-controls {
-    font-size: 20px !important;
-    padding: 10px 20px !important;
-    width: 150px !important;
-}
 
 button.active {
     background-color: rgb(44, 194, 194);
@@ -264,7 +259,7 @@ button.active {
     width: 60%;
     border: 2px solid #e99d3a;
     padding: 20px;
-    margin: 10px 0;
+    margin: 10px 0; /* Adjust the top and bottom margin */
     background-color: #242424;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
@@ -275,56 +270,51 @@ button.active {
     align-items: center;
 }
 
-.timer-controls button {
-    font-size: 1.5em;
-    padding: 10px 20px;
-    margin: 0 5px;
-    margin: 5px;
-    border-radius: 5px; /* Add border radius */
+.timer-container,
+.countdown-container {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+    padding: 20px;
+    border: 2px solid #e99d3a;
+    background-color: #242424;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    color: white;
+}
+
+.timer-container h2,
+.countdown-container h2 {
+    padding: 2% 8%; 
+    font-size: 120%; 
+}
+
+.timer-controls,
+.countdown-controls {
+    display: flex;
+    align-items: center;
+    margin: 0; 
 }
 
 .timer-elements,
 .countdown-elements {
-    display: flex;
-    align-items: center;
+    padding: 2% 8%;
+    font-size: 120%; 
 }
 
-.mins-elements,
-.secs-elements,
-.countdown_time_mins,
-.countdown_time_secs {
-    margin-right: 15px;
+.countdown {
+    position: absolute;
+    top: 100px; 
+    right: 0;
 }
 
-.colon,
-.countdown-colon {
-    font-size: 2em;
-    margin: 0 5px;
-    position: relative;
-}
 
-/* Additional Styles for Countdown */
-.countdown-controls button {
-    font-size: 1.5em;
-    padding: 10px 20px;
-    margin: 0 5px;
-    margin: 5px;
-    border-radius: 5px; /* Add border radius */
-}
-
-.countdown-elements {
-    display: flex;
-    align-items: center;
-}
-
-.countdown-elements p {
-    font-size: 1.5em; /* Adjust font size */
-    margin: 0 5px; /* Add margin */
-}
-
-.countdown-mins-elements,
-.countdown-secs-elements {
-    margin-right: 15px;
+.timer-controls button,
+.countdown-controls button,
+.timer-elements button,
+.countdown-elements button {
+    padding: 2% 8%; 
+    font-size: 120% !important; 
 }
 
 
