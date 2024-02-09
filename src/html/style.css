@@ -1,34 +1,6 @@
 /* Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Open+Sans&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap');
 
-/* General Styles */
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #161617;
-}
-
-ul li {
-    display: inline;
-    padding: 1px;
-}
-
-h1, h2, h3, p {
-    color: white;
-}
-
-button {
-    background-color: #e9981f;
-    border: none;
-    color: white;
-    padding: 1% 5%;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 100%; 
-    margin: 1.25% 0.625%;
-    cursor: pointer;
-    border-radius: 3%;
-}
 /* Header Styles */
 
 header ul {
@@ -81,80 +53,39 @@ header li a:hover {
     background: #fff;
     color: #1e1e1e;
   }
-  
 
-/* Team Styles */
-.away, .home {
-    width: 200px; /* Set a fixed width for the boxes */
-    border-style: solid;
-    border-width: 2px;
-    background-color: #1d1d1d;
-    font-family: 'Open Sans', sans-serif;
-    color: white;
-    padding: 10px;
-    margin: 20px;
-    border-radius: 5px;
+
+/* General Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #161617;
 }
 
-.away {
-    border-color: #d32559;
+ul li {
+    display: inline;
+    padding: 1px;
 }
 
-.home {
-    border-color: #5393c7;
-}
-
-.home button:nth-child(n+5), .away button:nth-child(n+5),
-.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
-    display: block;
-    width: 100%;
-    min-width: 100%; /* Set a minimum width for the boxes */
-    margin: 10px 0;
-    padding: 10px;
-    font-size: 16px;
-}
-.home button:nth-child(n+5), .away button:nth-child(n+5),
-.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
-    display: block;
-    width: 100%;
-    min-width: 100%; /* Set a minimum width for the boxes */
-    margin: 10px 0;
-    padding: 10px;
-    font-size: 16px;
-}
-
-
-/* Other Styles */
-.names {
-    font-size: 20px;
-    font-weight: bold;
+h1, h2, h3, p {
     color: white;
 }
 
-.score-container {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 40px;
-}
-
-.team-form {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.team-input {
-    flex: 1;
-    min-width: 200px;
-    margin: 10px;
-}
-
-input[type="text"], input[type="submit"] {
-    width: 100%;
+button {
+    background-color: #e9981f;
+    border: none;
+    color: white;
+    padding: 1% 5%;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 100%; 
+    margin: 1.25% 0.625%;
+    cursor: pointer;
+    border-radius: 3%;
 }
 
 
-#ping {
+  #ping {
     position: fixed;
     bottom: 0;
     right: 0;
@@ -162,21 +93,6 @@ input[type="text"], input[type="submit"] {
     background-color: rgba(0, 0, 0, 0.5); 
     color: white; 
 }
-
-.team-input label {
-    color: white;
-}
-
-.logo-upload {
-    color: white;
-    display: block;
-}
-
-.logo-upload #file-submit {
-    display: block;
-}
-
-/* General Styles */
 
 button.active {
     background-color: rgb(44, 194, 194);
@@ -186,8 +102,12 @@ button.active {
     color: white;
 }
 
+input[type="text"], input[type="submit"] {
+    width: 100%;
+}
 
-/* Box Styles */
+/* Overlay Styles */
+
 .white-boxes-container {
     justify-content: center;
     width: 100%;
@@ -242,7 +162,8 @@ button.active {
 
 .score-container {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
+    margin-top: 40px;
 }
 
 .team-container {
@@ -254,12 +175,13 @@ button.active {
 }
 
 /* Timer Styles */
+
 .timer-container {
     position: relative;
     width: 60%;
     border: 2px solid #e99d3a;
     padding: 20px;
-    margin: 10px 0; /* Adjust the top and bottom margin */
+    margin: 10px 0; 
     background-color: #242424;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
@@ -296,29 +218,81 @@ button.active {
     margin: 0; 
 }
 
+
 .timer-elements,
 .countdown-elements {
-    padding: 2% 8%;
+    padding: 4% 8%;
+    font-size: 120%; 
+    text-align: center;
+}
+
+.quick-timer-buttons,
+.quick-countdown-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 10px; 
+    padding: 4% 8%;
     font-size: 120%; 
 }
 
 .countdown {
     position: absolute;
     top: 100px; 
-    right: 0;
+    left: 65%;
 }
-
 
 .timer-controls button,
 .countdown-controls button,
 .timer-elements button,
-.countdown-elements button {
-    padding: 2% 8%; 
+.countdown-elements button,
+.timer-controls {
+    padding: 2px 8px; 
+    margin: 5px !important; 
     font-size: 120% !important; 
+    width: 200px !important;
 }
 
-
 /* Team Styles */
+
+.away, .home {
+    width: 200px; 
+    border-style: solid;
+    border-width: 2px;
+    background-color: #1d1d1d;
+    font-family: 'Open Sans', sans-serif;
+    color: white;
+    padding: 10px;
+    margin: 20px;
+    border-radius: 5px;
+}
+
+.away {
+    border-color: #d32559;
+}
+
+.home {
+    border-color: #5393c7;
+}
+
+.home button:nth-child(n+5), .away button:nth-child(n+5),
+.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
+    display: block;
+    width: 100%;
+    min-width: 100%; 
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
+.home button:nth-child(n+5), .away button:nth-child(n+5),
+.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
+    display: block;
+    width: 100%;
+    min-width: 100%; 
+    margin: 10px 0;
+    padding: 10px;
+    font-size: 16px;
+}
 .team-form {
     display: flex;
     justify-content: space-between;
@@ -355,8 +329,30 @@ input[type="text"] {
     align-items: center;
 }
 
-/* File Upload */
 
+.team-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.team-input {
+    flex: 1;
+    min-width: 200px;
+    margin: 10px;
+}
+
+.team-input label {
+    color: white;
+}
+
+.names {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+/* Teaminfo Styles */
 
 .logo-upload {
     max-width: 500px;
@@ -390,7 +386,7 @@ input[type="file"] {
 }
 
 #file-submit:hover {
-    background-color: #e9981f;
+    background-color: #e9981fe3;
 }
 
 #name-form {
@@ -431,4 +427,13 @@ input[type="file"] {
 
 #logo-form {
     margin-bottom: 30px; 
+}
+
+.logo-upload {
+    color: white;
+    display: block;
+}
+
+.logo-upload #file-submit {
+    display: block;
 }

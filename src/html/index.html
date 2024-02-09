@@ -37,7 +37,10 @@
     z-index: 2; /* Should put sponsor bar behind the buttons */
 }
 
-
+.timer-controls, .timer-buttons {
+    width: 400px !important; 
+    font-size: 120%;
+}
 
     </style>
     <script src="./htmx.min.js"></script>
@@ -124,6 +127,7 @@
                     
                     <div class="countdown-elements">
                         <div hx-put="/countdown_dashboard" hx-trigger="every 10ms"></div>
+                        <br>
                     <div hx-put="/countdown_time_mins" hx-trigger="every 10ms"></div>
                     <div hx-put="/countdown_time_secs" hx-trigger="every 10ms"></div>
                     <div class="countdown-controls">
@@ -140,8 +144,8 @@
                     </div>
                     <form id="countdown-form" hx-post="/update_countdown_title" class="countdown-title" hx-swap="none">
                         <label for="title">Countdown title:</label>
-                        <input type="text" id="title" name="title">
-                        <input type="submit" value="Submit" id="countdown-submit">
+                        <input type="text" id="title" name="title" onchange="this.form.submit()">
+                    </form>
                     </form>
                 </div>
             </div>
