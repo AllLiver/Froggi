@@ -21,5 +21,5 @@ Here are some features/updates planned
  - Logs
  - Automatic fullscreen & cursor hiding on overlay page.
 # Contribute
-If you would like to contribute, and you know rust, html, css, js, please feel free to create a pull request.
+If you would like to contribute, and you know familiar with rust & html, feel free clone the repository & create a pull request.
 
