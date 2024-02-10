@@ -53,11 +53,15 @@
     </div>
     <div class="show-countdown-button">
     <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Show countdown</button>
+    <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>  
     </div>
 </div>
 </div>
 <script>
     document.getElementById('show-countdown').addEventListener('click', function() {
+    this.classList.toggle('on');
+});
+document.getElementById('show-sponsor_roll').addEventListener('click', function() {
     this.classList.toggle('on');
 });
 </script>

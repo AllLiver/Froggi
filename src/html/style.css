@@ -205,6 +205,7 @@ input[type="text"], input[type="submit"] {
     display: flex;
     align-items: center;
     margin: 0; 
+    margin-bottom: 50px;
 }
 
 .timer-elements {
@@ -230,22 +231,25 @@ input[type="text"], input[type="submit"] {
     width: 200px;
 }
 
-.countdown-container {
-    top: 50%;
-    left: 50%;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Align vertically */
-    align-items: center; /* Align horizontally */
+/* Timer & Countdown Styles */
+.timer-container {
+    width: 60%;
     padding: 20px;
+    margin: 10px 0; 
     background-color: #242424;
-    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
-    width: 50%; /* Adjust width as needed */
-    margin: 0 auto; /* Center horizontally */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid transparent; 
+    border-image-source: linear-gradient(to right, #2f54f7, #8C2FF7); 
+    border-image-slice: 1;
+    border-image-width: 2px;
+    border-image-outset: 0;
+    border-image-repeat: stretch;
+    border-radius: 5px; 
 }
 
 .countdown-container h2 {
@@ -257,6 +261,7 @@ input[type="text"], input[type="submit"] {
     display: flex;
     align-items: center;
     margin: 0;
+    margin-bottom: 50px;
 }
 
 .countdown-elements {
@@ -278,9 +283,9 @@ input[type="text"], input[type="submit"] {
 }
 
 .countdown {
-    position: relative; /* Change to relative */
-    top: 0; /* Remove top positioning */
-    left: 0; /* Remove left positioning */
+    position: relative; 
+    top: 0; 
+    left: 0;
 }
 
 .countdown-controls button,
@@ -299,6 +304,20 @@ input[type="text"], input[type="submit"] {
     background-color: #e32d20; 
     color: white;
 }
+
+#show-sponsors.on {
+    background-color: #e32d20; 
+    color: white;
+}
+
+.timer-button.on {
+    background-color: #4CAF50;
+    color: white;
+}
+.selected {
+    background-color: red 
+}
+
 /* Team Styles */
 
 .away, .home {

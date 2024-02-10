@@ -158,7 +158,7 @@
 
     <div class="extra-buttons"></div>
     <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Show countdown</button>
-    <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>  <!-- Sponsor to impliment in the future -->
+    <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>  
     </div>
     
    <!-- <div class="extra-buttons">
@@ -171,12 +171,12 @@
 <!-- Javascript -->
 
     <script>
-        htmx.on('#startButton', 'htmx:afterRequest', function() {
+        htmx.on('startButton', 'htmx:afterRequest', function() {
             document.getElementById('startButton').classList.add('selected');
             document.getElementById('stopButton').classList.remove('selected');
         });
 
-        htmx.on('#stopButton', 'htmx:afterRequest', function() {
+        htmx.on('stopButton', 'htmx:afterRequest', function() {
             document.getElementById('stopButton').classList.add('selected');
             document.getElementById('startButton').classList.remove('selected');
         });    
@@ -194,6 +194,20 @@
         document.getElementById('show_quarter').classList.remove('active');
     });
 });
+document.addEventListener('DOMContentLoaded', function() {
+            const startButton = document.getElementById('startButton');
+            const stopButton = document.getElementById('stopButton');
+
+            startButton.addEventListener('click', function() {
+                startButton.classList.add('selected');
+                stopButton.classList.remove('selected');
+            });
+
+            stopButton.addEventListener('click', function() {
+                stopButton.classList.add('selected');
+                startButton.classList.remove('selected');
+            });
+        });
 
     </script>
 </body>
