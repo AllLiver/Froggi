@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon_png" type="image/x-icon">
-    <title>FOSSO Logo Upload</title>
+    <title>FOSSO Team Info</title>
     <link rel="stylesheet" type="text/css" href="./style.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
@@ -14,7 +14,6 @@
     <script>
         // NO TOUCHY ZONE (especially backend devs)
         document.addEventListener('DOMContentLoaded', function () {
-            // Define the previewImage function
             window.previewImage = function(input, previewId) {
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
@@ -55,7 +54,6 @@
                         if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
                             console.log("Name submit request finished and response is ready.");
                             
-                            // Update the names on the page.
                             document.getElementById('homeNameDisplay').textContent = homeName;
                             document.getElementById('awayNameDisplay').textContent = awayName;
                         }
@@ -78,24 +76,26 @@
     </header>
 
 <!-- Logo Upload Form -->
-<form id="logo-form" hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none"
-        onsubmit="return submitForm(event);">
-        <label for="home_img">Home Team Logo:</label>
-        <input type="file" name="home.png" id="home_img" accept="image/png"
-            onchange="previewImage(this, 'home_preview')"><br>
-        <img id="home_preview" src="#" alt="Home Team Logo Preview"
-            style="display:none; max-height: 50px; max-width: 50px;"><br>
+<div class="teaminfo-container">
+    <form id="logo-form" hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none"
+            onsubmit="return submitForm(event);">
+            <label for="home_img">Home Team Logo:</label>
+            <input type="file" name="home.png" id="home_img" accept="image/png"
+                onchange="previewImage(this, 'home_preview')"><br>
+            <img id="home_preview" src="#" alt="Home Team Logo Preview"
+                style="display:none; max-height: 50px; max-width: 50px;"><br>
 
-        <label for="away_img">Away Team Logo:</label>
-        <input type="file" name="away.png" id="away_img" accept="image/png"
-            onchange="previewImage(this, 'away_preview')">
-        <img id="away_preview" src="#" alt="Away Team Logo Preview"
-            style="display:none; max-height: 50px; max-width: 50px;">
-        <input type="submit" value="Submit" id="file-submit">
-        
-    </form>
+            <label for="away_img">Away Team Logo:</label>
+            <input type="file" name="away.png" id="away_img" accept="image/png"
+                onchange="previewImage(this, 'away_preview')">
+            <img id="away_preview" src="#" alt="Away Team Logo Preview"
+                style="display:none; max-height: 50px; max-width: 50px;">
+            <input type="submit" value="Submit" id="file-submit">
+            
+        </form>
 
 
+</div>
 <!-- Team Name Form -->
 <form id="name-form" hx-post="/" hx-swap="none">
     <div class="team-input">
@@ -112,15 +112,21 @@
 
 
 
-
     <!-- Display names on the page -->
     <div class="team-names-container">
         <div id="homeNameDisplay"></div>
         <div id="awayNameDisplay"></div>
     </div>
-    <div style="display: flex; justify-content: center;">
-        <button hx-post="/reset_scoreboard" hx-swap="none">Reset Scoreboard</button>
-    </div>
+        <button class="reset-button" hx-post="/reset_scoreboard" hx-swap="none">Reset Scoreboard</button>
+
+
+    <!-- Team Preset Content -->
+<div class="team-preset-container">
+
+    <h2>Team presets</h2>
+    <p></p>
+</div>
+
 </body>
 <script>
     document.querySelector('#logo-form').addEventListener('htmx:afterOnLoad', function () {
@@ -144,6 +150,21 @@
             submitButton.value = 'Submit'; 
         }, 10000); 
     }); });
+
+
+    fetch('/teamload/ID', {
+    method: 'POST',
+})
+.then(response => response.json())
+.then(data => {
+    const teamPresetContainer = document.querySelector('.team-preset-container');
+    teamPresetContainer.innerHTML = '';
+    const teamName = document.createElement('div');
+    teamName.textContent = data.name;
+    teamPresetContainer.appendChild(teamName);
+
+})
+.catch(error => console.error('preset post error :Error code: 2', error));
 </script>
 </html>
   

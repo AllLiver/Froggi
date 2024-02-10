@@ -9,19 +9,6 @@
     <link rel="stylesheet" type="text/css" href="./style.css">
     <link rel="icon" type="image/png" href="/favicon_png">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@900&family=Open+Sans&display=swap');
-
-        ::-webkit-scrollbar {
-            display: none;
-        }
-
-
-        * {
-            -ms-overflow-style: none;  
-            scrollbar-width: none; 
-        }
-
         body {
             font-family: 'Open Sans', sans-serif;
                 }
@@ -80,7 +67,9 @@
             <button hx-post="/hu2" hx-swap="none">2 Points</button>
             <button hx-post="/hu3" hx-swap="none">3 Points</button>
         </div>
+
 <!-- Timer Content-->
+
     <div class="timer-container">
         <div class="timer">
             <div class="quick-timer-buttons">
@@ -166,8 +155,10 @@
             <button hx-post="show_logs" hx-swap="none">Show logs</button>
             <div id="logs" hx-get="/logs" hx-trigger="show_logs"></div>
         </div>  --> <!-- Planned: Show logs, needs backend -->
+        <div class="ping">
     <p id="ping">Ping: calculating...</p>
-
+    <p id="version">V1.0.0</p>
+        </div>
 <!-- Javascript -->
 
     <script>

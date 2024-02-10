@@ -1,11 +1,23 @@
 /* Fonts */
   @import url('https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap');
 
+/* Hide Scrollbar */
+  ::-webkit-scrollbar {
+    display: none;
+}
+
+
+* {
+    -ms-overflow-style: none;  
+    scrollbar-width: none; 
+}
+
 /* Header Styles */
 
 header ul {
     list-style-type: none;
     margin: 10;
+    margin-right: 5px;
     padding: 0;
     overflow: hidden;
     position: fixed;
@@ -87,6 +99,15 @@ button {
 
 
   #ping {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    background-color: rgba(0, 0, 0, 0.5); 
+    color: white; 
+}
+
+#version {
     position: fixed;
     bottom: 0;
     right: 0;
@@ -501,4 +522,35 @@ input[type="file"] {
 
 .logo-upload #file-submit {
     display: block;
+}
+
+.teaminfo-container {
+align-items: stretch;
+justify-content: center;
+
+
+}
+
+.team-preset-container h2 {
+    text-align: center;
+}
+
+.team-preset-container {
+    top: 0;
+    left: 500px;
+    width: 75%;
+    height: 35vh; /* Vh stands for viewport height, so we should change this depending on how many teams we have */
+    background-color: #242424;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.reset-button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }

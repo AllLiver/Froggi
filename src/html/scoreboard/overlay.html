@@ -31,7 +31,19 @@
                 document.documentElement.msRequestFullscreen();
             }
         });
-        document.body.style.cursor = 'none';
+        function updateSponsorImage() {
+    fetch('/sponsor_roll')
+        .then(response => response.text())
+        .then(data => {
+            const teamPresetContainer = document.querySelector('.team-preset-container');
+            teamPresetContainer.innerHTML = data;
+        })
+        .catch(error => console.error('Failed to preload sponsor content: Error code: 1', error));
+
+    setTimeout(updateSponsorImage, 5000);
+}
+
+updateSponsorImage();
     </script>
     <style>
         body { cursor: none; }
