@@ -20,6 +20,8 @@ Here are some features/updates planned
  - Add savable school configurations with their pictures, names, and colors
  - Logs
  - Automatic fullscreen & cursor hiding on overlay page.
+ - Ui popups for team touchdowns, & scoring.
+
 # Contribute
 If you would like to contribute, and you know familiar with rust & html, feel free clone the repository & create a pull request.
 
