@@ -77,6 +77,7 @@ async fn main() {
         .route("/countdown", get(countdown_handler))
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
+        .route("/app.js", get(app_js_handler))
         .route("/favicon_png", get(favicon_handler))
         // Routes to update the home team's info
         .route("/hu", post(hu_handler))
@@ -298,6 +299,16 @@ async fn css_handler() -> impl IntoResponse {
 async fn htmx_handler() -> impl IntoResponse {
     println!(" -> SERVE: htmx.min.js");
     let body = include_str!("html/htmx.min.js");
+    let body = Body::from(body);
+    Response::builder()
+        .header(CONTENT_TYPE, TEXT_JAVASCRIPT.to_string())
+        .body(body)
+        .unwrap()
+}
+
+async fn app_js_handler() -> impl IntoResponse {
+    println!(" -> SERVE: htmx.min.js");
+    let body = include_str!("app.js");
     let body = Body::from(body);
     Response::builder()
         .header(CONTENT_TYPE, TEXT_JAVASCRIPT.to_string())
