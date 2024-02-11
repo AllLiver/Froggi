@@ -97,6 +97,12 @@ button {
     border-radius: 3%;
 }
 
+button:hover {
+    background-color: #e9981fe3; 
+    color: white; 
+    transform: scale(1.01);
+}
+
 
   #ping {
     position: fixed;
@@ -110,7 +116,7 @@ button {
 #version {
     position: fixed;
     bottom: 0;
-    right: 0;
+    left: 0;
     padding: 10px;
     background-color: rgba(0, 0, 0, 0.5); 
     color: white; 
@@ -252,27 +258,6 @@ input[type="text"], input[type="submit"] {
     width: 200px;
 }
 
-/* Timer & Countdown Styles */
-.timer-container {
-    width: 60%;
-    padding: 20px;
-    margin: 10px 0; 
-    background-color: #242424;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
-    color: white;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid transparent; 
-    border-image-source: linear-gradient(to right, #2f54f7, #8C2FF7); 
-    border-image-slice: 1;
-    border-image-width: 2px;
-    border-image-outset: 0;
-    border-image-repeat: stretch;
-    border-radius: 5px; 
-}
-
 .countdown-container h2 {
     padding: 2% 8%;
     font-size: 120%;
@@ -288,7 +273,7 @@ input[type="text"], input[type="submit"] {
 .countdown-elements {
     padding: 4% 8%;
     text-align: center;
-    font-size: 2em; /* Adjust as needed */
+    font-size: 2em; 
     font-weight: bold;
 
 }
@@ -345,7 +330,7 @@ input[type="text"], input[type="submit"] {
     width: 200px; 
     border-style: solid;
     border-width: 2px;
-    background-color: #1d1d1d;
+    background-color: #242424;
     font-family: 'Open Sans', sans-serif;
     color: white;
     padding: 10px;
@@ -553,4 +538,18 @@ justify-content: center;
     display: block;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Lighthouse User/Acsessability Optimizations */
+div.timer {
+    font-family: monospace;
+    font-weight: bold;
+    min-height: 50px;
+    min-width: 200px; 
+    font-size: 20px;
+}
+
+.quarter-container, .home-box, .away-box, .button {
+    min-height: 10px; 
+    min-width: 200px; 
 }
