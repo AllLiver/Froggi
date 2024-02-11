@@ -134,6 +134,10 @@ input[type="text"], input[type="submit"] {
     width: 100%;
 }
 
+.submit-button {
+    margin-top: 20px; /* adjust as needed */
+}
+
 /* Overlay Styles */
 
 .white-boxes-container {

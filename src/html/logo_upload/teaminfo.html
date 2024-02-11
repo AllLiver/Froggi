@@ -85,31 +85,21 @@
             <img id="home_preview" src="#" alt="Home Team Logo Preview"
                 style="display:none; max-height: 50px; max-width: 50px;"><br>
 
+            <label for="home_name">Home Team Name:</label>
+            <input type="text" name="home_name" id="home_name"><br>
+
             <label for="away_img">Away Team Logo:</label>
             <input type="file" name="away.png" id="away_img" accept="image/png"
                 onchange="previewImage(this, 'away_preview')">
             <img id="away_preview" src="#" alt="Away Team Logo Preview"
-                style="display:none; max-height: 50px; max-width: 50px;">
-            <input type="submit" value="Submit" id="file-submit">
-            
-        </form>
+                style="display:none; max-height: 50px; max-width: 50px;"><br>
 
+            <label for="away_name">Away Team Name:</label>
+            <input type="text" name="away_name" id="away_name"><br>
 
+            <input type="submit" value="Submit" id="file-submit" class="submit-button">
+    </form>
 </div>
-<!-- Team Name Form -->
-<form id="name-form" hx-post="/" hx-swap="none">
-    <div class="team-input">
-        <label for="home">Home Name: </label>
-        <input type="text" id="home" name="home" maxlength="8">
-    </div>
-    <div class="team-input">
-        <label for="away">Away Name: </label>
-        <input type="text" id="away" name="away" maxlength="8">
-    </div>
-    <input type="submit" value="Submit" id="name-submit">
-</form>
-
-
 
 
     <!-- Display names on the page -->
