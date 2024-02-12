@@ -77,7 +77,7 @@
 
 <!-- Logo Upload Form -->
 <div class="teaminfo-container">
-    <form id="logo-form" hx-post="/logo_upload" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none"
+    <form id="logo-form" hx-post="/add_team" class="logo-upload" hx-encoding="multipart/form-data" hx-swap="none"
             onsubmit="return submitForm(event);">
             <label for="home_img">Home Team Logo:</label>
             <input type="file" name="home.png" id="home_img" accept="image/png"
@@ -114,6 +114,7 @@
 <div class="team-preset-container">
 
     <h2>Team presets</h2>
+    <button hx-post="/load_team/WR7BL2n5DKAD" hx-swap="none">20 Min</button>
     <p></p>
 </div>
 

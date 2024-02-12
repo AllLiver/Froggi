@@ -25,14 +25,15 @@ use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
 
 // Brings libraries needed for JSON parsing into scope
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 // Brings standard libraries needed for many things into scope
 use std::io::{self, BufRead};
-use tokio::fs;
 
 // Used for sponsor roll
 use base64::prelude::*;
+
+use rand::{thread_rng, Rng};
 
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
@@ -57,11 +58,14 @@ lazy_static! {
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
     static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("countdown_title"));
     static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
+    static ref HOME_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
+    static ref AWAY_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
 }
 
 #[tokio::main]
 async fn main() {
     std::fs::create_dir_all("./sponsors").unwrap();
+    std::fs::create_dir_all("./teams").unwrap();
 
     *SPONSOR_IMG_TAGS.lock().unwrap() = tokio::spawn(load_sponsors()).await.unwrap();
 
@@ -125,8 +129,9 @@ async fn main() {
         .route("/q3", post(quarter3_change))
         .route("/q4", post(quarter4_change))
         .route("/show_quarter_css", put(show_quarter_css_handler))
-        // Routes for the file upload
-        .route("/logo_upload", post(logo_upload_handler))
+        // Routes for team management
+        .route("/add_team", post(add_team_handler))
+        .route("/load_team/:id", post(load_team_handler))
         // Routes for the sponsor roll
         .route("/sponsor_roll", put(sponsor_roll_handler))
         .route("/show_sponsor_roll", post(show_sponsor_roll_handler))
@@ -371,9 +376,7 @@ async fn aname_scoreboard_handler() -> Html<String> {
 
 // Handles and returns requests for the home team's logo
 async fn home_img_handler() -> impl IntoResponse {
-    let home_image = tokio::fs::read(Path::new("home.png"))
-        .await
-        .expect("Could not open home.png");
+    let home_image = HOME_IMG_DATA.lock().unwrap().clone();
     let body = Body::from(home_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -383,9 +386,7 @@ async fn home_img_handler() -> impl IntoResponse {
 
 // Handles and returns requests for the away team's logo
 async fn away_img_handler() -> impl IntoResponse {
-    let away_image = tokio::fs::read(Path::new("away.png"))
-        .await
-        .expect("Could not open away.png");
+    let away_image = AWAY_IMG_DATA.lock().unwrap().clone();
     let body = Body::from(away_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -666,20 +667,66 @@ async fn quarter4_change() {
 }
 
 // endregion: --- Quarter handlers
-// region: --- File upload handlers
+// region: --- Team preset handlers
+
+#[derive(Serialize, Deserialize, Debug)]
+struct TeamInfoContainer {
+    home_name: String,
+    away_name: String,
+}
+
+async fn load_team_handler(axum::extract::Path(id): axum::extract::Path<String>) {
+    let team_info_json = tokio::fs::read_to_string(format!("./teams/{}/teaminfo.json", id)).await.expect("Id doesnt exist!");
+
+    let team_info: TeamInfoContainer = serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
+
+    *HOME_NAME.lock().unwrap() = team_info.home_name;
+    *AWAY_NAME.lock().unwrap() = team_info.away_name;
+
+    *HOME_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/home.png", id)).await.unwrap();
+    *AWAY_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/away.png", id)).await.unwrap();
+}
 
 // Handles the file upload for the team's logo
-async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
+async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
+    const BASE62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    let mut home_name = String::from("");
+    let mut away_name = String::from("");
+
+    let mut id = String::with_capacity(12);
+    for _ in 0..12 {
+        id.push(BASE62[thread_rng().gen_range(0..BASE62.len())] as char);
+    }
+
+    std::fs::create_dir_all(Path::new(&format!("./teams/{}", id))).unwrap();
+
     // Loops through the fields of the form
     while let Some(field) = payload.next_field().await.unwrap() {
         // Gets the name and data of the field
         let name = field.name().unwrap().to_string();
         let data = field.bytes().await.unwrap();
 
-        // Writes the data to a .png file
-        println!(" -> LOGO: recieved {}\n\tLENGTH: {}", name, data.len());
-        tokio::fs::write(Path::new(&name), data).await.unwrap();
+        if name == "home.png" || name == "away.png" {
+            // Writes the data to a .png file
+            println!(" -> LOGO: recieved {}\n\tLENGTH: {}", name, data.len());
+            tokio::fs::write(Path::new(&format!("./teams/{}/{}", id, name)), data).await.unwrap();
+        } else if name == "home_name" {
+            home_name = std::str::from_utf8(&data).unwrap().to_string();
+        } else if name == "away_name" {
+            away_name = std::str::from_utf8(&data).unwrap().to_string();
+        }
     }
+
+    let info_container = TeamInfoContainer {
+        home_name: home_name,
+        away_name: away_name
+    };
+
+    dbg!(&info_container);
+
+    let json = serde_json::to_string(&info_container).expect("Failed to serialize team info");
+    tokio::fs::write(Path::new(&format!("./teams/{}/teaminfo.json", id)), json).await.expect("Failed to write to team info");
 
     StatusCode::OK
 }
@@ -688,7 +735,7 @@ async fn logo_upload_handler(mut payload: Multipart) -> impl IntoResponse {
 // region: --- Sponsor roll
 
 async fn load_sponsors() -> Vec<Html<String>> {
-    let mut entries = fs::read_dir("./sponsors").await.unwrap();
+    let mut entries = tokio::fs::read_dir("./sponsors").await.unwrap();
     let mut sponsor_imgs: Vec<tokio::fs::DirEntry> = Vec::new();
 
     while let Ok(Some(res)) = entries.next_entry().await {
@@ -703,7 +750,7 @@ async fn load_sponsors() -> Vec<Html<String>> {
     let mut img_tags: Vec<Html<String>> = Vec::new();
 
     for i in 0..sponsor_imgs.len() {
-        let img_bytes = fs::read(sponsor_imgs[i].path()).await.unwrap();
+        let img_bytes = tokio::fs::read(sponsor_imgs[i].path()).await.unwrap();
 
         img_tags.push(Html(format!(
             "<img src=\"data:image/png;base64,{}\" width=\"10%\" height=\"10%\" id=\"sponsor_roll_img\"/>",
