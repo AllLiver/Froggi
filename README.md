@@ -21,6 +21,7 @@ Here are some features/updates planned
  - Logs
  - Automatic fullscreen & cursor hiding on overlay page.
  - Ui popups for team touchdowns, & scoring.
+ - Acsessibility improvements, such as image alts.
 
 # Contribute
 If you would like to contribute, and you know familiar with rust & html, feel free clone the repository & create a pull request.
