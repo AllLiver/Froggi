@@ -8,6 +8,7 @@ use axum::{
     routing::{get, head, post, put},
     Form, Router,
 };
+
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
 use std::{
@@ -682,7 +683,9 @@ async fn team_selectors_handler() -> Html<String> {
     let mut valid_ids: Vec<String> = Vec::new();
 
     while let Ok(Some(res)) = team_presets.next_entry().await {
-        valid_ids.push(res.file_name().into_string().unwrap());
+        if !res.file_name().to_string_lossy().to_string().contains(".") {
+            valid_ids.push(res.file_name().into_string().unwrap());
+        }
     }
 
     for i in &valid_ids {
