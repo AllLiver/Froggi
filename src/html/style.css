@@ -536,7 +536,34 @@ justify-content: center;
     display: block;
     margin-left: auto;
     margin-right: auto;
+    
 }
+
+.team-selector {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.team-selector > * {
+    margin: 15px;
+    border-radius: 3px;
+}
+
+.team-selector > div:nth-child(odd) {
+    background-color: #1b1b1b; /* light gray for odd numbered boxes */
+}
+
+.team-selector > div:nth-child(even) {
+    background-color: #161616; /* slightly darker gray for even numbered boxes */
+}
+
+.match-selector {
+    background-color: #f2f2f2; 
+    border-radius: 10px; 
+    padding: 10px; 
+    margin: 5px; 
+}
+
 
 .reset-button {
     display: block;
