@@ -8,6 +8,7 @@ use axum::{
     routing::{get, head, post, put},
     Form, Router,
 };
+
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
 use std::{
