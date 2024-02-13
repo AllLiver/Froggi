@@ -132,6 +132,7 @@ async fn main() {
         // Routes for team management
         .route("/add_team", post(add_team_handler))
         .route("/load_team/:id", post(load_team_handler))
+        .route("/team_selectors", put(team_selectors_handler))
         // Routes for the sponsor roll
         .route("/sponsor_roll", put(sponsor_roll_handler))
         .route("/show_sponsor_roll", post(show_sponsor_roll_handler))
@@ -672,7 +673,35 @@ async fn quarter4_change() {
 #[derive(Serialize, Deserialize, Debug)]
 struct TeamInfoContainer {
     home_name: String,
+    home_color: String,
     away_name: String,
+    away_color: String
+}
+
+async fn team_selectors_handler() -> Html<String> {
+    let mut inject_html = String::new();
+    let mut team_presets = tokio::fs::read_dir("./teams").await.unwrap();
+    let mut valid_ids: Vec<String> = Vec::new();
+
+    while let Ok(Some(res)) = team_presets.next_entry().await {
+        valid_ids.push(res.file_name().into_string().unwrap());
+    }
+
+    for i in &valid_ids {
+        let team_info_json = tokio::fs::read_to_string(format!("./teams/{}/teaminfo.json", i)).await.expect("Id doesnt exist!");
+        let team_info: TeamInfoContainer = serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
+
+        inject_html += &format!("
+            <div class=\"match-selector\">
+                <p>{} vs. {}</p>
+                <button hx-post=\"/load_team/{}\" hx-swap=\"none\">Select</button>
+            </div>
+        ", team_info.home_name, team_info.away_name, i);
+    }
+
+    dbg!(valid_ids);
+
+    Html::from(inject_html)
 }
 
 async fn load_team_handler(axum::extract::Path(id): axum::extract::Path<String>) {
@@ -692,7 +721,10 @@ async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
     const BASE62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     let mut home_name = String::from("");
+    let mut home_color = String::from("");
+
     let mut away_name = String::from("");
+    let mut away_color = String::from("");
 
     let mut id = String::with_capacity(12);
     for _ in 0..12 {
@@ -715,12 +747,18 @@ async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
             home_name = std::str::from_utf8(&data).unwrap().to_string();
         } else if name == "away_name" {
             away_name = std::str::from_utf8(&data).unwrap().to_string();
+        } else if name == "home_color" {
+            home_color = std::str::from_utf8(&data).unwrap().to_string();
+        } else if name == "away_color" {
+            away_color = std::str::from_utf8(&data).unwrap().to_string();
         }
     }
 
     let info_container = TeamInfoContainer {
         home_name: home_name,
-        away_name: away_name
+        home_color: home_color,
+        away_name: away_name,
+        away_color: away_color,
     };
 
     dbg!(&info_container);
