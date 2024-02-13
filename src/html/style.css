@@ -206,6 +206,7 @@ input[type="text"], input[type="submit"] {
     z-index: 1000;
 }
 
+
 /* Timer & Countdown Styles */
 .timer-container {
     width: 60%;
@@ -236,7 +237,6 @@ input[type="text"], input[type="submit"] {
     display: flex;
     align-items: center;
     margin: 0; 
-    margin-bottom: 50px;
 }
 
 .timer-elements {
@@ -262,6 +262,24 @@ input[type="text"], input[type="submit"] {
     width: 200px;
 }
 
+.countdown-container {
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Align vertically */
+    align-items: center; /* Align horizontally */
+    padding: 20px;
+    background-color: #242424;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    color: white;
+    width: 50%; /* Adjust width as needed */
+    margin: 0 auto; /* Center horizontally */
+}
+
 .countdown-container h2 {
     padding: 2% 8%;
     font-size: 120%;
@@ -271,13 +289,12 @@ input[type="text"], input[type="submit"] {
     display: flex;
     align-items: center;
     margin: 0;
-    margin-bottom: 50px;
 }
 
 .countdown-elements {
     padding: 4% 8%;
     text-align: center;
-    font-size: 2em; 
+    font-size: 2em; /* Adjust as needed */
     font-weight: bold;
 
 }
@@ -293,9 +310,9 @@ input[type="text"], input[type="submit"] {
 }
 
 .countdown {
-    position: relative; 
-    top: 0; 
-    left: 0;
+    position: relative; /* Change to relative */
+    top: 0; /* Remove top positioning */
+    left: 0; /* Remove left positioning */
 }
 
 .countdown-controls button,
@@ -314,6 +331,7 @@ input[type="text"], input[type="submit"] {
     background-color: #e32d20; 
     color: white;
 }
+
 
 #show-sponsors.on {
     background-color: #e32d20; 
