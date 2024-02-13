@@ -17,16 +17,12 @@
         .white-boxes-container {
             transform: translateY(-5px);
             position: relative;
-            /* Should put sponsor bar behind the buttons */
             z-index: 1;
-            /* Should put sponsor bar behind the buttons */
         }
 
         .button {
             position: relative;
-            /* Should put sponsor bar behind the buttons */
             z-index: 2;
-            /* Should put sponsor bar behind the buttons */
         }
 
         .timer-controls,
@@ -36,11 +32,12 @@
         }
     </style>
     <script src="./htmx.min.js"></script>
-    <script src="../../app.js"></script>
+    <script src="../app.js"></script>
     <div hx-put="/show_quarter_css" hx-trigger="every 10ms"></div>
     <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
     <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
     <link rel="preload" href="https://fonts.gstatic.com/" as="font" type="font/woff2" crossorigin>
+
 </head>
 
 <nav>
@@ -150,102 +147,11 @@
 <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>
 </div>
 
-<!-- <div class="extra-buttons">
-        <div id="show_logs" class="logs">
-            <button hx-post="show_logs" hx-swap="none">Show logs</button>
-            <div id="logs" hx-get="/logs" hx-trigger="show_logs"></div>
-        </div>  --> <!-- Planned: Show logs, needs backend -->
 <div class="ping">
     <p id="ping">Ping: calculating...</p>
     <p id="version">V1.0.0</p>
 </div>
-<p id="clientCount">0 devices are currently viewing this page.</p>
-<!-- Javascript -->
 
-<script>
-    const socket = new WebSocket('ws://localhost:3000');
-    htmx.on('startButton', 'htmx:afterRequest', function () {
-        document.getElementById('startButton').classList.add('selected');
-        document.getElementById('stopButton').classList.remove('selected');
-    });
-
-    htmx.on('stopButton', 'htmx:afterRequest', function () {
-        document.getElementById('stopButton').classList.add('selected');
-        document.getElementById('startButton').classList.remove('selected');
-    });
-    var quarters = document.querySelectorAll('.quarter-container button');
-
-    function removeActiveClass() {
-        quarters.forEach(function (quarter) {
-            quarter.classList.remove('active');
-        });
-    }
-    quarters.forEach(function (quarter) {
-        quarter.addEventListener('click', function () {
-            removeActiveClass();
-            this.classList.add('active');
-            document.getElementById('show_quarter').classList.remove('active');
-        });
-    });
-    document.addEventListener('DOMContentLoaded', function () {
-        const startButton = document.getElementById('startButton');
-        const stopButton = document.getElementById('stopButton');
-
-        startButton.addEventListener('click', function () {
-            startButton.classList.add('selected');
-            stopButton.classList.remove('selected');
-        });
-
-        stopButton.addEventListener('click', function () {
-            stopButton.classList.add('selected');
-            startButton.classList.remove('selected');
-        });
-    });
-    async function ping() {
-        let start = performance.now();
-        await fetch('/ping', { method: 'HEAD' });
-        let end = performance.now();
-        let pingTime = end - start;
-        document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
-    }
-
-
-
-    // Function to update the client count
-    function updateClientCount() {
-        const clientCountElement = document.getElementById('clientCount');
-        clientCountElement.textContent = getClientCount() + ' devices are currently viewing this page.';
-    }
-
-    // Function to get the client count
-    function getClientCount() {
-        let clients = JSON.parse(localStorage.getItem('clients')) || {};
-        let clientId = getClientId();
-
-        if (!clients[clientId]) {
-            clients[clientId] = true;
-            localStorage.setItem('clients', JSON.stringify(clients));
-        }
-
-        return Object.keys(clients).length;
-    }
-
-    // Function to generate a unique client ID
-    function getClientId() {
-        let clientId = sessionStorage.getItem('clientId');
-        if (!clientId) {
-            clientId = Math.random().toString(36).substr(2, 9); // Generate a random alphanumeric string
-            sessionStorage.setItem('clientId', clientId);
-        }
-        return clientId;
-    }
-
-    // Update client count when the page loads
-    updateClientCount();
-
-    // Update client count periodically (e.g., every 10 seconds)
-    setInterval(updateClientCount, 10000); // Update every 10 seconds
-</script>
 </body>
 
 </html>
