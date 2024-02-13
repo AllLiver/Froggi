@@ -3,10 +3,10 @@ use axum::{
     body::Body,
     extract::Multipart,
     http::Response,
+    response::Redirect,
     response::{Html, IntoResponse},
     routing::{get, head, post, put},
     Form, Router,
-    response::Redirect
 };
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
@@ -283,12 +283,10 @@ async fn upload_page_handler() -> Html<&'static str> {
     Html(include_str!("html/logo_upload/teaminfo.html"))
 }
 
-
 async fn countdown_handler() -> Html<&'static str> {
     println!(" -> SERVE: countdown.html");
     Html(include_str!("html/countdown/countdown.html"))
 }
-
 
 // Serves the main css file
 async fn css_handler() -> impl IntoResponse {
@@ -675,7 +673,7 @@ struct TeamInfoContainer {
     home_name: String,
     home_color: String,
     away_name: String,
-    away_color: String
+    away_color: String,
 }
 
 async fn team_selectors_handler() -> Html<String> {
@@ -688,15 +686,37 @@ async fn team_selectors_handler() -> Html<String> {
     }
 
     for i in &valid_ids {
-        let team_info_json = tokio::fs::read_to_string(format!("./teams/{}/teaminfo.json", i)).await.expect("Id doesnt exist!");
-        let team_info: TeamInfoContainer = serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
+        let team_info_json = tokio::fs::read_to_string(format!("./teams/{}/teaminfo.json", i))
+            .await
+            .expect("Id doesnt exist!");
+        let team_info: TeamInfoContainer =
+            serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
 
-        inject_html += &format!("
+        let home_img_bytes = tokio::fs::read(format!("./teams/{}/home.png", i))
+            .await
+            .unwrap();
+        let away_img_bytes = tokio::fs::read(format!("./teams/{}/away.png", i))
+            .await
+            .unwrap();
+
+        inject_html += &format!(
+            "
             <div class=\"match-selector\">
                 <p>{} vs. {}</p>
+                <div style=\"display: inline\">
+                    <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\"/>
+                    <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\"/>
+                </div>
+                <br>
                 <button hx-post=\"/load_team/{}\" hx-swap=\"none\">Select</button>
             </div>
-        ", team_info.home_name, team_info.away_name, i);
+        ",
+            team_info.home_name,
+            team_info.away_name,
+            BASE64_STANDARD.encode(home_img_bytes),
+            BASE64_STANDARD.encode(away_img_bytes),
+            i
+        );
     }
 
     dbg!(valid_ids);
@@ -705,15 +725,22 @@ async fn team_selectors_handler() -> Html<String> {
 }
 
 async fn load_team_handler(axum::extract::Path(id): axum::extract::Path<String>) {
-    let team_info_json = tokio::fs::read_to_string(format!("./teams/{}/teaminfo.json", id)).await.expect("Id doesnt exist!");
+    let team_info_json = tokio::fs::read_to_string(format!("./teams/{}/teaminfo.json", id))
+        .await
+        .expect("Id doesnt exist!");
 
-    let team_info: TeamInfoContainer = serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
+    let team_info: TeamInfoContainer =
+        serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
 
     *HOME_NAME.lock().unwrap() = team_info.home_name;
     *AWAY_NAME.lock().unwrap() = team_info.away_name;
 
-    *HOME_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/home.png", id)).await.unwrap();
-    *AWAY_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/away.png", id)).await.unwrap();
+    *HOME_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/home.png", id))
+        .await
+        .unwrap();
+    *AWAY_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/away.png", id))
+        .await
+        .unwrap();
 }
 
 // Handles the file upload for the team's logo
@@ -742,7 +769,9 @@ async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
         if name == "home.png" || name == "away.png" {
             // Writes the data to a .png file
             println!(" -> LOGO: recieved {}\n\tLENGTH: {}", name, data.len());
-            tokio::fs::write(Path::new(&format!("./teams/{}/{}", id, name)), data).await.unwrap();
+            tokio::fs::write(Path::new(&format!("./teams/{}/{}", id, name)), data)
+                .await
+                .unwrap();
         } else if name == "home_name" {
             home_name = std::str::from_utf8(&data).unwrap().to_string();
         } else if name == "away_name" {
@@ -764,7 +793,9 @@ async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
     dbg!(&info_container);
 
     let json = serde_json::to_string(&info_container).expect("Failed to serialize team info");
-    tokio::fs::write(Path::new(&format!("./teams/{}/teaminfo.json", id)), json).await.expect("Failed to write to team info");
+    tokio::fs::write(Path::new(&format!("./teams/{}/teaminfo.json", id)), json)
+        .await
+        .expect("Failed to write to team info");
 
     StatusCode::OK
 }
