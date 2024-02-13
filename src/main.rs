@@ -732,6 +732,8 @@ async fn load_team_handler(axum::extract::Path(id): axum::extract::Path<String>)
     let team_info: TeamInfoContainer =
         serde_json::from_str(&team_info_json).expect("Could not deserialize data!");
 
+    println!(" -> LOAD: match {:?}", team_info);
+
     *HOME_NAME.lock().unwrap() = team_info.home_name;
     *AWAY_NAME.lock().unwrap() = team_info.away_name;
 
