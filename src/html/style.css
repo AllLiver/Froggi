@@ -544,6 +544,13 @@ justify-content: center;
     margin-right: auto;
 }
 
+hr {
+    border: 0; /* Reset the border */
+    height: 1px; 
+    background-image: -webkit-linear-gradient(left, #000, #000 50%, #fff 50%, #fff); 
+    background-size: 10px 100%; 
+}
+
 /* Lighthouse User/Acsessability Optimizations */
 div.timer {
     font-family: monospace;

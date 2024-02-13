@@ -1,31 +1,18 @@
-const WebSocket = require('ws');
+const socket = new WebSocket('ws://localhost:8080');
 
-const wss = new WebSocket.Server({ port: 8080 });
-
-let count = 0;
-
-wss.on('connection', ws => {
-  count++;
-  wss.clients.forEach(client => {
-    if (client.readyState === WebSocket.OPEN) {
-      client.send(JSON.stringify({ type: 'count', count: count }));
+socket.addEventListener('message', function (event) {
+    const data = JSON.parse(event.data);
+    if (data.type === 'count') {
+        document.getElementById('clientCount').textContent = `${data.count} devices are currently viewing this page.`;
     }
-  });
-
-  ws.on('close', () => {
-    count--;
-    wss.clients.forEach(client => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify({ type: 'count', count: count }));
-      }
-    });
-  });
 });
+
 
 // Compression
 app.use(compression()); 
 app.use(express.static('public')); 
 
-app.listen(3000, function () {
-  console.log('Example app listening on port 3000!');
+app.listen(8080, function () {
+  console.log('Compression');
 });
+
