@@ -559,7 +559,7 @@ justify-content: center;
     top: 0;
     left: 500px;
     width: 75%;
-    height: 35vh; /* Vh stands for viewport height, so we should change this depending on how many teams we have */
+    height: 35vh;
     background-color: #242424;
     padding: 20px;
     border-radius: 10px;
@@ -581,11 +581,11 @@ justify-content: center;
 }
 
 .team-selector > div:nth-child(odd) {
-    background-color: #1b1b1b; /* light gray for odd numbered boxes */
+    background-color: #1b1b1b; /* You happy? */
 }
 
 .team-selector > div:nth-child(even) {
-    background-color: #161616; /* slightly darker gray for even numbered boxes */
+    background-color: #1b1b1a; /* You happy? */
 }
 
 .match-selector {
