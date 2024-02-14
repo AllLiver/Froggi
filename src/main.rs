@@ -711,7 +711,7 @@ async fn team_selectors_handler() -> Html<String> {
                     <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\"/>
                 </div>
                 <br>
-                <button hx-post=\"/load_team/{}\" hx-swap=\"none\">Select</button>
+                <button hx-post=\"/load_team/{}\" hx-swap=\"none\" style=\"width: 100%;\">Select</button>
             </div>
         ",
             team_info.home_name,

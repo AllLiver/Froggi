@@ -135,3 +135,7 @@ document.getElementById('show-countdown').addEventListener('click', function () 
 document.getElementById('show-sponsor_roll').addEventListener('click', function () {
     this.classList.toggle('on');
 });
+
+
+
+// Shwoooooooooooooooooooooooosh alpha
