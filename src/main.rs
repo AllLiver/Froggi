@@ -910,7 +910,7 @@ async fn stop_countdown_handler() {
 async fn countdown_display_handler() -> Html<String> {
     Html(format!(
         "<h2>{}</h2> <br>
-    Time: {}:{:02?}
+         {}:{:02?}
     ",
         *COUNTDOWN_TITLE.lock().unwrap(),
         *COUNTDOWN_MINS.lock().unwrap(),

@@ -71,7 +71,8 @@ header li a:hover {
 body {
     font-family: 'Roboto', sans-serif;
     background-color: #1b1b1b;
-    touch-action: manipulation
+    touch-action: manipulation;
+    user-select: none;
 }
 
 ul li {
@@ -314,9 +315,9 @@ input[type="text"], input[type="submit"] {
 }
 
 .countdown {
-    position: relative; /* Change to relative */
-    top: 0; /* Remove top positioning */
-    left: 0; /* Remove left positioning */
+    position: relative; 
+    top: 0; 
+    left: 0; 
 }
 
 .countdown-controls button,
@@ -354,6 +355,7 @@ input[type="text"], input[type="submit"] {
 .startButton:hover, .stopButton:hover {
     background-color: red; 
 }
+
 
 /* Team Styles */
 
@@ -604,6 +606,7 @@ hr {
     background-image: -webkit-linear-gradient(left, #000, #000 50%, #fff 50%, #fff); 
     background-size: 10px 100%; 
 }
+
 
 /* Lighthouse User/Acsessability Optimizations */
 div.timer {
