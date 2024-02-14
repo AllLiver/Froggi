@@ -269,15 +269,15 @@ input[type="text"], input[type="submit"] {
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    justify-content: center; /* Align vertically */
-    align-items: center; /* Align horizontally */
+    justify-content: center; 
+    align-items: center; 
     padding: 20px;
     background-color: #242424;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
-    width: 50%; /* Adjust width as needed */
-    margin: 0 auto; /* Center horizontally */
+    width: 50%; 
+    margin: 0 auto; 
 }
 
 .countdown-container h2 {
@@ -289,6 +289,10 @@ input[type="text"], input[type="submit"] {
     display: flex;
     align-items: center;
     margin: 0;
+}
+
+#show-countdown:active, #show-sponsor:active {
+    background-color: red;
 }
 
 .countdown-elements {
@@ -325,6 +329,7 @@ input[type="text"], input[type="submit"] {
 
 .show-countdown-button {
     text-align: center;
+    transform: scale(1.30); 
 }
 
 #show-countdown.on {
@@ -344,6 +349,10 @@ input[type="text"], input[type="submit"] {
 }
 .selected {
     background-color: red 
+}
+
+.startButton:hover, .stopButton:hover {
+    background-color: red; 
 }
 
 /* Team Styles */
