@@ -16,10 +16,9 @@ The compiled binary will be in /target/release
 # Roadmap
 FOSSO is an indev project so change is very likley.
 Here are some features/updates planned
+ - Login page
  - More consistent naming in API and frontend code
- - Add savable school configurations with their pictures, names, and colors
  - Logs
- - Automatic fullscreen & cursor hiding on overlay page.
  - Ui popups for team touchdowns, & scoring.
  - Acsessibility improvements, such as image alts.
 
