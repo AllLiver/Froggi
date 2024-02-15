@@ -3,21 +3,19 @@ use axum::{
     body::Body,
     extract::Multipart,
     http::Response,
-    response::Redirect,
-    response::{Html, IntoResponse},
+    response::{Html, IntoResponse, Redirect},
     routing::{get, head, post, put},
     Form, Router,
 };
 
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
-use std::{
-    path::Path,
-    sync::{
-        atomic::{AtomicUsize, Ordering},
-        Mutex,
-    },
+use std::sync::{
+    atomic::{AtomicUsize, Ordering},
+    Mutex,
 };
+
+use std::path::Path;
 
 // Brings libraries needed for the server headers into scope
 use hyper::{header::CONTENT_TYPE, StatusCode};
@@ -48,7 +46,7 @@ lazy_static! {
     static ref TIME_SECS: Mutex<i32> = Mutex::new(0);
     static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
     static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
-    static ref QUARTER: Mutex<i32> = Mutex::new(1);
+    static ref QUARTER: Mutex<u8> = Mutex::new(1);
     static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
     static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
     static ref SHOW_SPONSOR: Mutex<bool> = Mutex::new(false);
@@ -125,10 +123,7 @@ async fn main() {
         .route("/quarter", put(quarter_handler))
         .route("/show_quarter", post(quarter_show_handler))
         // Routes to change quarter info
-        .route("/q1", post(quarter1_change))
-        .route("/q2", post(quarter2_change))
-        .route("/q3", post(quarter3_change))
-        .route("/q4", post(quarter4_change))
+        .route("/change_quarter/:q", post(quarter_change_handler))
         .route("/show_quarter_css", put(show_quarter_css_handler))
         // Routes for team management
         .route("/add_team", post(add_team_handler))
@@ -615,7 +610,7 @@ async fn quarter_handler() -> Html<&'static str> {
         } else if *quarter == 4 {
             return Html("4th");
         } else {
-            return Html("Q");
+            return Html("OVERTIME");
         }
     } else {
         return Html("");
@@ -643,27 +638,9 @@ async fn show_quarter_css_handler() -> Html<&'static str> {
 }
 
 // Changes the quarter to 1
-async fn quarter1_change() {
+async fn quarter_change_handler(axum::extract::Path(q): axum::extract::Path<u8>) {
     let mut quarter = QUARTER.lock().unwrap();
-    *quarter = 1;
-}
-
-// Changes the quarter to 2
-async fn quarter2_change() {
-    let mut quarter = QUARTER.lock().unwrap();
-    *quarter = 2;
-}
-
-// Changes the quarter to 3
-async fn quarter3_change() {
-    let mut quarter = QUARTER.lock().unwrap();
-    *quarter = 3;
-}
-
-// Changes the quarter to 4
-async fn quarter4_change() {
-    let mut quarter = QUARTER.lock().unwrap();
-    *quarter = 4;
+    *quarter = q;
 }
 
 // endregion: --- Quarter handlers
@@ -1048,7 +1025,7 @@ async fn time_and_quarter_handler() -> Html<String> {
         } else if *quarter == 4 {
             return Html(format!("{}:{:02?} - 4th", time_mins, time_secs));
         } else {
-            return Html(format!("{}:{:02?} - q{}", time_mins, time_secs, quarter));
+            return Html(format!("{}:{:02?} - OVERTIME", time_mins, time_secs));
         }
     } else {
         return Html(format!("{}:{:02?}", time_mins, time_secs));
