@@ -835,14 +835,16 @@ async fn load_sponsors() -> Vec<Html<String>> {
 }
 
 async fn sponsor_roll_ticker() {
-    loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
-        let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+    if SPONSOR_IMG_TAGS.lock().unwrap().len() > 1 && *SHOW_SPONSOR.lock().unwrap() {
+        loop {
+            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+            let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
 
-        if last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().unwrap().len() - 1 {
-            LAST_SPONSOR.store(0, Ordering::SeqCst);
-        } else {
-            LAST_SPONSOR.fetch_add(1, Ordering::SeqCst);
+            if last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().unwrap().len() - 1 {
+                LAST_SPONSOR.store(0, Ordering::SeqCst);
+            } else {
+                LAST_SPONSOR.fetch_add(1, Ordering::SeqCst);
+            }
         }
     }
 }
@@ -909,7 +911,7 @@ async fn stop_countdown_handler() {
 async fn countdown_display_handler() -> Html<String> {
     Html(format!(
         "<h2>{}</h2> <br>
-         {}:{:02?}
+         <p id=\"countdown-display-clock\">{}:{:02?}<>/p
     ",
         *COUNTDOWN_TITLE.lock().unwrap(),
         *COUNTDOWN_MINS.lock().unwrap(),
