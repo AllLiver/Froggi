@@ -10,12 +10,12 @@ use axum::{
 
 // Bring the cryptography library into scope
 use argon2::{
-    password_hash::{PasswordHasher, SaltString},
-    Argon2
+    password_hash::{PasswordHasher, SaltString}, Argon2, PasswordHash, PasswordVerifier
 };
 
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
+use tokio::io::AsyncWriteExt;
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Mutex,
@@ -71,6 +71,7 @@ lazy_static! {
 async fn main() {
     std::fs::create_dir_all("./sponsors").unwrap();
     std::fs::create_dir_all("./teams").unwrap();
+    std::fs::create_dir_all("./login").unwrap();
 
     *SPONSOR_IMG_TAGS.lock().unwrap() = tokio::spawn(load_sponsors()).await.unwrap();
 
@@ -84,6 +85,9 @@ async fn main() {
         .route("/overlay", get(chroma_handler)) // Handles get requests for the overlay page
         .route("/teaminfo", get(upload_page_handler)) // Handles get requests for the upload page
         .route("/countdown", get(countdown_handler))
+        .route("/login/create", get(create_login_page_handler))
+        .route("/login/create", post(create_login_handler))
+        .route("/login/", get(login_page_handler))
         .route("/login", get(login_page_handler))
         .route("/login", post(login_handler))
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
@@ -270,31 +274,84 @@ async fn read_or_create_config() {
 // region: --- Page handlers
 
 // Serves the index.html file
-async fn idx_handler() -> Html<&'static str> {
-    println!(" -> SERVE: index.html");
-    Html(include_str!("html/index.html")) // Serves the contents of index.html
+async fn idx_handler() -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => {
+            println!(" -> SERVE: index.html");
+            return Html(include_str!("html/index.html")).into_response();
+        },
+        Err(_) => {
+            println!(" -> REDIRECT: login not created yet");
+            return Redirect::to("/login/create").into_response();
+        }
+    }
 }
 
 // Serves the overlay.html file
-async fn chroma_handler() -> Html<&'static str> {
-    println!(" -> SERVE: overlay.html");
-    Html(include_str!("html/scoreboard/overlay.html"))
+async fn chroma_handler() -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => {
+            println!(" -> SERVE: overlay.html");
+            return Html(include_str!("html/scoreboard/overlay.html")).into_response();
+        },
+        Err(_) => {
+            println!(" -> REDIRECT: login not created yet");
+            return Redirect::to("/login/create").into_response();
+        }
+    }
 }
 
 // Serve the teaminfo.html file
-async fn upload_page_handler() -> Html<&'static str> {
-    println!(" -> SERVE: teaminfo.html");
-    Html(include_str!("html/logo_upload/teaminfo.html"))
+async fn upload_page_handler() -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => {
+            println!(" -> SERVE: teaminfo.html");
+            return Html(include_str!("html/teaminfo/teaminfo.html")).into_response();
+        },
+        Err(_) => {
+            println!(" -> REDIRECT: login not created yet");
+            return Redirect::to("/login/create").into_response();
+        }
+    }
 }
 
-async fn countdown_handler() -> Html<&'static str> {
-    println!(" -> SERVE: countdown.html");
-    Html(include_str!("html/countdown/countdown.html"))
+async fn countdown_handler() -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => {
+            println!(" -> SERVE: countdown.html");
+            return Html(include_str!("html/countdown/countdown.html")).into_response();
+        },
+        Err(_) => {
+            println!(" -> REDIRECT: login not created yet");
+            return Redirect::to("/login/create").into_response();
+        }
+    }
 }
 
-async fn login_page_handler() -> Html<&'static str> {
-    println!(" -> SERVE: login.html");
-    Html(include_str!("html/login/login.html"))
+async fn login_page_handler() -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => {
+            println!(" -> SERVE: login.html");
+            return Html(include_str!("html/login/login.html")).into_response();
+        },
+        Err(_) => {
+            println!(" -> REDIRECT: login not created yet");
+            return Redirect::to("/login/create").into_response();
+        }
+    }
+}
+
+async fn create_login_page_handler() -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => return {
+            println!(" -> REDIRECT: login already created");
+            Redirect::to("/login").into_response()
+        },
+        Err(_) => return {
+            println!(" -> SERVE: create_login.html");
+            Html(include_str!("html/login/create_login.html")).into_response()
+        },
+    }
 }
 
 // Serves the main css file
@@ -320,7 +377,7 @@ async fn htmx_handler() -> impl IntoResponse {
 }
 
 async fn app_js_handler() -> impl IntoResponse {
-    println!(" -> SERVE: htmx.min.js");
+    println!(" -> SERVE: app.js");
     let body = include_str!("app.js");
     let body = Body::from(body);
     Response::builder()
@@ -1016,7 +1073,7 @@ struct CountdownTitle {
     title: String,
 }
 
-async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> Redirect {
+async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> impl IntoResponse {
     println!(" -> COUNTDOWN: title set to {}", title_data.title);
     *COUNTDOWN_TITLE.lock().unwrap() = title_data.title;
     Redirect::to("/countdown")
@@ -1031,15 +1088,40 @@ struct LoginInfo {
     password: String
 }
 
-async fn login_handler(Form(login): Form<LoginInfo>) {
-    //let salt = SaltString::generate(&mut rand::rngs::OsRng);
-    let salt = SaltString::from_b64("TwuCiqR+IfQlZZB9lObu8Q").unwrap();
-    println!(" -> USERNAME: {}", login.username);
-    println!(" -> SALT: {:?}", salt);
+async fn create_login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
+    match tokio::fs::File::open("login/logins.txt").await {
+        Ok(_) => {
+            println!(" -> BLOCK: password already exists, cannot create new one");
+            return Redirect::to("/login");
+        },
+        Err(_) => {
+            let salt = SaltString::generate(&mut rand::rngs::OsRng);
+            let argon2 = Argon2::default();
 
-    let argon2 = Argon2::default();
-    let pw_hash = argon2.hash_password(login.password.as_bytes(), &salt).unwrap().to_string();
-    println!(" -> HASH: {}", pw_hash);
+            let pw_hash = argon2.hash_password(login.password.as_bytes(), &salt).unwrap().to_string();
+
+            println!(" -> WRITE: login info to logins.txt\n\tINFO: {}, {}, {}", login.username, pw_hash, salt.as_str());
+
+            let mut logins_txt = tokio::fs::File::create("login/logins.txt").await.unwrap();
+            logins_txt.write(format!("{}\n{}\n{}", login.username, pw_hash, salt.as_str()).as_bytes()).await.unwrap();
+            return Redirect::to("/login");
+        }
+    }
+    
+}
+
+async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
+    println!(" -> ATTEMPT LOGIN");
+    let pw_info: Vec<String> = tokio::fs::read_to_string("login/logins.txt").await.unwrap().split("\n").map(|x| x.trim().to_string()).collect();
+    let parsed_hash = PasswordHash::new(&pw_info[1]).unwrap();
+
+    if login.username == pw_info[0] && Argon2::default().verify_password(login.password.as_bytes(), &parsed_hash).is_ok() {
+        println!(" -> LOGIN: successful");
+        return Redirect::to("/");
+    } else {
+        println!(" -> LOGIN: failed");
+        return Redirect::to("/login");
+    }
 }
 
 // endregion: --- Login fn's
@@ -1112,7 +1194,3 @@ async fn reset_scoreboard_handler() {
 }
 
 // endregion: -- Sponsor roll
-
-// region: --- Misc fn's
-
-// endregion: --- Misc fn's

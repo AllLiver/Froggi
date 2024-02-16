@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon_png" type="image/x-icon">
+    <title>FOSSO Create Login</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <script src="/htmx.min.js"></script>
+</head>
+<body>
+    <div class="create-login-container">
+        <h1>FOSSO Create Login</h1>
+        <form action="/login/create" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username">
+    
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password">
+    
+            <input type="submit" id="submit" name="submit">
+        </form>
+    </div>
+</body>
+</html>
