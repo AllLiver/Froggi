@@ -8,6 +8,12 @@ use axum::{
     Form, Router,
 };
 
+// Bring the cryptography library into scope
+use argon2::{
+    password_hash::{PasswordHasher, SaltString},
+    Argon2
+};
+
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
 use std::sync::{
@@ -79,6 +85,7 @@ async fn main() {
         .route("/teaminfo", get(upload_page_handler)) // Handles get requests for the upload page
         .route("/countdown", get(countdown_handler))
         .route("/login", get(login_page_handler))
+        .route("/login", post(login_handler))
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
         .route("/app.js", get(app_js_handler))
@@ -1016,6 +1023,26 @@ async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> Redi
 }
 
 // endregion: --- Countdown
+// region: --- Login fn's
+
+#[derive(Deserialize)]
+struct LoginInfo {
+    username: String,
+    password: String
+}
+
+async fn login_handler(Form(login): Form<LoginInfo>) {
+    //let salt = SaltString::generate(&mut rand::rngs::OsRng);
+    let salt = SaltString::from_b64("TwuCiqR+IfQlZZB9lObu8Q").unwrap();
+    println!(" -> USERNAME: {}", login.username);
+    println!(" -> SALT: {:?}", salt);
+
+    let argon2 = Argon2::default();
+    let pw_hash = argon2.hash_password(login.password.as_bytes(), &salt).unwrap().to_string();
+    println!(" -> HASH: {}", pw_hash);
+}
+
+// endregion: --- Login fn's
 // region: --- Misc handelers
 
 // Function for testing http requests
