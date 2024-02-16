@@ -138,7 +138,7 @@ document.getElementById('show-sponsor_roll').addEventListener('click', function 
 
 
 
-// Background
+// Background & Login
 
 const canvas = document.getElementById('background');
 const ctx = canvas.getContext('2d');
@@ -193,3 +193,17 @@ canvas.addEventListener('mousemove', function(event) {
         }
     });
 });
+
+function validateForm() {
+    const password = document.getElementById("password").value;
+    const confirm_password = document.getElementById("confirm_password").value;
+    const password_error = document.getElementById("password_error");
+
+    if (password !== confirm_password) {
+        password_error.textContent = "The passwords do not match";
+        return false;
+    } else {
+        password_error.textContent = "";
+        return true;
+    }
+}
