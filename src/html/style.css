@@ -508,7 +508,7 @@ input[type="file"] {
 }
 
 #name-form {
-    margin-top: 50px; /* Adjust this value as needed */
+    margin-top: 50px; 
     max-width: 500px;
     margin: 0 auto;
     background-color: #242424;
