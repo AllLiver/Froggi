@@ -138,4 +138,58 @@ document.getElementById('show-sponsor_roll').addEventListener('click', function 
 
 
 
-// Shwoooooooooooooooooooooooosh alpha
+// Background
+
+const canvas = document.getElementById('background');
+const ctx = canvas.getContext('2d');
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const circles = [];
+for (let i = 0; i < 50; i++) {
+    circles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 20 + 10,
+        color: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`, // Reduced opacity
+        vx: Math.random() * 4 - 2,
+        vy: Math.random() * 4 - 2
+    });
+}
+
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    circles.forEach(circle => {
+        ctx.beginPath();
+        ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+        ctx.fillStyle = circle.color;
+        ctx.fill();
+        ctx.closePath();
+
+        circle.x += circle.vx;
+        circle.y += circle.vy;
+
+        if (circle.x - circle.radius < 0 || circle.x + circle.radius > canvas.width) {
+            circle.vx *= -1;
+        }
+        if (circle.y - circle.radius < 0 || circle.y + circle.radius > canvas.height) {
+            circle.vy *= -1;
+        }
+    });
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+canvas.addEventListener('mousemove', function(event) {
+    circles.forEach(circle => {
+        const dx = event.clientX - circle.x;
+        const dy = event.clientY - circle.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < 100) {
+            circle.vx += dx * 0.001;
+            circle.vy += dy * 0.001;
+        }
+    });
+});

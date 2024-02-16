@@ -615,17 +615,67 @@ justify-content: center;
 }
 
 hr {
-    border: 0; /* Reset the border */
+    border: 0;
     height: 1px; 
     background-image: -webkit-linear-gradient(left, #000, #000 50%, #fff 50%, #fff); 
     background-size: 10px 100%; 
 }
 
 #home_name, #away_name {
-    width: 35%;  /* adjust as needed */
-    height: 35%;  /* adjust as needed */
+    width: 35%; 
+    height: 35%;  
 }
 
+/* Login Styling */
+
+
+.login-container {
+    background-color: #242424;
+    width: 300px;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container label {
+    display: block;
+    margin-bottom: 6px;
+    color: #ccc;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+}
+
+.login-container input[type="submit"] {
+    background-color: #3c993f;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.login-container input[type="submit"]:hover {
+    background-color: #2f7f33;
+}
+
+.login-container input[type="submit"]:focus {
+    outline: no
+}
 
 /* Lighthouse User/Acsessability Optimizations */
 div.timer {
@@ -640,3 +690,5 @@ div.timer {
     min-height: 10px; 
     min-width: 200px; 
 }
+
+
