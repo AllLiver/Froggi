@@ -240,6 +240,8 @@ input[type="text"], input[type="submit"] {
     margin: 0;
     margin-top: 10px; 
     padding: 15px;
+    width: 400px !important;
+    font-size: 120%;
 }
 
 .timer-elements {
@@ -255,6 +257,8 @@ input[type="text"], input[type="submit"] {
     gap: 10px; 
     padding: 4% 8%;
     font-size: 120%; 
+        width: 400px !important;
+        font-size: 120%;
 }
 
 .timer-controls button,
@@ -358,6 +362,9 @@ input[type="text"], input[type="submit"] {
     background-color: red; 
 }
 
+#title {
+    width: 35%;  
+}
 
 /* Team Styles */
 
@@ -456,6 +463,11 @@ input[type="text"] {
     font-size: 20px;
     font-weight: bold;
     color: white;
+}
+
+.point-button {
+    width: 100px;  
+    height: 50px;  
 }
 
 /* Teaminfo Styles */
@@ -607,6 +619,11 @@ hr {
     height: 1px; 
     background-image: -webkit-linear-gradient(left, #000, #000 50%, #fff 50%, #fff); 
     background-size: 10px 100%; 
+}
+
+#home_name, #away_name {
+    width: 35%;  /* adjust as needed */
+    height: 35%;  /* adjust as needed */
 }
 
 
