@@ -69,19 +69,13 @@
         </div>
     </div>
     <script>
-        document.getElementById('show-countdown').addEventListener('click', function (event) {
-            event.preventDefault();
-            this.classList.toggle('on');
-        });
-        document.getElementById('show-sponsor').addEventListener('click', function(event) {
-            event.preventDefault();
-            this.classList.add('on');
-        });
         document.getElementById('cdstartButton').addEventListener('click', function () {
-            this.classList.toggle('on');
+            this.classList.add('on');
+            document.getElementById('cdstopButton').classList.remove('on');
         });
         document.getElementById('cdstopButton').addEventListener('click', function () {
-            this.classList.toggle('on');
+            this.classList.add('on');
+            document.getElementById('cdstartButton').classList.remove('on');
         });
     </script>
     
