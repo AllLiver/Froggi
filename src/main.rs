@@ -1100,10 +1100,10 @@ async fn create_login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse
 
             let pw_hash = argon2.hash_password(login.password.as_bytes(), &salt).unwrap().to_string();
 
-            println!(" -> WRITE: login info to logins.txt\n\tINFO: {}, {}, {}", login.username, pw_hash, salt.as_str());
+            println!(" -> WRITE: login info to logins.txt\n\tINFO: un: {}, hash: {}, salt: {}", login.username, pw_hash, salt.as_str());
 
             let mut logins_txt = tokio::fs::File::create("login/logins.txt").await.unwrap();
-            logins_txt.write(format!("{}\n{}\n{}", login.username, pw_hash, salt.as_str()).as_bytes()).await.unwrap();
+            logins_txt.write(format!("{}\n{}", login.username, pw_hash).as_bytes()).await.unwrap();
             return Redirect::to("/login");
         }
     }
