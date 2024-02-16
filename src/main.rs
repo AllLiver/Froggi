@@ -55,7 +55,7 @@ lazy_static! {
     static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(0);
     static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
-    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("countdown_title"));
+    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("countdown"));
     static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
     static ref HOME_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
     static ref AWAY_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
@@ -78,6 +78,7 @@ async fn main() {
         .route("/overlay", get(chroma_handler)) // Handles get requests for the overlay page
         .route("/teaminfo", get(upload_page_handler)) // Handles get requests for the upload page
         .route("/countdown", get(countdown_handler))
+        .route("/login", get(login_page_handler))
         .route("/style.css", get(css_handler)) // Handles get requests for the css of the app
         .route("/htmx.min.js", get(htmx_handler)) // Handles get requests for the htmx library
         .route("/app.js", get(app_js_handler))
@@ -282,6 +283,11 @@ async fn upload_page_handler() -> Html<&'static str> {
 async fn countdown_handler() -> Html<&'static str> {
     println!(" -> SERVE: countdown.html");
     Html(include_str!("html/countdown/countdown.html"))
+}
+
+async fn login_page_handler() -> Html<&'static str> {
+    println!(" -> SERVE: login.html");
+    Html(include_str!("html/login/login.html"))
 }
 
 // Serves the main css file
