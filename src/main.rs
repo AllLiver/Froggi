@@ -5,26 +5,34 @@ use axum::{
     http::Response,
     response::{Html, IntoResponse, Redirect},
     routing::{get, head, post, put},
-    Form, Router,
+    Form, Router
 };
+
+use axum_extra::extract::{cookie::Cookie, CookieJar};
 
 // Bring the cryptography library into scope
 use argon2::{
-    password_hash::{PasswordHasher, SaltString}, Argon2, PasswordHash, PasswordVerifier
+    password_hash::{PasswordHasher, SaltString},
+    Argon2, PasswordHash, PasswordVerifier,
 };
+
+// Brings libraries needed for the jwt auth token into spope
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use std::time::{Duration, SystemTime};
+use uuid::Uuid;
 
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
-use tokio::io::AsyncWriteExt;
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Mutex,
 };
+use tokio::io::AsyncWriteExt;
 
 use std::path::Path;
 
 // Brings libraries needed for the server headers into scope
-use hyper::{header::CONTENT_TYPE, StatusCode};
+use hyper::{header::{CONTENT_TYPE, SET_COOKIE}, StatusCode};
 use mime::IMAGE_PNG;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
@@ -38,7 +46,7 @@ use std::io::{self, BufRead};
 // Used for sponsor roll
 use base64::prelude::*;
 
-use rand::{thread_rng, Rng};
+use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
@@ -76,6 +84,7 @@ async fn main() {
     *SPONSOR_IMG_TAGS.lock().unwrap() = tokio::spawn(load_sponsors()).await.unwrap();
 
     tokio::spawn(sponsor_roll_ticker());
+    tokio::spawn(secret_file_verifier());
 
     // region: --- Routing
 
@@ -175,7 +184,7 @@ async fn main() {
             println!(" -> 404: not found");
             (StatusCode::NOT_FOUND, Html("<h1>404 - Not Found</h1>"))
         }));
-
+    
     // endregion: --- Routing
 
     // Starts the clock tickers
@@ -274,16 +283,31 @@ async fn read_or_create_config() {
 // region: --- Page handlers
 
 // Serves the index.html file
-async fn idx_handler() -> impl IntoResponse {
-    match tokio::fs::File::open("login/logins.txt").await {
-        Ok(_) => {
-            println!(" -> SERVE: index.html");
-            return Html(include_str!("html/index.html")).into_response();
-        },
-        Err(_) => {
-            println!(" -> REDIRECT: login not created yet");
-            return Redirect::to("/login/create").into_response();
+async fn idx_handler(cookies: CookieJar) -> impl IntoResponse {
+    if let Some(auth_cookie) = cookies.get("authToken") {
+        let secret = tokio::fs::read_to_string("login/secrets.txt").await.unwrap().trim().to_string();
+        let validation = Validation::default();
+        match decode::<AuthClaims>(&auth_cookie.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
+            Ok(_) => {
+                match tokio::fs::File::open("login/logins.txt").await {
+                    Ok(_) => {
+                        println!(" -> SERVE: index.html");
+                        return Html(include_str!("html/index.html")).into_response();
+                    }
+                    Err(_) => {
+                        println!(" -> REDIRECT: login not created yet");
+                        return Redirect::to("/login/create").into_response();
+                    }
+                }
+            }
+            Err(_) => {
+                println!(" -> REDIRECT: Invalid auth cookie");
+                return Redirect::to("/login").into_response();
+            }
         }
+    } else {
+        println!(" -> REDIRECT: No auth cookie");
+        return Redirect::to("/login").into_response();
     }
 }
 
@@ -293,7 +317,7 @@ async fn chroma_handler() -> impl IntoResponse {
         Ok(_) => {
             println!(" -> SERVE: overlay.html");
             return Html(include_str!("html/scoreboard/overlay.html")).into_response();
-        },
+        }
         Err(_) => {
             println!(" -> REDIRECT: login not created yet");
             return Redirect::to("/login/create").into_response();
@@ -302,29 +326,59 @@ async fn chroma_handler() -> impl IntoResponse {
 }
 
 // Serve the teaminfo.html file
-async fn upload_page_handler() -> impl IntoResponse {
-    match tokio::fs::File::open("login/logins.txt").await {
-        Ok(_) => {
-            println!(" -> SERVE: teaminfo.html");
-            return Html(include_str!("html/teaminfo/teaminfo.html")).into_response();
-        },
-        Err(_) => {
-            println!(" -> REDIRECT: login not created yet");
-            return Redirect::to("/login/create").into_response();
+async fn upload_page_handler(cookies: CookieJar) -> impl IntoResponse {
+    if let Some(auth_cookie) = cookies.get("authToken") {
+        let secret = tokio::fs::read_to_string("login/secrets.txt").await.unwrap().trim().to_string();
+        let validation = Validation::default();
+        match decode::<AuthClaims>(&auth_cookie.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
+            Ok(_) => {
+                match tokio::fs::File::open("login/logins.txt").await {
+                    Ok(_) => {
+                        println!(" -> SERVE: teaminfo.html");
+                        return Html(include_str!("html/teaminfo/teaminfo.html")).into_response();
+                    }
+                    Err(_) => {
+                        println!(" -> REDIRECT: login not created yet");
+                        return Redirect::to("/login/create").into_response();
+                    }
+                }
+            }
+            Err(_) => {
+                println!(" -> REDIRECT: Invalid auth cookie");
+                return Redirect::to("/login").into_response();
+            }
         }
+    } else {
+        println!(" -> REDIRECT: No auth cookie");
+        return Redirect::to("/login").into_response();
     }
 }
 
-async fn countdown_handler() -> impl IntoResponse {
-    match tokio::fs::File::open("login/logins.txt").await {
-        Ok(_) => {
-            println!(" -> SERVE: countdown.html");
-            return Html(include_str!("html/countdown/countdown.html")).into_response();
-        },
-        Err(_) => {
-            println!(" -> REDIRECT: login not created yet");
-            return Redirect::to("/login/create").into_response();
+async fn countdown_handler(cookies: CookieJar) -> impl IntoResponse {
+    if let Some(auth_cookie) = cookies.get("authToken") {
+        let secret = tokio::fs::read_to_string("login/secrets.txt").await.unwrap().trim().to_string();
+        let validation = Validation::default();
+        match decode::<AuthClaims>(&auth_cookie.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
+            Ok(_) => {
+                match tokio::fs::File::open("login/logins.txt").await {
+                    Ok(_) => {
+                        println!(" -> SERVE: countdown.html");
+                        return Html(include_str!("html/countdown/countdown.html")).into_response();
+                    }
+                    Err(_) => {
+                        println!(" -> REDIRECT: login not created yet");
+                        return Redirect::to("/login/create").into_response();
+                    }
+                }
+            }
+            Err(_) => {
+                println!(" -> REDIRECT: Invalid auth cookie");
+                return Redirect::to("/login").into_response();
+            }
         }
+    } else {
+        println!(" -> REDIRECT: No auth cookie");
+        return Redirect::to("/login").into_response();
     }
 }
 
@@ -333,7 +387,7 @@ async fn login_page_handler() -> impl IntoResponse {
         Ok(_) => {
             println!(" -> SERVE: login.html");
             return Html(include_str!("html/login/login.html")).into_response();
-        },
+        }
         Err(_) => {
             println!(" -> REDIRECT: login not created yet");
             return Redirect::to("/login/create").into_response();
@@ -343,14 +397,18 @@ async fn login_page_handler() -> impl IntoResponse {
 
 async fn create_login_page_handler() -> impl IntoResponse {
     match tokio::fs::File::open("login/logins.txt").await {
-        Ok(_) => return {
-            println!(" -> REDIRECT: login already created");
-            Redirect::to("/login").into_response()
-        },
-        Err(_) => return {
-            println!(" -> SERVE: create_login.html");
-            Html(include_str!("html/login/create_login.html")).into_response()
-        },
+        Ok(_) => {
+            return {
+                println!(" -> REDIRECT: login already created");
+                Redirect::to("/login").into_response()
+            }
+        }
+        Err(_) => {
+            return {
+                println!(" -> SERVE: create_login.html");
+                Html(include_str!("html/login/create_login.html")).into_response()
+            }
+        }
     }
 }
 
@@ -1085,7 +1143,14 @@ async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> impl
 #[derive(Deserialize)]
 struct LoginInfo {
     username: String,
-    password: String
+    password: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct AuthClaims {
+    sub: String,
+    un: String,
+    exp: usize,
 }
 
 async fn create_login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
@@ -1093,34 +1158,97 @@ async fn create_login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse
         Ok(_) => {
             println!(" -> BLOCK: password already exists, cannot create new one");
             return Redirect::to("/login");
-        },
+        }
         Err(_) => {
             let salt = SaltString::generate(&mut rand::rngs::OsRng);
             let argon2 = Argon2::default();
 
-            let pw_hash = argon2.hash_password(login.password.as_bytes(), &salt).unwrap().to_string();
+            let pw_hash = argon2
+                .hash_password(login.password.as_bytes(), &salt)
+                .unwrap()
+                .to_string();
 
-            println!(" -> WRITE: login info to logins.txt\n\tINFO: un: {}, hash: {}, salt: {}", login.username, pw_hash, salt.as_str());
+            println!(
+                " -> WRITE: login info to logins.txt\n\tINFO: un: {}, hash: {}, salt: {}",
+                login.username,
+                pw_hash,
+                salt.as_str()
+            );
 
             let mut logins_txt = tokio::fs::File::create("login/logins.txt").await.unwrap();
-            logins_txt.write(format!("{}\n{}", login.username, pw_hash).as_bytes()).await.unwrap();
+            logins_txt
+                .write(format!("{}\n{}", login.username, pw_hash).as_bytes())
+                .await
+                .unwrap();
             return Redirect::to("/login");
         }
     }
-    
 }
 
 async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
     println!(" -> ATTEMPT LOGIN");
-    let pw_info: Vec<String> = tokio::fs::read_to_string("login/logins.txt").await.unwrap().split("\n").map(|x| x.trim().to_string()).collect();
+    let pw_info: Vec<String> = tokio::fs::read_to_string("login/logins.txt")
+        .await
+        .unwrap()
+        .split("\n")
+        .map(|x| x.trim().to_string())
+        .collect();
     let parsed_hash = PasswordHash::new(&pw_info[1]).unwrap();
 
-    if login.username == pw_info[0] && Argon2::default().verify_password(login.password.as_bytes(), &parsed_hash).is_ok() {
+    if login.username == pw_info[0]
+        && Argon2::default()
+            .verify_password(login.password.as_bytes(), &parsed_hash)
+            .is_ok()
+    {
         println!(" -> LOGIN: successful");
-        return Redirect::to("/");
+
+        let token_uuid = Uuid::new_v4().to_string();
+
+        let token_claim = AuthClaims {
+            sub: token_uuid,
+            un: login.username,
+            exp: (SystemTime::now() + Duration::from_secs(60 * 60 * 24 * 14))
+                .duration_since(SystemTime::UNIX_EPOCH)
+                .unwrap()
+                .as_secs() as usize,
+        };
+
+        let secret = tokio::fs::read_to_string("login/secrets.txt")
+            .await
+            .unwrap()
+            .trim()
+            .to_string();
+
+        let token = encode(
+            &Header::default(),
+            &token_claim,
+            &EncodingKey::from_secret(secret.as_bytes()),
+        )
+        .unwrap();
+
+        let auth_cookie = Cookie::build(("authToken", token))
+            .http_only(true)
+            .secure(true)
+            .path("/");
+
+        let response = Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header("Location", "/")
+            .header(SET_COOKIE, auth_cookie.to_string())
+            .body(axum::body::Body::empty())
+            .unwrap();
+    
+        return response.into_response();
     } else {
         println!(" -> LOGIN: failed");
-        return Redirect::to("/login");
+
+        let response = Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header("Location", "/login")
+            .body(axum::body::Body::empty())
+            .unwrap();
+
+        return response.into_response();
     }
 }
 
@@ -1194,3 +1322,24 @@ async fn reset_scoreboard_handler() {
 }
 
 // endregion: -- Sponsor roll
+// region: --- Misc fn's
+
+async fn secret_file_verifier() {
+    match tokio::fs::File::open("login/secrets.txt").await {
+        Ok(_) => {}
+        Err(_) => {
+            let secret: String = rand::thread_rng()
+                .sample_iter(&Alphanumeric)
+                .take(30)
+                .map(char::from)
+                .collect();
+
+            let mut key_file = tokio::fs::File::create("login/secrets.txt").await.unwrap();
+            key_file.write(secret.to_string().as_bytes()).await.unwrap();
+
+            println!(" -> CREATE: secrets.txt");
+        }
+    }
+}
+
+// endregion: -- Misc fn's
