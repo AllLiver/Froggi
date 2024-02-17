@@ -31,6 +31,10 @@
         }
     </style>
     <script src="/htmx.min.js"></script>
+    <script>async function ping() {let start = performance.now(); await fetch('/ping', { method: 'HEAD' });let end = performance.now(); let pingTime = end - start; document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
+    }
+    setInterval(ping, 2000);
+    </script>
     <script src="/app.js"></script>
     <div hx-put="/show_quarter_css" hx-trigger="every 100ms"></div>
     <div hx-put="/sponsor_roll_css" hx-trigger="every 100ms"></div>
