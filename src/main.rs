@@ -886,6 +886,7 @@ async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
 async fn delete_preset_handler(axum::extract::Path(id): axum::extract::Path<String>) {
     let id_path = format!("teams/{}", id);
     if std::path::Path::new(&id_path).is_dir() {
+        println!(" -> REMOVE: {}", id);
         tokio::fs::remove_dir_all(id_path).await.expect("Could not delete id!");
     } else {
         println!(" -> FAIL: cannot delete {}, doesnt exist!", id);
