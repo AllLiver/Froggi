@@ -21,7 +21,7 @@ The compiled binary will be in /target/release
 Froggi is an indev project so change is very likley.
 Here are some features/updates planned
  - More consistent naming in API and frontend code
- - Logs you can access in the browser
+ - Logs you can access in the web app
  - Ui popups for team touchdowns, & scoring
  - Acsessibility improvements, such as image alts
 
