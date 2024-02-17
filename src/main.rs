@@ -1211,7 +1211,7 @@ async fn time_and_quarter_handler() -> Html<String> {
         } else if *quarter == 4 {
             return Html(format!("{}:{:02?} - 4th", time_mins, time_secs));
         } else {
-            return Html(format!("{}:{:02?} - OVERTIME", time_mins, time_secs));
+            return Html(format!("{}:{:02?} - OT", time_mins, time_secs));
         }
     } else {
         return Html(format!("{}:{:02?}", time_mins, time_secs));

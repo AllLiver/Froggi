@@ -44,40 +44,23 @@
 </head>
 
 <body>
+    <header>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/overlay" target="_blank">Overlay</a></li>
+            <li><a href="#" class="active4">Countdown</a></li>
+            <li><a href="/teaminfo">Teaminfo</a></li>
+        </ul>
+    </header>
 
-    <nav>
-        <header>
-            <ul>
-                <li><a href="#" class="active4" title="Dashboard">Dashboard</a></li>
-                <li><a href="/overlay" target="_blank" title="Overlay">Overlay</a></li>
-                <li><a href="/countdown" title="Countdown">Countdown</a></li>
-                <li><a href="/teaminfo" title="Team Info">Team Info</a></li>
-            </ul>
-        </header>
-    </nav>
-    <!-- Home Score Content -->
-    <div class="score-container">
-        <div class="home">
-            <div hx-put="/hdisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/home_add/1" hx-swap="none">+</button>
-            <p>Points:</p>
-            <div hx-put="/hp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/home_add/-1" hx-swap="none">-</button><br><br>
-            <button class="point-button" hx-post="/home_add/1" hx-swap="none">1 Point</button>
-            <button class="point-button" hx-post="/home_add/2" hx-swap="none">2 Points</button>
-            <button class="point-button" hx-post="/home_add/3" hx-swap="none">3 Points</button>
-        </div>
-
-        <!-- Timer Content-->
-
-        <div class="timer-container">
-            <div class="timer">
-                <div class="quick-timer-buttons">
-                    <button hx-post="/quick_time/8/0" hx-swap="none">8 Min</button>
-                    <button hx-post="/quick_time/5/0" hx-swap="none">5 Min</button>
-                    <button hx-post="/quick_time/3/0" hx-swap="none">3 Min</button>
-                    <button hx-post="/quick_time/1/0" hx-swap="none">1 Min</button>
-                </div>
+    <div class="countdown-container">
+        <div class="countdown">
+            <div class="quick-countdown-buttons">
+                <button hx-post="/quick_countdown/20/0" hx-swap="none">20 Min</button>
+                <button hx-post="/quick_countdown/15/0" hx-swap="none">15 Min</button>
+                <button hx-post="/quick_countdown/10/0" hx-swap="none">10 Min</button>
+                <button hx-post="/quick_countdown/5/0" hx-swap="none">5 Min </button>
+            </div>
 
 
                 <div class="timer-elements">
