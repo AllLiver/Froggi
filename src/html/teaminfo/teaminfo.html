@@ -156,6 +156,16 @@
         method: 'POST',
     })
 
+    document.querySelector('#logo-form').addEventListener('submit', function (event) {
+    event.preventDefault();
+    setTimeout(function() {
+        location.reload();
+    }, 2000);
+    });
+
+    document.querySelector('.team-selector').addEventListener('click', function (event) {
+    event.target.classList.add('clicked');
+});
 
 </script>
 </script>

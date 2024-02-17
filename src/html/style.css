@@ -626,6 +626,10 @@ hr {
     height: 35%;  
 }
 
+.clicked {
+    background-color: #4CAF50; /* green */
+    color: white;
+}
 /* Login Styling */
 
 #submit {
