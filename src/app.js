@@ -1,4 +1,3 @@
-
 htmx.on('startButton', 'htmx:afterRequest', function () {
     document.getElementById('startButton').classList.add('selected');
     document.getElementById('stopButton').classList.remove('selected');
