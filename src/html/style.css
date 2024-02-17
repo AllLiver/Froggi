@@ -207,6 +207,12 @@ input[type="text"], input[type="submit"] {
     z-index: 1000;
 }
 
+.popup-container {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    font-size: 100;
+}
 
 /* Timer & Countdown Styles */
 .timer-container {

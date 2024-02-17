@@ -74,6 +74,9 @@
     <div hx-put="/countdown_display" hx-trigger="every 10ms" id="countdown"
         style="position: fixed; bottom: 0; right: 0; background-color: black; color: white; padding: 10px; border-radius: 4px; opacity: 0.5; text-align: center;">
     </div>
+    <div class="popup-container" id="popupContainer" hx-put="/popup" hx-trigger="every 5000ms">
+        <p id="popupText"></p>
+    </div>
 </body>
 
 </html>
