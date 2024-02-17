@@ -187,6 +187,7 @@ async fn main() {
         // Routes for misc. buttons
         .route("/popup/:type", post(popup_handler))
         .route("/popup", put(popup_show_handler))
+        .route("/popup_css", put(popup_css_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -1357,6 +1358,14 @@ async fn secret_file_verifier() {
 
             println!(" -> CREATE: secrets.txt");
         }
+    }
+}
+
+async fn popup_css_handler() -> Html<&'static str> {
+    if *FOUL_AWAY.lock().await && *FOUL_HOME.lock().await && *FLAG.lock().await && *TIMEOUT.lock().await {
+        return Html("<style> .popupContainer { display: none; } </style>");
+    } else {
+        return Html("");
     }
 }
 
