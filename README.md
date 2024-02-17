@@ -1,5 +1,5 @@
-# FOSSO
-FOSSO or Free & Open Source Scoreboard Overlay is an indev program that designed to provide a clean & customizable program to chromakey for sports on youtube.
+# FROGGI
+**F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
 If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
