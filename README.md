@@ -1,5 +1,5 @@
 # FROGGI
-**F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation
+**F** lexible **R** eal-time **O** verlay for **G** ame **G** raphics and **I** nformation
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
 If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
