@@ -5,7 +5,7 @@ use axum::{
     http::Response,
     response::{Html, IntoResponse, Redirect},
     routing::{get, head, post, put},
-    Form, Router
+    Form, Router,
 };
 
 use axum_extra::extract::{cookie::Cookie, CookieJar};
@@ -23,16 +23,16 @@ use uuid::Uuid;
 
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
-use std::sync::{
-    atomic::{AtomicUsize, Ordering},
-    Mutex,
-};
 use tokio::io::AsyncWriteExt;
+use tokio::sync::Mutex;
 
 use std::path::Path;
 
 // Brings libraries needed for the server headers into scope
-use hyper::{header::{CONTENT_TYPE, SET_COOKIE}, StatusCode};
+use hyper::{
+    header::{CONTENT_TYPE, SET_COOKIE},
+    StatusCode,
+};
 use mime::IMAGE_PNG;
 use mime::TEXT_CSS;
 use mime::TEXT_JAVASCRIPT;
@@ -64,7 +64,7 @@ lazy_static! {
     static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
     static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
     static ref SHOW_SPONSOR: Mutex<bool> = Mutex::new(false);
-    static ref LAST_SPONSOR: AtomicUsize = AtomicUsize::from(0);
+    static ref LAST_SPONSOR: Mutex<usize> = Mutex::new(0);
     static ref SHOW_COUNTDOWN: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
     static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(0);
@@ -73,6 +73,7 @@ lazy_static! {
     static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
     static ref HOME_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
     static ref AWAY_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
+    static ref SECRET: Mutex<String> = tokio::sync::Mutex::new(String::new());
 }
 
 #[tokio::main]
@@ -81,10 +82,16 @@ async fn main() {
     std::fs::create_dir_all("./teams").unwrap();
     std::fs::create_dir_all("./login").unwrap();
 
-    *SPONSOR_IMG_TAGS.lock().unwrap() = tokio::spawn(load_sponsors()).await.unwrap();
+    *SPONSOR_IMG_TAGS.lock().await = tokio::spawn(load_sponsors()).await.unwrap();
 
     tokio::spawn(sponsor_roll_ticker());
     tokio::spawn(secret_file_verifier());
+
+    *SECRET.lock().await = tokio::fs::read_to_string("login/secrets.txt")
+        .await
+        .unwrap()
+        .trim()
+        .to_string();
 
     // region: --- Routing
 
@@ -184,7 +191,7 @@ async fn main() {
             println!(" -> 404: not found");
             (StatusCode::NOT_FOUND, Html("<h1>404 - Not Found</h1>"))
         }));
-    
+
     // endregion: --- Routing
 
     // Starts the clock tickers
@@ -194,7 +201,7 @@ async fn main() {
     tokio::spawn(read_or_create_config()).await.unwrap();
 
     // Gets address from the ADDR mutex
-    let listen_addr = ADDR.lock().unwrap();
+    let listen_addr = ADDR.lock().await;
     let listen_addr: String = listen_addr.clone();
 
     // Bind the server to the address
@@ -267,11 +274,11 @@ async fn read_or_create_config() {
                 let r: u8 = rgb[0].trim().parse().unwrap();
                 let g: u8 = rgb[1].trim().parse().unwrap();
                 let b: u8 = rgb[2].trim().parse().unwrap();
-                let mut chromakey = CHROMAKEY.lock().unwrap();
+                let mut chromakey = CHROMAKEY.lock().await;
                 *chromakey = (r, g, b);
             }
             "listen_addr" => {
-                let mut addr = ADDR.lock().unwrap();
+                let mut addr = ADDR.lock().await;
                 *addr = parts[1].trim().to_string();
             }
             _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
@@ -285,21 +292,22 @@ async fn read_or_create_config() {
 // Serves the index.html file
 async fn idx_handler(cookies: CookieJar) -> impl IntoResponse {
     if let Some(auth_cookie) = cookies.get("authToken") {
-        let secret = tokio::fs::read_to_string("login/secrets.txt").await.unwrap().trim().to_string();
         let validation = Validation::default();
-        match decode::<AuthClaims>(&auth_cookie.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
-            Ok(_) => {
-                match tokio::fs::File::open("login/logins.txt").await {
-                    Ok(_) => {
-                        println!(" -> SERVE: index.html");
-                        return Html(include_str!("html/index.html")).into_response();
-                    }
-                    Err(_) => {
-                        println!(" -> REDIRECT: login not created yet");
-                        return Redirect::to("/login/create").into_response();
-                    }
+        match decode::<AuthClaims>(
+            &auth_cookie.value(),
+            &DecodingKey::from_secret(SECRET.lock().await.as_bytes()),
+            &validation,
+        ) {
+            Ok(_) => match tokio::fs::File::open("login/logins.txt").await {
+                Ok(_) => {
+                    println!(" -> SERVE: index.html");
+                    return Html(include_str!("html/index.html")).into_response();
                 }
-            }
+                Err(_) => {
+                    println!(" -> REDIRECT: login not created yet");
+                    return Redirect::to("/login/create").into_response();
+                }
+            },
             Err(_) => {
                 println!(" -> REDIRECT: Invalid auth cookie");
                 return Redirect::to("/login").into_response();
@@ -328,21 +336,22 @@ async fn chroma_handler() -> impl IntoResponse {
 // Serve the teaminfo.html file
 async fn upload_page_handler(cookies: CookieJar) -> impl IntoResponse {
     if let Some(auth_cookie) = cookies.get("authToken") {
-        let secret = tokio::fs::read_to_string("login/secrets.txt").await.unwrap().trim().to_string();
         let validation = Validation::default();
-        match decode::<AuthClaims>(&auth_cookie.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
-            Ok(_) => {
-                match tokio::fs::File::open("login/logins.txt").await {
-                    Ok(_) => {
-                        println!(" -> SERVE: teaminfo.html");
-                        return Html(include_str!("html/teaminfo/teaminfo.html")).into_response();
-                    }
-                    Err(_) => {
-                        println!(" -> REDIRECT: login not created yet");
-                        return Redirect::to("/login/create").into_response();
-                    }
+        match decode::<AuthClaims>(
+            &auth_cookie.value(),
+            &DecodingKey::from_secret(SECRET.lock().await.as_bytes()),
+            &validation,
+        ) {
+            Ok(_) => match tokio::fs::File::open("login/logins.txt").await {
+                Ok(_) => {
+                    println!(" -> SERVE: teaminfo.html");
+                    return Html(include_str!("html/teaminfo/teaminfo.html")).into_response();
                 }
-            }
+                Err(_) => {
+                    println!(" -> REDIRECT: login not created yet");
+                    return Redirect::to("/login/create").into_response();
+                }
+            },
             Err(_) => {
                 println!(" -> REDIRECT: Invalid auth cookie");
                 return Redirect::to("/login").into_response();
@@ -356,21 +365,22 @@ async fn upload_page_handler(cookies: CookieJar) -> impl IntoResponse {
 
 async fn countdown_handler(cookies: CookieJar) -> impl IntoResponse {
     if let Some(auth_cookie) = cookies.get("authToken") {
-        let secret = tokio::fs::read_to_string("login/secrets.txt").await.unwrap().trim().to_string();
         let validation = Validation::default();
-        match decode::<AuthClaims>(&auth_cookie.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
-            Ok(_) => {
-                match tokio::fs::File::open("login/logins.txt").await {
-                    Ok(_) => {
-                        println!(" -> SERVE: countdown.html");
-                        return Html(include_str!("html/countdown/countdown.html")).into_response();
-                    }
-                    Err(_) => {
-                        println!(" -> REDIRECT: login not created yet");
-                        return Redirect::to("/login/create").into_response();
-                    }
+        match decode::<AuthClaims>(
+            &auth_cookie.value(),
+            &DecodingKey::from_secret(SECRET.lock().await.as_bytes()),
+            &validation,
+        ) {
+            Ok(_) => match tokio::fs::File::open("login/logins.txt").await {
+                Ok(_) => {
+                    println!(" -> SERVE: countdown.html");
+                    return Html(include_str!("html/countdown/countdown.html")).into_response();
                 }
-            }
+                Err(_) => {
+                    println!(" -> REDIRECT: login not created yet");
+                    return Redirect::to("/login/create").into_response();
+                }
+            },
             Err(_) => {
                 println!(" -> REDIRECT: Invalid auth cookie");
                 return Redirect::to("/login").into_response();
@@ -467,39 +477,39 @@ struct UpdNames {
 // Handles the form to update the team names
 async fn tname_handler(Form(names): Form<UpdNames>) {
     println!(" -> TEAMS: update names: {} - {}", names.home, names.away);
-    let mut home_name = HOME_NAME.lock().unwrap();
-    let mut away_name = AWAY_NAME.lock().unwrap();
+    let mut home_name = HOME_NAME.lock().await;
+    let mut away_name = AWAY_NAME.lock().await;
     *home_name = names.home;
     *away_name = names.away;
 }
 
 // Handles the display of the home team's name
 async fn hdisp_handler() -> Html<String> {
-    let home_name = HOME_NAME.lock().unwrap();
+    let home_name = HOME_NAME.lock().await;
     Html(format!("<h2>Home: {}</h2>", home_name))
 }
 
 // Handles the display of the away team's name
 async fn adisp_handler() -> Html<String> {
-    let away_name = AWAY_NAME.lock().unwrap();
+    let away_name = AWAY_NAME.lock().await;
     Html(format!("<h2>Away: {}</h2>", away_name))
 }
 
 // Handles the display of the home team's name for the scoreboard
 async fn hname_scoreboard_handler() -> Html<String> {
-    let home_name = HOME_NAME.lock().unwrap();
+    let home_name = HOME_NAME.lock().await;
     Html(format!("{}", home_name))
 }
 
 // Handles the display of the away team's name for the scoreboard
 async fn aname_scoreboard_handler() -> Html<String> {
-    let away_name = AWAY_NAME.lock().unwrap();
+    let away_name = AWAY_NAME.lock().await;
     Html(format!("{}", away_name))
 }
 
 // Handles and returns requests for the home team's logo
 async fn home_img_handler() -> impl IntoResponse {
-    let home_image = HOME_IMG_DATA.lock().unwrap().clone();
+    let home_image = HOME_IMG_DATA.lock().await.clone();
     let body = Body::from(home_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -509,7 +519,7 @@ async fn home_img_handler() -> impl IntoResponse {
 
 // Handles and returns requests for the away team's logo
 async fn away_img_handler() -> impl IntoResponse {
-    let away_image = AWAY_IMG_DATA.lock().unwrap().clone();
+    let away_image = AWAY_IMG_DATA.lock().await.clone();
     let body = Body::from(away_image);
     Response::builder()
         .header(CONTENT_TYPE, IMAGE_PNG.to_string())
@@ -523,14 +533,14 @@ async fn away_img_handler() -> impl IntoResponse {
 // Increases the home team's points by 1
 async fn hu_handler() {
     // Increments home points
-    let mut home_points = HOME_POINTS.lock().unwrap();
+    let mut home_points = HOME_POINTS.lock().await;
     *home_points += 1;
 }
 
 // Decreases the home team's points by 1
 async fn hd_handler() {
     // Decrements home points
-    let mut home_points = HOME_POINTS.lock().unwrap();
+    let mut home_points = HOME_POINTS.lock().await;
     if *home_points > 0 {
         *home_points -= 1;
     }
@@ -539,21 +549,21 @@ async fn hd_handler() {
 // Increases the home team's points by 2
 async fn hu2_handler() {
     // Adds 2 home points
-    let mut home_points = HOME_POINTS.lock().unwrap();
+    let mut home_points = HOME_POINTS.lock().await;
     *home_points += 2;
 }
 
 // Increases the home team's points by 3
 async fn hu3_handler() {
     // Adds 3 home points
-    let mut home_points = HOME_POINTS.lock().unwrap();
+    let mut home_points = HOME_POINTS.lock().await;
     *home_points += 3;
 }
 
 // Handles and returns the home team's points
 async fn hp_handler() -> Html<String> {
     // Displays home points
-    let home_points = HOME_POINTS.lock().unwrap();
+    let home_points = HOME_POINTS.lock().await;
     Html(format!("{}", *home_points))
 }
 
@@ -563,14 +573,14 @@ async fn hp_handler() -> Html<String> {
 // Increases the away team's points by 1
 async fn au_handler() {
     // Increments home points
-    let mut away_points = AWAY_POINTS.lock().unwrap();
+    let mut away_points = AWAY_POINTS.lock().await;
     *away_points += 1;
 }
 
 // Decreases the away team's points by 1
 async fn ad_handler() {
     // Decrements home points
-    let mut away_points = AWAY_POINTS.lock().unwrap();
+    let mut away_points = AWAY_POINTS.lock().await;
     if *away_points > 0 {
         *away_points -= 1;
     }
@@ -579,21 +589,21 @@ async fn ad_handler() {
 // Increases the away team's points by 2
 async fn au2_handler() {
     // Adds 2 home points
-    let mut away_points = AWAY_POINTS.lock().unwrap();
+    let mut away_points = AWAY_POINTS.lock().await;
     *away_points += 2;
 }
 
 // Increases the away team's points by 3
 async fn au3_handler() {
     // Adds 3 home points
-    let mut away_points = AWAY_POINTS.lock().unwrap();
+    let mut away_points = AWAY_POINTS.lock().await;
     *away_points += 3;
 }
 
 // Handles and returns the away team's points
 async fn ap_handler() -> Html<String> {
     // Displays home points
-    let away_points = AWAY_POINTS.lock().unwrap();
+    let away_points = AWAY_POINTS.lock().await;
     Html(format!("{}", *away_points))
 }
 
@@ -602,40 +612,40 @@ async fn ap_handler() -> Html<String> {
 
 // Sets the clock to 8 minutes
 async fn quick_time8_handler() {
-    let mut time_mins = TIME_MINS.lock().unwrap();
-    let mut time_secs = TIME_SECS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().await;
+    let mut time_secs = TIME_SECS.lock().await;
     *time_mins = 8;
     *time_secs = 0;
 }
 
 // Sets the clock to 5 minutes
 async fn quick_time5_handler() {
-    let mut time_mins = TIME_MINS.lock().unwrap();
-    let mut time_secs = TIME_SECS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().await;
+    let mut time_secs = TIME_SECS.lock().await;
     *time_mins = 5;
     *time_secs = 0;
 }
 
 // Sets the clock to 3 minutes
 async fn quick_time3_handler() {
-    let mut time_mins = TIME_MINS.lock().unwrap();
-    let mut time_secs = TIME_SECS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().await;
+    let mut time_secs = TIME_SECS.lock().await;
     *time_mins = 3;
     *time_secs = 0;
 }
 
 // Sets the clock to 1 minute
 async fn quick_time1_handler() {
-    let mut time_mins = TIME_MINS.lock().unwrap();
-    let mut time_secs = TIME_SECS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().await;
+    let mut time_secs = TIME_SECS.lock().await;
     *time_mins = 1;
     *time_secs = 0;
 }
 
 // Handles and returns the time formatted as "mm:ss"
 async fn time_handler() -> Html<String> {
-    let time_mins = TIME_MINS.lock().unwrap();
-    let time_secs = TIME_SECS.lock().unwrap();
+    let time_mins = TIME_MINS.lock().await;
+    let time_secs = TIME_SECS.lock().await;
     Html(format!("{}:{:02?}", *time_mins, *time_secs))
 }
 
@@ -643,20 +653,20 @@ async fn time_handler() -> Html<String> {
 async fn dashboard_time_display_handler() -> Html<String> {
     Html(format!(
         "{}:{:02?}",
-        *TIME_MINS.lock().unwrap(),
-        *TIME_SECS.lock().unwrap()
+        *TIME_MINS.lock().await,
+        *TIME_SECS.lock().await
     ))
 }
 
 // Increases the minutes of the time by 1
 async fn mins_up_handler() {
-    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().await;
     *time_mins += 1;
 }
 
 // Decreases the minutes of the time by 1
 async fn mins_down_handler() {
-    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_mins = TIME_MINS.lock().await;
     if *time_mins > 0 {
         *time_mins -= 1;
     }
@@ -664,11 +674,11 @@ async fn mins_down_handler() {
 
 // Increases the seconds of the time by 1
 async fn secs_up_handler() {
-    let mut time_secs = TIME_SECS.lock().unwrap();
+    let mut time_secs = TIME_SECS.lock().await;
     if *time_secs < 59 {
         *time_secs += 1;
     } else {
-        let mut time_mins = TIME_MINS.lock().unwrap();
+        let mut time_mins = TIME_MINS.lock().await;
         *time_mins = *time_mins + 1;
         *time_secs = 0;
     }
@@ -676,8 +686,8 @@ async fn secs_up_handler() {
 
 // Decreases the seconds of the time by 1
 async fn secs_down_handler() {
-    let mut time_secs = TIME_SECS.lock().unwrap();
-    let mut time_mins = TIME_MINS.lock().unwrap();
+    let mut time_secs = TIME_SECS.lock().await;
+    let mut time_mins = TIME_MINS.lock().await;
     if *time_secs > 0 {
         *time_secs -= 1;
     } else if *time_mins - 1 > 0 {
@@ -690,10 +700,10 @@ async fn secs_down_handler() {
 async fn clock_ticker() {
     loop {
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        let mut time_started = TIME_STARTED.lock().unwrap();
+        let mut time_started = TIME_STARTED.lock().await;
         if *time_started {
-            let mut time_mins = TIME_MINS.lock().unwrap();
-            let mut time_secs = TIME_SECS.lock().unwrap();
+            let mut time_mins = TIME_MINS.lock().await;
+            let mut time_secs = TIME_SECS.lock().await;
             if *time_secs == 0 {
                 if *time_mins == 0 {
                     *time_started = false;
@@ -711,14 +721,14 @@ async fn clock_ticker() {
 // Starts the clock
 async fn tstart_handler() {
     println!(" -> TIMER: start");
-    let mut time_started = TIME_STARTED.lock().unwrap();
+    let mut time_started = TIME_STARTED.lock().await;
     *time_started = true;
 }
 
 // Stops the clock
 async fn tstop_handler() {
     println!(" -> TIMER: stop");
-    let mut time_started = TIME_STARTED.lock().unwrap();
+    let mut time_started = TIME_STARTED.lock().await;
     *time_started = false;
 }
 
@@ -727,8 +737,8 @@ async fn tstop_handler() {
 
 // Handles and returns the current quarter formatted for the scoreboard
 async fn quarter_handler() -> Html<&'static str> {
-    let quarter = QUARTER.lock().unwrap();
-    if *SHOW_QUARTER.lock().unwrap() {
+    let quarter = QUARTER.lock().await;
+    if *SHOW_QUARTER.lock().await {
         if *quarter == 1 {
             return Html("1st");
         } else if *quarter == 2 {
@@ -747,7 +757,7 @@ async fn quarter_handler() -> Html<&'static str> {
 
 // Handles the show quarter button
 async fn quarter_show_handler() {
-    let mut show_quarter = SHOW_QUARTER.lock().unwrap();
+    let mut show_quarter = SHOW_QUARTER.lock().await;
     if *show_quarter {
         *show_quarter = false;
     } else {
@@ -757,8 +767,8 @@ async fn quarter_show_handler() {
 
 // Handles and returns the css for the show quarter button
 async fn show_quarter_css_handler() -> Html<&'static str> {
-    let show_quarter = SHOW_QUARTER.lock().unwrap();
-    let quarter = QUARTER.lock().unwrap();
+    let show_quarter = SHOW_QUARTER.lock().await;
+    let quarter = QUARTER.lock().await;
 
     if *show_quarter {
         if *quarter == 1 {
@@ -789,7 +799,7 @@ async fn show_quarter_css_handler() -> Html<&'static str> {
 
 // Changes the quarter to 1
 async fn quarter_change_handler(axum::extract::Path(q): axum::extract::Path<u8>) {
-    let mut quarter = QUARTER.lock().unwrap();
+    let mut quarter = QUARTER.lock().await;
     *quarter = q;
 }
 
@@ -864,13 +874,13 @@ async fn load_team_handler(axum::extract::Path(id): axum::extract::Path<String>)
 
     println!(" -> LOAD: match {:?}", team_info);
 
-    *HOME_NAME.lock().unwrap() = team_info.home_name;
-    *AWAY_NAME.lock().unwrap() = team_info.away_name;
+    *HOME_NAME.lock().await = team_info.home_name;
+    *AWAY_NAME.lock().await = team_info.away_name;
 
-    *HOME_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/home.png", id))
+    *HOME_IMG_DATA.lock().await = tokio::fs::read(format!("./teams/{}/home.png", id))
         .await
         .unwrap();
-    *AWAY_IMG_DATA.lock().unwrap() = tokio::fs::read(format!("./teams/{}/away.png", id))
+    *AWAY_IMG_DATA.lock().await = tokio::fs::read(format!("./teams/{}/away.png", id))
         .await
         .unwrap();
 }
@@ -963,29 +973,29 @@ async fn load_sponsors() -> Vec<Html<String>> {
 }
 
 async fn sponsor_roll_ticker() {
-    if SPONSOR_IMG_TAGS.lock().unwrap().len() > 1 && *SHOW_SPONSOR.lock().unwrap() {
-        loop {
+    loop {
+        if SPONSOR_IMG_TAGS.lock().await.len() > 1 && *SHOW_SPONSOR.lock().await {
             tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
-            let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+            let mut last_sponsor = LAST_SPONSOR.lock().await;
 
-            if last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().unwrap().len() - 1 {
-                LAST_SPONSOR.store(0, Ordering::SeqCst);
+            if *last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().await.len() - 1 {
+                *last_sponsor = 0;
             } else {
-                LAST_SPONSOR.fetch_add(1, Ordering::SeqCst);
+                *last_sponsor = *last_sponsor + 1;
             }
         }
     }
 }
 
 async fn sponsor_roll_handler() -> Html<String> {
-    let sponsor_imgs = SPONSOR_IMG_TAGS.lock().unwrap();
-    let last_sponsor = LAST_SPONSOR.load(Ordering::SeqCst);
+    let sponsor_imgs = SPONSOR_IMG_TAGS.lock().await;
+    let last_sponsor = LAST_SPONSOR.lock().await;
 
-    sponsor_imgs[last_sponsor].clone()
+    sponsor_imgs[*last_sponsor].clone()
 }
 
 async fn show_sponsor_roll_handler() {
-    let mut show_sponsor = SHOW_SPONSOR.lock().unwrap();
+    let mut show_sponsor = SHOW_SPONSOR.lock().await;
 
     if *show_sponsor {
         *show_sponsor = false;
@@ -995,7 +1005,7 @@ async fn show_sponsor_roll_handler() {
 }
 
 async fn sponsor_roll_css_handler() -> Html<&'static str> {
-    let show_sponsor = SHOW_SPONSOR.lock().unwrap();
+    let show_sponsor = SHOW_SPONSOR.lock().await;
 
     if *show_sponsor {
         return Html("<style> #show-sponsor { background-color: rgb(227, 45, 32); } </style>");
@@ -1010,10 +1020,10 @@ async fn sponsor_roll_css_handler() -> Html<&'static str> {
 async fn countdown_ticker() {
     loop {
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        let mut countdown_started = COUNTDOWN_STARTED.lock().unwrap();
+        let mut countdown_started = COUNTDOWN_STARTED.lock().await;
         if *countdown_started {
-            let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
-            let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+            let mut countdown_mins = COUNTDOWN_MINS.lock().await;
+            let mut countdown_secs = COUNTDOWN_SECS.lock().await;
             if *countdown_secs == 0 {
                 if *countdown_mins == 0 {
                     *countdown_started = false;
@@ -1029,11 +1039,11 @@ async fn countdown_ticker() {
 }
 
 async fn start_countdown_handler() {
-    *COUNTDOWN_STARTED.lock().unwrap() = true;
+    *COUNTDOWN_STARTED.lock().await = true;
 }
 
 async fn stop_countdown_handler() {
-    *COUNTDOWN_STARTED.lock().unwrap() = false;
+    *COUNTDOWN_STARTED.lock().await = false;
 }
 
 async fn countdown_display_handler() -> Html<String> {
@@ -1041,22 +1051,22 @@ async fn countdown_display_handler() -> Html<String> {
         "<h2 style=\"font-family: monospace;\">{}</h2> <br>
          <p id=\"countdown-display-clock\" style=\"font-family: monospace; font-size: 150%;\">{}:{:02?}</p>
     ",
-        *COUNTDOWN_TITLE.lock().unwrap(),
-        *COUNTDOWN_MINS.lock().unwrap(),
-        *COUNTDOWN_SECS.lock().unwrap()
+        *COUNTDOWN_TITLE.lock().await,
+        *COUNTDOWN_MINS.lock().await,
+        *COUNTDOWN_SECS.lock().await
     ))
 }
 
 async fn dashboard_countdown_display_handler() -> Html<String> {
     Html(format!(
         "{}:{:02?}",
-        *COUNTDOWN_MINS.lock().unwrap(),
-        *COUNTDOWN_SECS.lock().unwrap()
+        *COUNTDOWN_MINS.lock().await,
+        *COUNTDOWN_SECS.lock().await
     ))
 }
 
 async fn show_countdown_handler() {
-    let mut show_countdown = SHOW_COUNTDOWN.lock().unwrap();
+    let mut show_countdown = SHOW_COUNTDOWN.lock().await;
     if *show_countdown {
         *show_countdown = false;
     } else {
@@ -1065,7 +1075,7 @@ async fn show_countdown_handler() {
 }
 
 async fn countdown_css_handler() -> Html<&'static str> {
-    if *SHOW_COUNTDOWN.lock().unwrap() {
+    if *SHOW_COUNTDOWN.lock().await {
         return Html("<style> .white-boxes-container { display: none; } #show-countdown { background-color: rgb(227, 45, 32); } </style>");
     } else {
         return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } #countdown { display: none; }</style>");
@@ -1073,51 +1083,51 @@ async fn countdown_css_handler() -> Html<&'static str> {
 }
 
 async fn qtc20_handler() {
-    *COUNTDOWN_MINS.lock().unwrap() = 20;
-    *COUNTDOWN_SECS.lock().unwrap() = 0;
+    *COUNTDOWN_MINS.lock().await = 20;
+    *COUNTDOWN_SECS.lock().await = 0;
 }
 
 async fn qtc15_handler() {
-    *COUNTDOWN_MINS.lock().unwrap() = 15;
-    *COUNTDOWN_SECS.lock().unwrap() = 0;
+    *COUNTDOWN_MINS.lock().await = 15;
+    *COUNTDOWN_SECS.lock().await = 0;
 }
 
 async fn qtc10_handler() {
-    *COUNTDOWN_MINS.lock().unwrap() = 10;
-    *COUNTDOWN_SECS.lock().unwrap() = 0;
+    *COUNTDOWN_MINS.lock().await = 10;
+    *COUNTDOWN_SECS.lock().await = 0;
 }
 
 async fn qtc5_handler() {
-    *COUNTDOWN_MINS.lock().unwrap() = 5;
-    *COUNTDOWN_SECS.lock().unwrap() = 0;
+    *COUNTDOWN_MINS.lock().await = 5;
+    *COUNTDOWN_SECS.lock().await = 0;
 }
 
 async fn countdown_mins_up_handler() {
-    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    let mut countdown_mins = COUNTDOWN_MINS.lock().await;
     *countdown_mins = *countdown_mins + 1;
 }
 
 async fn countdown_mins_down_handler() {
-    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    let mut countdown_mins = COUNTDOWN_MINS.lock().await;
     if *countdown_mins > 0 {
         *countdown_mins = *countdown_mins - 1;
     }
 }
 
 async fn countdown_secs_up_handler() {
-    let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
+    let mut countdown_secs = COUNTDOWN_SECS.lock().await;
     if *countdown_secs < 59 {
         *countdown_secs = *countdown_secs + 1;
     } else {
-        let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+        let mut countdown_mins = COUNTDOWN_MINS.lock().await;
         *countdown_mins = *countdown_mins + 1;
         *countdown_secs = 0;
     }
 }
 
 async fn countdown_secs_down_handler() {
-    let mut countdown_secs = COUNTDOWN_SECS.lock().unwrap();
-    let mut countdown_mins = COUNTDOWN_MINS.lock().unwrap();
+    let mut countdown_secs = COUNTDOWN_SECS.lock().await;
+    let mut countdown_mins = COUNTDOWN_MINS.lock().await;
     if *countdown_secs > 0 {
         *countdown_secs = *countdown_secs - 1;
     } else if *countdown_mins - 1 > 0 {
@@ -1133,7 +1143,7 @@ struct CountdownTitle {
 
 async fn countdown_title_handler(Form(title_data): Form<CountdownTitle>) -> impl IntoResponse {
     println!(" -> COUNTDOWN: title set to {}", title_data.title);
-    *COUNTDOWN_TITLE.lock().unwrap() = title_data.title;
+    *COUNTDOWN_TITLE.lock().await = title_data.title;
     Redirect::to("/countdown")
 }
 
@@ -1237,7 +1247,7 @@ async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
             .header(SET_COOKIE, auth_cookie.to_string())
             .body(axum::body::Body::empty())
             .unwrap();
-    
+
         return response.into_response();
     } else {
         println!(" -> LOGIN: failed");
@@ -1262,7 +1272,7 @@ async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
 
 // Handles and returns the chromakey color as a css background color
 async fn chromargb_handler() -> Html<String> {
-    let chromakey = CHROMAKEY.lock().unwrap();
+    let chromakey = CHROMAKEY.lock().await;
     Html(format!(
         "<style>body {{ background-color: rgb({}, {}, {}); }}</style>",
         chromakey.0, chromakey.1, chromakey.2
@@ -1271,17 +1281,17 @@ async fn chromargb_handler() -> Html<String> {
 
 // Handles and returns the score as a string formatted for the scoreboard
 async fn score_handler() -> Html<String> {
-    let home_points = HOME_POINTS.lock().unwrap();
-    let away_points = AWAY_POINTS.lock().unwrap();
+    let home_points = HOME_POINTS.lock().await;
+    let away_points = AWAY_POINTS.lock().await;
     Html(format!("{} - {}", home_points, away_points))
 }
 
 // Handles and returns the time and quarter as a string formatted for the scoreboard
 async fn time_and_quarter_handler() -> Html<String> {
-    let time_mins = TIME_MINS.lock().unwrap();
-    let time_secs = TIME_SECS.lock().unwrap();
-    let quarter = QUARTER.lock().unwrap();
-    let show_quarter = SHOW_QUARTER.lock().unwrap();
+    let time_mins = TIME_MINS.lock().await;
+    let time_secs = TIME_SECS.lock().await;
+    let quarter = QUARTER.lock().await;
+    let show_quarter = SHOW_QUARTER.lock().await;
     if *show_quarter {
         if *quarter == 1 {
             return Html(format!("{}:{:02?} - 1st", time_mins, time_secs));
@@ -1301,24 +1311,24 @@ async fn time_and_quarter_handler() -> Html<String> {
 
 async fn reset_scoreboard_handler() {
     println!(" -> SCOREBOARD: reset");
-    *HOME_NAME.lock().unwrap() = String::from("team_name");
-    *AWAY_NAME.lock().unwrap() = String::from("team_name");
+    *HOME_NAME.lock().await = String::from("team_name");
+    *AWAY_NAME.lock().await = String::from("team_name");
 
-    *HOME_POINTS.lock().unwrap() = 0;
-    *AWAY_POINTS.lock().unwrap() = 0;
+    *HOME_POINTS.lock().await = 0;
+    *AWAY_POINTS.lock().await = 0;
 
-    *TIME_MINS.lock().unwrap() = 0;
-    *TIME_SECS.lock().unwrap() = 0;
+    *TIME_MINS.lock().await = 0;
+    *TIME_SECS.lock().await = 0;
 
-    *TIME_STARTED.lock().unwrap() = false;
+    *TIME_STARTED.lock().await = false;
 
-    *QUARTER.lock().unwrap() = 1;
+    *QUARTER.lock().await = 1;
 
-    *COUNTDOWN_TITLE.lock().unwrap() = String::from("countdown_title");
+    *COUNTDOWN_TITLE.lock().await = String::from("countdown_title");
 
-    *COUNTDOWN_MINS.lock().unwrap() = 0;
-    *COUNTDOWN_SECS.lock().unwrap() = 0;
-    *COUNTDOWN_STARTED.lock().unwrap() = false;
+    *COUNTDOWN_MINS.lock().await = 0;
+    *COUNTDOWN_SECS.lock().await = 0;
+    *COUNTDOWN_STARTED.lock().await = false;
 }
 
 // endregion: -- Sponsor roll

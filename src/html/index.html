@@ -32,9 +32,9 @@
     </style>
     <script src="/htmx.min.js"></script>
     <script src="/app.js"></script>
-    <div hx-put="/show_quarter_css" hx-trigger="every 10ms"></div>
-    <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
-    <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
+    <div hx-put="/show_quarter_css" hx-trigger="every 100ms"></div>
+    <div hx-put="/sponsor_roll_css" hx-trigger="every 100ms"></div>
+    <div hx-put="/countdown_css" hx-trigger="every 100ms"></div>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap" as="font" type="font/woff2" crossorigin>
 
 </head>
@@ -54,10 +54,10 @@
     <!-- Home Score Content -->
     <div class="score-container">
         <div class="home">
-            <div hx-put="/hdisp" hx-trigger="every 10ms"></div>
+            <div hx-put="/hdisp" hx-trigger="every 100ms"></div>
             <button class="button-hover" hx-post="/hu" hx-swap="none">+</button>
             <p>Points:</p>
-            <div hx-put="/hp" hx-trigger="every 10ms"></div>
+            <div hx-put="/hp" hx-trigger="every 100ms"></div>
             <button class="button-hover" hx-post="/hd" hx-swap="none">-</button><br><br>
             <button class="point-button" hx-post="/hu" hx-swap="none">1 Point</button>
             <button class="point-button" hx-post="/hu2" hx-swap="none">2 Points</button>
@@ -77,7 +77,7 @@
 
 
                 <div class="timer-elements">
-                    <div hx-put="/time_dashboard" hx-trigger="every 10ms"></div>
+                    <div hx-put="/time_dashboard" hx-trigger="every 100ms"></div>
                 </div>
 
                 <div class="timer-controls">
@@ -100,10 +100,10 @@
         <!-- Away Score Content -->
 
         <div class="away">
-            <div hx-put="/adisp" hx-trigger="every 10ms"></div>
+            <div hx-put="/adisp" hx-trigger="every 100ms"></div>
             <button class="button-hover" hx-post="/au" hx-swap="none">+</button>
             <p>Points:</p>
-            <div hx-put="/ap" hx-trigger="every 10ms"></div>
+            <div hx-put="/ap" hx-trigger="every 100ms"></div>
             <button class="button-hover" hx-post="/ad" hx-swap="none">-</button><br><br>
             <button class="point-button" hx-post="/au" hx-swap="none">Add 1 Point</button>
             <button class="point-button" hx-post="/au2" hx-swap="none">Add 2 Points</button>
@@ -117,18 +117,18 @@
     <div class="white-boxes-container">
         <div class="home-box">
             <img class="logo" src="/home_png" alt="Home" height="28px" width="auto">
-            <div class="team-name" hx-put="/hname_score" hx-trigger="every 10ms"></div>
+            <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
         </div>
 
-        <div class="score-box" hx-put="/score" hx-trigger="every 10ms"></div>
+        <div class="score-box" hx-put="/score" hx-trigger="every 100ms"></div>
 
         <div class="away-box">
             <img class="logo" src="/away_png" alt="Away" height="28px" width="auto">
-            <div class="team-name" hx-put="/aname_score" hx-trigger="every 10ms"></div>
+            <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
         </div>
 
         <div class="clock-box">
-            <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
+            <div hx-put="/time_and_quarter" hx-trigger="every 100ms"></div>
         </div>
     </div>
 

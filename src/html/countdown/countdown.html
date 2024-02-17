@@ -15,8 +15,8 @@
             background-color: red;
         }
     </style>
-    <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
-    <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
+    <div hx-put="/countdown_css" hx-trigger="every 100ms"></div>
+    <div hx-put="/sponsor_roll_css" hx-trigger="every 100ms"></div>
 </head>
 
 <body>
@@ -39,7 +39,7 @@
             </div>
 
             <div class="countdown-elements">
-                <div hx-put="/countdown_dashboard" hx-trigger="every 10ms"></div>
+                <div hx-put="/countdown_dashboard" hx-trigger="every 100ms"></div>
                 <br>
                 <div class="countdown-controls">
                     <button id="cdstartButton" hx-post="/start_countdown" hx-swap="none" hx-trigger="click"
