@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,59 +12,68 @@
     <div hx-put="/chromargb" hx-trigger="load"></div>
     <div hx-put="/countdown_css" hx-trigger="every 10ms"></div>
     <div hx-put="/sponsor_roll_css" hx-trigger="every 10ms"></div>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&family=Protest+Strike&family=Roboto&display=swap" as="style">
+    <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&family=Protest+Strike&family=Roboto&display=swap"
+        as="style">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&display=swap" as="style">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&family=Protest+Strike&family=Roboto&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@700&family=Protest+Strike&family=Roboto&display=swap"
+        rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
     <script>
         // Auto Fullscreen
-        document.addEventListener('click', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen();
-            } else if (document.documentElement.mozRequestFullScreen) { 
+            } else if (document.documentElement.mozRequestFullScreen) {
                 document.documentElement.mozRequestFullScreen();
-            } else if (document.documentElement.webkitRequestFullscreen) { 
+            } else if (document.documentElement.webkitRequestFullscreen) {
                 document.documentElement.webkitRequestFullscreen();
-            } else if (document.documentElement.msRequestFullscreen) { 
+            } else if (document.documentElement.msRequestFullscreen) {
                 document.documentElement.msRequestFullscreen();
             }
         });
         function updateSponsorImage() {
         }
-updateSponsorImage();
+        updateSponsorImage();
     </script>
     <style>
-        body { cursor: none; }
-        * {
-    cursor: none !important;
-    }
+        body {
+            cursor: none;
+        }
 
+        * {
+            cursor: none !important;
+        }
     </style>
 </head>
+
 <body>
     <div class="white-boxes-container">
         <div class="home-box">
-            <img class="logo" src="home_png" alt="Home Team Logo" height="28px" width="auto"> 
+            <img class="logo" src="home_png" alt="Home Team Logo" height="28px" width="auto">
             <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
         </div>
-        
+
         <div class="score-box" hx-put="/score" hx-trigger="every 10ms"></div>
-        
+
         <div class="away-box">
-            <img class="logo" src="away_png" alt="Away Team Logo" height="28px" width="auto"> 
+            <img class="logo" src="away_png" alt="Away Team Logo" height="28px" width="auto">
             <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
         </div>
-        
+
         <div class="clock-box">
             <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
         </div>
     </div>
     <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div>
-    <div hx-put="/countdown_display" hx-trigger="every 10ms" id="countdown" style="position: fixed; bottom: 0; right: 0; background-color: black; color: white; padding: 10px; border-radius: 4px; opacity: 0.5; text-align: center;">
+    <div hx-put="/countdown_display" hx-trigger="every 10ms" id="countdown"
+        style="position: fixed; bottom: 0; right: 0; background-color: black; color: white; padding: 10px; border-radius: 4px; opacity: 0.5; text-align: center;">
     </div>
 </body>
+
 </html>

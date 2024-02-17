@@ -27,19 +27,22 @@
 
 
         .button-hover:hover {
-            background-color: red; 
+            background-color: red;
         }
     </style>
     <script src="/htmx.min.js"></script>
-    <script>async function ping() {let start = performance.now(); await fetch('/ping', { method: 'HEAD' });let end = performance.now(); let pingTime = end - start; document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
-    }
-    setInterval(ping, 2000);
+    <script>async function ping() {
+            let start = performance.now(); await fetch('/ping', { method: 'HEAD' }); let end = performance.now(); let pingTime = end - start; document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
+        }
+        setInterval(ping, 2000);
     </script>
     <script src="/app.js"></script>
     <div hx-put="/show_quarter_css" hx-trigger="every 100ms"></div>
     <div hx-put="/sponsor_roll_css" hx-trigger="every 100ms"></div>
     <div hx-put="/countdown_css" hx-trigger="every 100ms"></div>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap" as="font" type="font/woff2" crossorigin>
+    <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap"
+        as="font" type="font/woff2" crossorigin>
 
 </head>
 
@@ -86,7 +89,7 @@
 
                 <div class="timer-controls">
                     <button id="stopButton" class="button-hover" hx-post="/tstop" hx-swap="none" hx-trigger="click"
-                    class="timer-button">Stop</button>
+                        class="timer-button">Stop</button>
                     <button id="startButton" class="button-hover" hx-post="/tstart" hx-swap="none" hx-trigger="click"
                         class="timer-button">Start</button>
                 </div>
@@ -112,7 +115,7 @@
             <button class="point-button" hx-post="/away_add/1" hx-swap="none">Add 1 Point</button>
             <button class="point-button" hx-post="/away_add/2" hx-swap="none">Add 2 Points</button>
             <button class="point-button" hx-post="/away_add/3" hx-swap="none">Add 3 Points</button>
-            
+
         </div>
     </div>
 
