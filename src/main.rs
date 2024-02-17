@@ -1330,6 +1330,7 @@ async fn popup_show_handler() -> Html<String> {
     if *FLAG.lock().await {
         html += "<p>Flag on the play</p>";
     }
+    println!("{html}");
     return Html(html);
 }
 
