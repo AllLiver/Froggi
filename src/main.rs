@@ -158,6 +158,7 @@ async fn main() {
         .route("/add_team", post(add_team_handler))
         .route("/load_team/:id", post(load_team_handler))
         .route("/team_selectors", put(team_selectors_handler))
+        .route("/delete_preset/:id", post(delete_preset_handler))
         // Routes for the sponsor roll
         .route("/sponsor_roll", put(sponsor_roll_handler))
         .route("/show_sponsor_roll", post(show_sponsor_roll_handler))
@@ -787,12 +788,14 @@ async fn team_selectors_handler() -> Html<String> {
                 </div>
                 <br>
                 <button hx-post=\"/load_team/{}\" hx-swap=\"none\" style=\"width: 100%;\">Select</button>
+                <button hx-post=\"/delete_preset/{}\" hx-swap=\"none\" style=\"width: 100%;\">Remove</button>
             </div>
         ",
             team_info.home_name,
             team_info.away_name,
             BASE64_STANDARD.encode(home_img_bytes),
             BASE64_STANDARD.encode(away_img_bytes),
+            i,
             i
         );
     }
@@ -878,6 +881,15 @@ async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
         .expect("Failed to write to team info");
 
     StatusCode::OK
+}
+
+async fn delete_preset_handler(axum::extract::Path(id): axum::extract::Path<String>) {
+    let id_path = format!("teams/{}", id);
+    if std::path::Path::new(&id_path).is_dir() {
+        tokio::fs::remove_dir_all(id_path).await.expect("Could not delete id!");
+    } else {
+        println!(" -> FAIL: cannot delete {}, doesnt exist!", id)
+    }
 }
 
 // endregion: --- File upload handlers
