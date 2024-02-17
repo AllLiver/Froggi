@@ -1,5 +1,6 @@
 # FROGGI
-[![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)  
+[![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
+![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
