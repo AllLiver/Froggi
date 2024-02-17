@@ -257,7 +257,7 @@ input[type="text"], input[type="submit"] {
     gap: 10px;
     padding: 4.1% 4.3%; 
     font-size: 120%;
-    width: auto; /* Remove fixed width to allow the buttons to adjust dynamically */
+    width: auto; 
 }
 
 
