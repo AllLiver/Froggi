@@ -254,12 +254,12 @@ input[type="text"], input[type="submit"] {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 10px; 
-    padding: 4% 8%;
-    font-size: 120%; 
-        width: 400px !important;
-        font-size: 120%;
+    gap: 10px;
+    padding: 4.1% 4.3%; 
+    font-size: 120%;
+    width: auto; /* Remove fixed width to allow the buttons to adjust dynamically */
 }
+
 
 .timer-controls button,
 .timer-elements button {
