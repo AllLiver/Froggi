@@ -86,7 +86,7 @@ async fn main() {
     *SPONSOR_IMG_TAGS.lock().await = tokio::spawn(load_sponsors()).await.unwrap();
 
     tokio::spawn(sponsor_roll_ticker());
-    tokio::spawn(secret_file_verifier());
+    tokio::spawn(secret_file_verifier()).await.unwrap();
 
     *SECRET.lock().await = tokio::fs::read_to_string("login/secrets.txt")
         .await
