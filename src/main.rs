@@ -18,7 +18,7 @@ use argon2::{
 
 // Brings libraries needed for the jwt auth token into spope
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use std::time::{Duration, SystemTime};
+use std::time::SystemTime;
 use uuid::Uuid;
 
 // Brings libraries needed for global variables into scope
@@ -49,6 +49,10 @@ use base64::prelude::*;
 
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
+// Other async imports
+use tokio::time::sleep;
+use tokio::time::Duration;
+
 const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
 
 // Declares and intializes all the global variables used everywhere in the app
@@ -75,6 +79,10 @@ lazy_static! {
     static ref HOME_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
     static ref AWAY_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
     static ref SECRET: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
+    static ref TIMEOUT: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref FOUL_HOME: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref FOUL_AWAY: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref FLAG: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
 #[tokio::main]
@@ -169,6 +177,9 @@ async fn main() {
             "/countdown_dashboard",
             put(dashboard_countdown_display_handler),
         )
+        // Routes for misc. buttons
+        .route("/popup/:type", post(popup_handler))
+        .route("/popup", put(popup_show_handler))
         // Routes to reset the scoreboard
         .route("/reset_scoreboard", post(reset_scoreboard_handler))
         // Routes for the favicon
@@ -1126,7 +1137,7 @@ async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
         let token_claim = AuthClaims {
             sub: token_uuid,
             un: login.username,
-            exp: (SystemTime::now() + Duration::from_secs(60 * 60 * 24 * 14))
+            exp: (SystemTime::now() + std::time::Duration::from_secs(604800))
                 .duration_since(SystemTime::UNIX_EPOCH)
                 .unwrap()
                 .as_secs() as usize,
@@ -1238,6 +1249,65 @@ async fn reset_scoreboard_handler() {
     *COUNTDOWN_MINS.lock().await = 0;
     *COUNTDOWN_SECS.lock().await = 0;
     *COUNTDOWN_STARTED.lock().await = false;
+}
+
+async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<String>) {
+    match popup_type.as_str() {
+        "timeout" => {
+            let mut timeout = TIMEOUT.lock().await;
+            if *timeout == false {
+                println!(" -> TIMEOUT");
+                *timeout = true;
+                sleep(Duration::from_secs(3)).await;
+                *timeout = false;
+            }
+        },
+        "foul_home" => {
+            let mut foul_home = FOUL_HOME.lock().await;
+            if *foul_home == false {
+                println!(" -> FOUL: home");
+                *foul_home = true;
+                sleep(Duration::from_secs(3)).await;
+                *foul_home = false;
+            }
+        },
+        "foul_away" => {
+            let mut foul_away = FOUL_AWAY.lock().await;
+            if *foul_away == false {
+                println!(" -> FOUL: away");
+                *foul_away = true;
+                sleep(Duration::from_secs(3)).await;
+                *foul_away = false;
+            }
+        },
+        "flag" => {
+            let mut flag = FLAG.lock().await;
+            if *flag == false {
+                println!(" -> FLAG");
+                *flag = true;
+                sleep(Duration::from_secs(3)).await;
+                *flag = false;
+            }
+        }
+        _ => {}
+    }
+}
+
+async fn popup_show_handler() -> Html<String> {
+    let mut html = String::new();
+    if *TIMEOUT.lock().await {
+        html += "<p>Timeout</p>";
+    } 
+    if *FOUL_HOME.lock().await {
+        html += "<p>Foul: Home";
+    }
+    if *FOUL_AWAY.lock().await {
+        html += "<p>Foul: Away</p>";
+    }
+    if *FLAG.lock().await {
+        html += "<p>Flag on the play</p>";
+    }
+    return Html(html);
 }
 
 // endregion: -- Sponsor roll
