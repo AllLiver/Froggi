@@ -888,7 +888,7 @@ async fn delete_preset_handler(axum::extract::Path(id): axum::extract::Path<Stri
     if std::path::Path::new(&id_path).is_dir() {
         tokio::fs::remove_dir_all(id_path).await.expect("Could not delete id!");
     } else {
-        println!(" -> FAIL: cannot delete {}, doesnt exist!", id)
+        println!(" -> FAIL: cannot delete {}, doesnt exist!", id);
     }
 }
 
