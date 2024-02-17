@@ -25,6 +25,7 @@ use uuid::Uuid;
 use lazy_static::lazy_static;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::Mutex;
+use std::sync::Arc;
 
 use std::path::Path;
 
@@ -52,28 +53,28 @@ const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config f
 
 // Declares and intializes all the global variables used everywhere in the app
 lazy_static! {
-    static ref HOME_NAME: Mutex<String> = Mutex::new(String::from("team_name"));
-    static ref AWAY_NAME: Mutex<String> = Mutex::new(String::from("team_name"));
-    static ref HOME_POINTS: Mutex<i32> = Mutex::new(0);
-    static ref AWAY_POINTS: Mutex<i32> = Mutex::new(0);
-    static ref TIME_MINS: Mutex<i32> = Mutex::new(0);
-    static ref TIME_SECS: Mutex<i32> = Mutex::new(0);
-    static ref TIME_STARTED: Mutex<bool> = Mutex::new(false);
-    static ref CHROMAKEY: Mutex<(u8, u8, u8)> = Mutex::new((0, 0, 0));
-    static ref QUARTER: Mutex<u8> = Mutex::new(1);
-    static ref SHOW_QUARTER: Mutex<bool> = Mutex::new(false);
-    static ref ADDR: Mutex<String> = Mutex::new(String::from(""));
-    static ref SHOW_SPONSOR: Mutex<bool> = Mutex::new(false);
-    static ref LAST_SPONSOR: Mutex<usize> = Mutex::new(0);
-    static ref SHOW_COUNTDOWN: Mutex<bool> = Mutex::new(false);
-    static ref COUNTDOWN_STARTED: Mutex<bool> = Mutex::new(false);
-    static ref COUNTDOWN_MINS: Mutex<i32> = Mutex::new(0);
-    static ref COUNTDOWN_SECS: Mutex<i32> = Mutex::new(0);
-    static ref COUNTDOWN_TITLE: Mutex<String> = Mutex::new(String::from("countdown"));
-    static ref SPONSOR_IMG_TAGS: Mutex<Vec<Html<String>>> = Mutex::new(Vec::new());
-    static ref HOME_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
-    static ref AWAY_IMG_DATA: Mutex<Vec<u8>> = Mutex::new(Vec::new());
-    static ref SECRET: Mutex<String> = tokio::sync::Mutex::new(String::new());
+    static ref HOME_NAME: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("team_name")));
+    static ref AWAY_NAME: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("team_name")));
+    static ref HOME_POINTS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref AWAY_POINTS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref TIME_MINS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref TIME_SECS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref TIME_STARTED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref CHROMAKEY: Arc<Mutex<(u8, u8, u8)>> = Arc::new(Mutex::new((0, 0, 0)));
+    static ref QUARTER: Arc<Mutex<u8>> = Arc::new(Mutex::new(1));
+    static ref SHOW_QUARTER: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref ADDR: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("")));
+    static ref SHOW_SPONSOR: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref LAST_SPONSOR: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    static ref SHOW_COUNTDOWN: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref COUNTDOWN_STARTED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref COUNTDOWN_MINS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref COUNTDOWN_SECS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref COUNTDOWN_TITLE: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("countdown")));
+    static ref SPONSOR_IMG_TAGS: Arc<Mutex<Vec<Html<String>>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref HOME_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref AWAY_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref SECRET: Arc<Mutex<String>> = Arc::new(Mutex::new(String::new()));
 }
 
 #[tokio::main]
