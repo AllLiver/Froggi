@@ -1,13 +1,4 @@
-async function ping() {
-    let start = performance.now();
-    await fetch('/ping', { method: 'HEAD' });
-    let end = performance.now();
-    let pingTime = end - start;
-    document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
-}
-setInterval(ping, 2000);
 
-const socket = new WebSocket('ws://localhost:3000');
 htmx.on('startButton', 'htmx:afterRequest', function () {
     document.getElementById('startButton').classList.add('selected');
     document.getElementById('stopButton').classList.remove('selected');
