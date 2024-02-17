@@ -59,13 +59,13 @@
     <div class="score-container">
         <div class="home">
             <div hx-put="/hdisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/hu" hx-swap="none">+</button>
+            <button class="button-hover" hx-post="/home_add/1" hx-swap="none">+</button>
             <p>Points:</p>
             <div hx-put="/hp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/hd" hx-swap="none">-</button><br><br>
-            <button class="point-button" hx-post="/hu" hx-swap="none">1 Point</button>
-            <button class="point-button" hx-post="/hu2" hx-swap="none">2 Points</button>
-            <button class="point-button" hx-post="/hu3" hx-swap="none">3 Points</button>
+            <button class="button-hover" hx-post="/home_add/-1" hx-swap="none">-</button><br><br>
+            <button class="point-button" hx-post="/home_add/1" hx-swap="none">1 Point</button>
+            <button class="point-button" hx-post="/home_add/2" hx-swap="none">2 Points</button>
+            <button class="point-button" hx-post="/home_add/3" hx-swap="none">3 Points</button>
         </div>
 
         <!-- Timer Content-->
@@ -73,10 +73,10 @@
         <div class="timer-container">
             <div class="timer">
                 <div class="quick-timer-buttons">
-                    <button hx-post="/qt8" hx-swap="none">8 Min</button>
-                    <button hx-post="/qt5" hx-swap="none">5 Min</button>
-                    <button hx-post="/qt3" hx-swap="none">3 Min</button>
-                    <button hx-post="/qt1" hx-swap="none">1 Min</button>
+                    <button hx-post="/quick_time/8/0" hx-swap="none">8 Min</button>
+                    <button hx-post="/quick_time/5/0" hx-swap="none">5 Min</button>
+                    <button hx-post="/quick_time/3/0" hx-swap="none">3 Min</button>
+                    <button hx-post="/quick_time/1/0" hx-swap="none">1 Min</button>
                 </div>
 
 
@@ -105,13 +105,13 @@
 
         <div class="away">
             <div hx-put="/adisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/au" hx-swap="none">+</button>
+            <button class="button-hover" hx-post="/away_add/1" hx-swap="none">+</button>
             <p>Points:</p>
             <div hx-put="/ap" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/ad" hx-swap="none">-</button><br><br>
-            <button class="point-button" hx-post="/au" hx-swap="none">Add 1 Point</button>
-            <button class="point-button" hx-post="/au2" hx-swap="none">Add 2 Points</button>
-            <button class="point-button" hx-post="/au3" hx-swap="none">Add 3 Points</button>
+            <button class="button-hover" hx-post="/away_add/-1" hx-swap="none">-</button><br><br>
+            <button class="point-button" hx-post="/away_add/1" hx-swap="none">Add 1 Point</button>
+            <button class="point-button" hx-post="/away_add/2" hx-swap="none">Add 2 Points</button>
+            <button class="point-button" hx-post="/away_add/3" hx-swap="none">Add 3 Points</button>
             
         </div>
     </div>

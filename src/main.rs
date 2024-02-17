@@ -57,8 +57,8 @@ lazy_static! {
     static ref AWAY_NAME: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("team_name")));
     static ref HOME_POINTS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
     static ref AWAY_POINTS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
-    static ref TIME_MINS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
-    static ref TIME_SECS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref TIME_MINS: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
+    static ref TIME_SECS: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
     static ref TIME_STARTED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref CHROMAKEY: Arc<Mutex<(u8, u8, u8)>> = Arc::new(Mutex::new((0, 0, 0)));
     static ref QUARTER: Arc<Mutex<u8>> = Arc::new(Mutex::new(1));
@@ -68,8 +68,8 @@ lazy_static! {
     static ref LAST_SPONSOR: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref SHOW_COUNTDOWN: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref COUNTDOWN_STARTED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
-    static ref COUNTDOWN_MINS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
-    static ref COUNTDOWN_SECS: Arc<Mutex<i32>> = Arc::new(Mutex::new(0));
+    static ref COUNTDOWN_MINS: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
+    static ref COUNTDOWN_SECS: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
     static ref COUNTDOWN_TITLE: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("countdown")));
     static ref SPONSOR_IMG_TAGS: Arc<Mutex<Vec<Html<String>>>> = Arc::new(Mutex::new(Vec::new()));
     static ref HOME_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
@@ -112,24 +112,15 @@ async fn main() {
         .route("/app.js", get(app_js_handler))
         .route("/favicon_png", get(favicon_handler))
         // Routes to update the home team's info
-        .route("/hu", post(hu_handler))
-        .route("/hd", post(hd_handler))
-        .route("/hu2", post(hu2_handler))
-        .route("/hu3", post(hu3_handler))
+        .route("/home_add/:points", post(home_add_handler))
         .route("/hp", put(hp_handler))
         .route("/home_png", get(home_img_handler))
         // Routes to update the away team's info
-        .route("/au", post(au_handler))
-        .route("/ad", post(ad_handler))
-        .route("/au2", post(au2_handler))
-        .route("/au3", post(au3_handler))
+        .route("/away_add/:points", post(away_add_handler))
         .route("/ap", put(ap_handler))
         .route("/away_png", get(away_img_handler))
         // Routes to update the clock
-        .route("/qt8", post(quick_time8_handler))
-        .route("/qt5", post(quick_time5_handler))
-        .route("/qt3", post(quick_time3_handler))
-        .route("/qt1", post(quick_time1_handler))
+        .route("/quick_time/:mins/:secs", post(quick_time_handler))
         .route("/tstart", post(tstart_handler))
         .route("/tstop", post(tstop_handler))
         .route("/time", put(time_handler))
@@ -166,10 +157,7 @@ async fn main() {
         .route("/show_countdown", post(show_countdown_handler))
         .route("/countdown_css", put(countdown_css_handler))
         .route("/countdown_display", put(countdown_display_handler))
-        .route("/qtc20", post(qtc20_handler))
-        .route("/qtc15", post(qtc15_handler))
-        .route("/qtc10", post(qtc10_handler))
-        .route("/qtc5", post(qtc5_handler))
+        .route("/quick_countdown/:mins/:secs", post(quick_countdown_handler))
         .route("/countdown_mins_up", post(countdown_mins_up_handler))
         .route("/countdown_mins_down", post(countdown_mins_down_handler))
         .route("/countdown_secs_up", post(countdown_secs_up_handler))
@@ -531,35 +519,16 @@ async fn away_img_handler() -> impl IntoResponse {
 // endregion: --- Team names
 // region: --- Home handlers
 
-// Increases the home team's points by 1
-async fn hu_handler() {
-    // Increments home points
+// Handles post request chaning the teams points
+async fn home_add_handler(axum::extract::Path(dval): axum::extract::Path<i32>) {
     let mut home_points = HOME_POINTS.lock().await;
-    *home_points += 1;
-}
-
-// Decreases the home team's points by 1
-async fn hd_handler() {
-    // Decrements home points
-    let mut home_points = HOME_POINTS.lock().await;
-    if *home_points > 0 {
-        *home_points -= 1;
+    if dval < 0 && *home_points + dval >= 0 {
+        *home_points = *home_points + dval;
+    } else if dval > 0 {
+        *home_points = *home_points + dval;
     }
 }
 
-// Increases the home team's points by 2
-async fn hu2_handler() {
-    // Adds 2 home points
-    let mut home_points = HOME_POINTS.lock().await;
-    *home_points += 2;
-}
-
-// Increases the home team's points by 3
-async fn hu3_handler() {
-    // Adds 3 home points
-    let mut home_points = HOME_POINTS.lock().await;
-    *home_points += 3;
-}
 
 // Handles and returns the home team's points
 async fn hp_handler() -> Html<String> {
@@ -571,34 +540,14 @@ async fn hp_handler() -> Html<String> {
 // endregion: --- Home handlers
 // region: --- Away handlers
 
-// Increases the away team's points by 1
-async fn au_handler() {
-    // Increments home points
+// Handles post request chaning the teams points
+async fn away_add_handler(axum::extract::Path(dval): axum::extract::Path<i32>) {
     let mut away_points = AWAY_POINTS.lock().await;
-    *away_points += 1;
-}
-
-// Decreases the away team's points by 1
-async fn ad_handler() {
-    // Decrements home points
-    let mut away_points = AWAY_POINTS.lock().await;
-    if *away_points > 0 {
-        *away_points -= 1;
+    if dval < 0 && *away_points + dval >= 0 {
+        *away_points = *away_points + dval;
+    } else if dval > 0 {
+        *away_points = *away_points + dval;
     }
-}
-
-// Increases the away team's points by 2
-async fn au2_handler() {
-    // Adds 2 home points
-    let mut away_points = AWAY_POINTS.lock().await;
-    *away_points += 2;
-}
-
-// Increases the away team's points by 3
-async fn au3_handler() {
-    // Adds 3 home points
-    let mut away_points = AWAY_POINTS.lock().await;
-    *away_points += 3;
 }
 
 // Handles and returns the away team's points
@@ -611,36 +560,10 @@ async fn ap_handler() -> Html<String> {
 // endregion: --- Away Handlers
 // region: --- Clock handlers
 
-// Sets the clock to 8 minutes
-async fn quick_time8_handler() {
-    let mut time_mins = TIME_MINS.lock().await;
-    let mut time_secs = TIME_SECS.lock().await;
-    *time_mins = 8;
-    *time_secs = 0;
-}
-
-// Sets the clock to 5 minutes
-async fn quick_time5_handler() {
-    let mut time_mins = TIME_MINS.lock().await;
-    let mut time_secs = TIME_SECS.lock().await;
-    *time_mins = 5;
-    *time_secs = 0;
-}
-
-// Sets the clock to 3 minutes
-async fn quick_time3_handler() {
-    let mut time_mins = TIME_MINS.lock().await;
-    let mut time_secs = TIME_SECS.lock().await;
-    *time_mins = 3;
-    *time_secs = 0;
-}
-
-// Sets the clock to 1 minute
-async fn quick_time1_handler() {
-    let mut time_mins = TIME_MINS.lock().await;
-    let mut time_secs = TIME_SECS.lock().await;
-    *time_mins = 1;
-    *time_secs = 0;
+// Sets the clock to a quick time in the path
+async fn quick_time_handler(axum::extract::Path((mins, secs)): axum::extract::Path<(u32, u32)>) {
+    *TIME_MINS.lock().await = mins;
+    *TIME_SECS.lock().await = secs;
 }
 
 // Handles and returns the time formatted as "mm:ss"
@@ -1083,24 +1006,9 @@ async fn countdown_css_handler() -> Html<&'static str> {
     }
 }
 
-async fn qtc20_handler() {
-    *COUNTDOWN_MINS.lock().await = 20;
-    *COUNTDOWN_SECS.lock().await = 0;
-}
-
-async fn qtc15_handler() {
-    *COUNTDOWN_MINS.lock().await = 15;
-    *COUNTDOWN_SECS.lock().await = 0;
-}
-
-async fn qtc10_handler() {
-    *COUNTDOWN_MINS.lock().await = 10;
-    *COUNTDOWN_SECS.lock().await = 0;
-}
-
-async fn qtc5_handler() {
-    *COUNTDOWN_MINS.lock().await = 5;
-    *COUNTDOWN_SECS.lock().await = 0;
+async fn quick_countdown_handler(axum::extract::Path((mins, secs)): axum::extract::Path<(u32, u32)>) {
+    *COUNTDOWN_MINS.lock().await = mins;
+    *COUNTDOWN_SECS.lock().await = secs;
 }
 
 async fn countdown_mins_up_handler() {
