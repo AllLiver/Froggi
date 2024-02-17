@@ -23,9 +23,9 @@ use uuid::Uuid;
 
 // Brings libraries needed for global variables into scope
 use lazy_static::lazy_static;
+use std::sync::Arc;
 use tokio::io::AsyncWriteExt;
 use tokio::sync::Mutex;
-use std::sync::Arc;
 
 use std::path::Path;
 
@@ -74,7 +74,8 @@ lazy_static! {
     static ref COUNTDOWN_STARTED: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref COUNTDOWN_MINS: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
     static ref COUNTDOWN_SECS: Arc<Mutex<u32>> = Arc::new(Mutex::new(0));
-    static ref COUNTDOWN_TITLE: Arc<Mutex<String>> = Arc::new(Mutex::new(String::from("countdown")));
+    static ref COUNTDOWN_TITLE: Arc<Mutex<String>> =
+        Arc::new(Mutex::new(String::from("countdown")));
     static ref SPONSOR_IMG_TAGS: Arc<Mutex<Vec<Html<String>>>> = Arc::new(Mutex::new(Vec::new()));
     static ref HOME_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
     static ref AWAY_IMG_DATA: Arc<Mutex<Vec<u8>>> = Arc::new(Mutex::new(Vec::new()));
@@ -165,7 +166,10 @@ async fn main() {
         .route("/show_countdown", post(show_countdown_handler))
         .route("/countdown_css", put(countdown_css_handler))
         .route("/countdown_display", put(countdown_display_handler))
-        .route("/quick_countdown/:mins/:secs", post(quick_countdown_handler))
+        .route(
+            "/quick_countdown/:mins/:secs",
+            post(quick_countdown_handler),
+        )
         .route("/countdown_mins_up", post(countdown_mins_up_handler))
         .route("/countdown_mins_down", post(countdown_mins_down_handler))
         .route("/countdown_secs_up", post(countdown_secs_up_handler))
@@ -540,7 +544,6 @@ async fn home_add_handler(axum::extract::Path(dval): axum::extract::Path<i32>) {
     }
 }
 
-
 // Handles and returns the home team's points
 async fn hp_handler() -> Html<String> {
     // Displays home points
@@ -908,25 +911,30 @@ async fn load_sponsors() -> Vec<Html<String>> {
 }
 
 async fn sponsor_roll_ticker() {
-    loop {
-        if SPONSOR_IMG_TAGS.lock().await.len() > 1 && *SHOW_SPONSOR.lock().await {
-            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
-            let mut last_sponsor = LAST_SPONSOR.lock().await;
+    if SPONSOR_IMG_TAGS.lock().await.len() != 0 {
+        loop {
+            if SPONSOR_IMG_TAGS.lock().await.len() > 1 && *SHOW_SPONSOR.lock().await {
+                tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+                let mut last_sponsor = LAST_SPONSOR.lock().await;
 
-            if *last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().await.len() - 1 {
-                *last_sponsor = 0;
-            } else {
-                *last_sponsor = *last_sponsor + 1;
+                if *last_sponsor + 1 > SPONSOR_IMG_TAGS.lock().await.len() - 1 {
+                    *last_sponsor = 0;
+                } else {
+                    *last_sponsor = *last_sponsor + 1;
+                }
             }
         }
     }
 }
 
 async fn sponsor_roll_handler() -> Html<String> {
-    let sponsor_imgs = SPONSOR_IMG_TAGS.lock().await;
-    let last_sponsor = LAST_SPONSOR.lock().await;
+    if SPONSOR_IMG_TAGS.lock().await.len() != 0 {
+        let sponsor_imgs = SPONSOR_IMG_TAGS.lock().await;
+        let last_sponsor = LAST_SPONSOR.lock().await;
 
-    sponsor_imgs[*last_sponsor].clone()
+        return sponsor_imgs[*last_sponsor].clone();
+    }
+    return Html(String::new());
 }
 
 async fn show_sponsor_roll_handler() {
@@ -1017,7 +1025,9 @@ async fn countdown_css_handler() -> Html<&'static str> {
     }
 }
 
-async fn quick_countdown_handler(axum::extract::Path((mins, secs)): axum::extract::Path<(u32, u32)>) {
+async fn quick_countdown_handler(
+    axum::extract::Path((mins, secs)): axum::extract::Path<(u32, u32)>,
+) {
     *COUNTDOWN_MINS.lock().await = mins;
     *COUNTDOWN_SECS.lock().await = secs;
 }
@@ -1258,34 +1268,34 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
             if *timeout == false {
                 println!(" -> TIMEOUT");
                 *timeout = true;
-                sleep(Duration::from_secs(3)).await;
+                sleep(Duration::from_secs(4)).await;
                 *timeout = false;
             }
-        },
+        }
         "foul_home" => {
             let mut foul_home = FOUL_HOME.lock().await;
             if *foul_home == false {
                 println!(" -> FOUL: home");
                 *foul_home = true;
-                sleep(Duration::from_secs(3)).await;
+                sleep(Duration::from_secs(4)).await;
                 *foul_home = false;
             }
-        },
+        }
         "foul_away" => {
             let mut foul_away = FOUL_AWAY.lock().await;
             if *foul_away == false {
                 println!(" -> FOUL: away");
                 *foul_away = true;
-                sleep(Duration::from_secs(3)).await;
+                sleep(Duration::from_secs(4)).await;
                 *foul_away = false;
             }
-        },
+        }
         "flag" => {
             let mut flag = FLAG.lock().await;
             if *flag == false {
                 println!(" -> FLAG");
                 *flag = true;
-                sleep(Duration::from_secs(3)).await;
+                sleep(Duration::from_secs(4)).await;
                 *flag = false;
             }
         }
@@ -1297,7 +1307,7 @@ async fn popup_show_handler() -> Html<String> {
     let mut html = String::new();
     if *TIMEOUT.lock().await {
         html += "<p>Timeout</p>";
-    } 
+    }
     if *FOUL_HOME.lock().await {
         html += "<p>Foul: Home";
     }
