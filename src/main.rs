@@ -1,3 +1,5 @@
+#[forbid(unsafe_code)]
+
 // Brings the axum backend into scope
 use axum::{
     body::Body,
@@ -1281,8 +1283,9 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
             if *timeout == false {
                 println!(" -> TIMEOUT");
                 *timeout = true;
+                drop(timeout);
                 sleep(Duration::from_secs(4)).await;
-                *timeout = false;
+                *TIMEOUT.lock().await = false;
             }
         }
         "foul_home" => {
@@ -1290,8 +1293,9 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
             if *foul_home == false {
                 println!(" -> FOUL: home");
                 *foul_home = true;
+                drop(foul_home);
                 sleep(Duration::from_secs(4)).await;
-                *foul_home = false;
+                *FOUL_HOME.lock().await = false;
             }
         }
         "foul_away" => {
@@ -1299,8 +1303,9 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
             if *foul_away == false {
                 println!(" -> FOUL: away");
                 *foul_away = true;
+                drop(foul_away);
                 sleep(Duration::from_secs(4)).await;
-                *foul_away = false;
+                *FOUL_AWAY.lock().await = false;
             }
         }
         "flag" => {
@@ -1308,8 +1313,9 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
             if *flag == false {
                 println!(" -> FLAG");
                 *flag = true;
+                drop(flag);
                 sleep(Duration::from_secs(4)).await;
-                *flag = false;
+                *FLAG.lock().await = false;
             }
         }
         _ => {}
@@ -1330,7 +1336,6 @@ async fn popup_show_handler() -> Html<String> {
     if *FLAG.lock().await {
         html += "<p>Flag on the play</p>";
     }
-    println!("{html}");
     return Html(html);
 }
 
