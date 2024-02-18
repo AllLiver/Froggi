@@ -11,6 +11,7 @@ Here is what each of those files/folders do.
  - teams (folder): this folder contains the images, names, and jersey color of all team presets you set
  - login (folder): this folder is not for manual editing and contains login information
  - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format  
+
 When logging into the web interface for the first time you will be prompted to create a login for the web interface.  
 After creating a login simply sign in, upload team presets, and start streaming!
 
