@@ -1363,7 +1363,7 @@ async fn secret_file_verifier() {
 }
 
 async fn popup_css_handler() -> Html<&'static str> {
-    if *FOUL_AWAY.lock().await && *FOUL_HOME.lock().await && *FLAG.lock().await && *TIMEOUT.lock().await {
+    if !*FOUL_AWAY.lock().await && !*FOUL_HOME.lock().await && !*FLAG.lock().await && !*TIMEOUT.lock().await {
         return Html("<style> .popup-container { display: none; } </style>");
     } else {
         return Html("");
