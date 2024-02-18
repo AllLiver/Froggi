@@ -1164,7 +1164,7 @@ async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
         let token_claim = AuthClaims {
             sub: token_uuid,
             un: login.username,
-            exp: (SystemTime::now() + std::time::Duration::from_secs(604800))
+            exp: (SystemTime::now() + std::time::Duration::from_secs(60 * 60 * 24))
                 .duration_since(SystemTime::UNIX_EPOCH)
                 .unwrap()
                 .as_secs() as usize,
