@@ -786,12 +786,12 @@ async fn team_selectors_handler() -> Html<String> {
             <div class=\"match-selector\">
                 <p>{} vs. {}</p>
                 <div style=\"display: inline\">
-                    <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\"/>
-                    <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\"/>
+                <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\" style=\"margin-right: 15px;\"/>
+                    <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\" style=\"margin-right: 15px;\"/>
                 </div>
                 <br>
                 <button hx-post=\"/load_team/{}\" hx-swap=\"none\" style=\"width: 100%;\">Select</button>
-                <button hx-post=\"/delete_preset/{}\" hx-swap=\"none\" style=\"width: 100%;\">Remove</button>
+                <button hx-post=\"/delete_preset/{}\" hx-swap=\"none\" style=\"width: 100%; margin-top: 15px;\">Remove</button>
             </div>
         ",
             team_info.home_name,
@@ -1325,17 +1325,18 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
 
 async fn popup_show_handler() -> Html<String> {
     let mut html = String::new();
+    let style = "style=\"color: black; text-align: center; display: flex; justify-content: center; align-items: center; height: 100%; font-family: 'Protest Strike', cursive;\"";
     if *TIMEOUT.lock().await {
-        html += "<p>Timeout</p>";
+        html += &format!("<p {}>Timeout</p>", style);
     }
     if *FOUL_HOME.lock().await {
-        html += "<p>Foul: Home";
+        html += &format!("<p {}>Foul: Home</p>", style);
     }
     if *FOUL_AWAY.lock().await {
-        html += "<p>Foul: Away</p>";
+        html += &format!("<p {}>Foul: Away</p>", style);
     }
     if *FLAG.lock().await {
-        html += "<p>Flag on the play</p>";
+        html += &format!("<p {}>Flag on the play</p>", style);
     }
     return Html(html);
 }

@@ -136,7 +136,7 @@ input[type="text"], input[type="submit"] {
 }
 
 .submit-button {
-    margin-top: 20px; /* adjust as needed */
+    margin-top: 20px; 
 }
 
 /* Overlay Styles */
@@ -208,10 +208,61 @@ input[type="text"], input[type="submit"] {
 }
 
 .popup-container {
+    position: fixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgb(255, 255, 255);
+    border-radius: 8%;
+    padding: 10px; 
+    min-width: 100px; 
+    max-width: 150px; 
+    overflow: hidden;
+    max-height: 28px;
+}
+
+.popup-container::before {
+    content: '';
+    background: conic-gradient(transparent 270deg, rgb(255, 175, 2), transparent);
     position: absolute;
-    top: 0;
-    z-index: 1;
-    font-size: 100;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    aspect-ratio: 1;
+    width: 100%;
+    animation: rotate 2s linear infinite;
+}
+
+.popup-container::after {
+    content: '';
+    background: inherit;
+    border-radius: inherit;
+    position: absolute;
+    inset: 3px;
+    height: calc(100% - 6px);
+    width: calc(100% - 6px);
+}
+
+.popup-container p {
+    background: transparent;
+    color: white;
+    position: relative; 
+    z-index: 10;
+    margin: 0; 
+    white-space: nowrap; 
+}
+
+@keyframes rotate {
+    from {
+        transform: translate(-50%, -50%) scale(1.4) rotate(0turn);
+    }
+
+    to {
+        transform: translate(-50%, -50%) scale(1.4) rotate(1turn);
+    }
 }
 
 /* Timer & Countdown Styles */
