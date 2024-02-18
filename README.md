@@ -1,7 +1,16 @@
 # FROGGI
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
-**F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation
+**F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
+Is a self-hosted scoreboard overlay software that aims to provide an easy-to-use overlay for sports broadcasting!
+
+# Usage
+When you run the binary for the first time it should generate all the files and folders it needs  
+Here is what each of those files/folders do.
+ - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard or countdown page, note it will only load these on app startup
+ - teams (folder): this folder contains the images, names, and jersey color of all team presets you set
+ - login (folder): this folder is not for manual editing and contains login information
+ - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format
 
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
