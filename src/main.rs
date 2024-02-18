@@ -1,5 +1,4 @@
 #[forbid(unsafe_code)]
-
 // Brings the axum backend into scope
 use axum::{
     body::Body,
@@ -890,7 +889,9 @@ async fn delete_preset_handler(axum::extract::Path(id): axum::extract::Path<Stri
     let id_path = format!("teams/{}", id);
     if std::path::Path::new(&id_path).is_dir() {
         println!(" -> REMOVE: {}", id);
-        tokio::fs::remove_dir_all(id_path).await.expect("Could not delete id!");
+        tokio::fs::remove_dir_all(id_path)
+            .await
+            .expect("Could not delete id!");
     } else {
         println!(" -> FAIL: cannot delete {}, doesnt exist!", id);
     }
@@ -1363,7 +1364,11 @@ async fn secret_file_verifier() {
 }
 
 async fn popup_css_handler() -> Html<&'static str> {
-    if !*FOUL_AWAY.lock().await && !*FOUL_HOME.lock().await && !*FLAG.lock().await && !*TIMEOUT.lock().await {
+    if !*FOUL_AWAY.lock().await
+        && !*FOUL_HOME.lock().await
+        && !*FLAG.lock().await
+        && !*TIMEOUT.lock().await
+    {
         return Html("<style> .popup-container { display: none; } </style>");
     } else {
         return Html("");
