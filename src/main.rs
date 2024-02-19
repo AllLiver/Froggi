@@ -85,6 +85,7 @@ lazy_static! {
     static ref FOUL_HOME: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref FOUL_AWAY: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref FLAG: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref SECURE_AUTH_COOKIE: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
 }
 
 #[tokio::main]
@@ -256,7 +257,7 @@ async fn read_or_create_config() {
             println!(" -> CREATE: config file");
             tokio::fs::write(
                 CONFIG_FILE,
-                "# FOSSO config file\nchromakey=0, 177, 64\nlisten_addr=0.0.0.0:8080",
+                "# FROGGI config file\nchromakey=0, 177, 64\nlisten_addr=0.0.0.0:8080\nsecure_auth_cookie=true",
             )
             .await
             .unwrap();
@@ -287,6 +288,13 @@ async fn read_or_create_config() {
             "listen_addr" => {
                 let mut addr = ADDR.lock().await;
                 *addr = parts[1].trim().to_string();
+            }
+            "secure_auth_cookie" => {
+                if parts[1].trim() == "false" {
+                    *SECURE_AUTH_COOKIE.lock().await = false;
+                } else {
+                    *SECURE_AUTH_COOKIE.lock().await = true;
+                }
             }
             _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
         }
