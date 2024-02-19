@@ -1334,7 +1334,7 @@ async fn popup_handler(axum::extract::Path(popup_type): axum::extract::Path<Stri
 
 async fn popup_show_handler() -> Html<String> {
     let mut html = String::new();
-    let style = "style=\"color: black; text-align: center; display: flex; justify-content: center; align-items: center; height: 100%; font-family: 'Protest Strike', cursive;\"";
+    let style = "style=\"color: black; text-align: center; display: flex; justify-content: center; align-items: center; height: 100%; font-family: 'Protest Strike', cursive; font-size: 24px;\"";
     if *TIMEOUT.lock().await {
         html += &format!("<p {}>Timeout</p>", style);
     }

@@ -222,6 +222,7 @@ input[type="text"], input[type="submit"] {
     max-width: 150px; 
     overflow: hidden;
     max-height: 28px;
+    font-size: 24px;
 }
 
 .popup-container::before {
@@ -800,6 +801,31 @@ hr {
     margin-top: 5px;
 }
 
+/* iPad Styling */
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
+    .quarter-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .extra-buttons button {
+        width: 150px;
+        margin-bottom: 15px;
+    }
+
+    #quarter5 {
+        height: 60px; 
+    }
+
+    #timeout {
+        margin-top: 15px;
+        height: 60px;
+    }
+}
+
 /* Lighthouse User/Acsessability Optimizations */
 div.timer {
     font-family: monospace;
@@ -813,5 +839,3 @@ div.timer {
     min-height: 10px; 
     min-width: 200px; 
 }
-
-

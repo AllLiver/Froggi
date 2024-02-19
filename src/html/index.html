@@ -29,6 +29,7 @@
         .button-hover:hover {
             background-color: red;
         }
+        
     </style>
     <script src="/htmx.min.js"></script>
     <script>async function ping() {
@@ -152,15 +153,15 @@
 
     <!-- Extra Button Content -->
 
-    <div class="extra-buttons"></div>
-    <button id="show-countdown" hx-post="/show_countdown" hx-swap="none">Show countdown</button>
-    <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>
-    <!-- <button id="" hx-post="/popup/flag" hx-swap="none">FLAG</button> -->
-    <button id="" hx-post="/popup/timeout" hx-swap="none">TIMEOUT</button>
-    <button id="" hx-post="/popup/foul_home" hx-swap="none">FOUL HOME</button>
-    <button id="" hx-post="/popup/foul_away" hx-swap="none">FOUL AWAY</button>
+    <div class="extra-buttons">
+        <button id="show-countdown" hx-post="/show_countdown" hx-swap="none">Toggle countdown</button>
+        <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Toggle sponsors</button>
+        <!-- <button id="" hx-post="/popup/flag" hx-swap="none">FLAG</button> -->
+        <button id="timeout" hx-post="/popup/timeout" hx-swap="none">TIMEOUT</button>
+        <button id="foul_a" hx-post="/popup/foul_home" hx-swap="none">FOUL HOME</button>
+        <button id="foul_h" hx-post="/popup/foul_away" hx-swap="none">FOUL AWAY</button>
+        </div>
     </div>
-
     <div class="ping">
         <p id="ping">Ping: calculating...</p>
         <p id="version">V1.0.0 -- release candidate</p>
