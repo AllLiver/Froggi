@@ -1193,7 +1193,7 @@ async fn login_handler(Form(login): Form<LoginInfo>) -> impl IntoResponse {
 
         let auth_cookie = Cookie::build(("authToken", token))
             .http_only(true)
-            .secure(true)
+            .secure(*SECURE_AUTH_COOKIE.lock().await)
             .path("/");
 
         let response = Response::builder()
