@@ -20,7 +20,7 @@ Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO
 If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
 
 # Compilation 
-- Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases") (usually main branch is not stable)
+- Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases") or clone the repository (main may not always be stable)
 - Install [Rust](https://rustup.rs/ "rustup") if you have not
 - Make sure you have basic C build tools (Windows and MacOS usually have them pre-installed)
 - Run this command in the same directory as the cloned repository
