@@ -1,4 +1,4 @@
-# FROGGI
+93# FROGGI
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
@@ -42,4 +42,4 @@ Here are some features/updates planned
  - HTML, CSS, JavaScript, and the HTMX library for the frontend
 
 # Contribute
-If you are fammiliar with our tech stack, feel free to submit a poll request!
+If you are fammiliar with our tech stack, feel free to submit a pull request!
