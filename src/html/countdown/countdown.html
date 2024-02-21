@@ -49,13 +49,14 @@
                 </div>
                 <div class="countdown-controls">
                     <button hx-post="/countdown_mins_up" hx-swap="none" class="timer-button min-button">Min+</button>
-                    <button hx-post="/countdown_mins_down" hx-swap="none"
-                        class="timer-button min-minus-button">Min-</button>
+                    <button hx-post="/countdown_secs_up" hx-swap="none" class="countdown-button min-button">Sec+</button>
+                    
                 </div>
                 <div class="countdown-controls">
-                    <button hx-post="/countdown_secs_up" hx-swap="none" class="countdown-button min-button">Sec+</button>
-                    <button hx-post="/countdown_secs_down" hx-swap="none"
-                        class="countdown-button min-minus-button">Sec-</button>
+                    <button hx-post="/countdown_mins_down" hx-swap="none"
+                    class="timer-button min-minus-button">Min-</button>
+                    <button hx-post="/countdown_secs_down" hx-swap="none"class="countdown-button min-minus-button">Sec-</button>
+                        
                 </div>
                 <form id="countdown-form" action="/update_countdown_title" method="post" class="countdown-title">
                     <label for="title">Countdown title:</label>
@@ -63,8 +64,8 @@
                 </form>
             </div>
             <div class="show-countdown-button">
-                <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Show countdown</button>
-                <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Show sponsors</button>
+                <button id="show-countdown" hx-post="show_countdown" hx-swap="none">Toggle countdown</button>
+                <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Toggle sponsors</button>
             </div>
         </div>
     </div>
