@@ -1,0 +1,11 @@
+/target
+/README.md
+/LICENSE
+/.github
+/.gitignore
+/config.cfg
+/login
+/sponsors
+/teams
+/.ds_store
+/.DS_Store

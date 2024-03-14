@@ -43,7 +43,7 @@ use mime::TEXT_JAVASCRIPT;
 use serde::{Deserialize, Serialize};
 
 // Brings standard libraries needed for many things into scope
-use std::io::{self, BufRead};
+// use std::io::{self, BufRead};
 
 // Used for sponsor roll
 use base64::prelude::*;
@@ -86,6 +86,7 @@ lazy_static! {
     static ref FOUL_AWAY: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref FLAG: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref SECURE_AUTH_COOKIE: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
+    static ref FOOTBALL_MODE: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
 #[tokio::main]
@@ -214,36 +215,38 @@ async fn main() {
 
     // Bind the server to the address
     println!(
-        "Listening on: {}\nType \"stop\" to do shut down the server gracefully\n",
+        "Listening on: {}\n" /*"Type \"stop\" to do shut down the server gracefully\n"*/,
         listen_addr
     );
     let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
 
-    // Creates a oneshot channel to be able to shut down the server gracefully
-    let (tx, rx) = tokio::sync::oneshot::channel();
+    // // Creates a oneshot channel to be able to shut down the server gracefully
+    // let (tx, rx) = tokio::sync::oneshot::channel();
 
-    // Spawns a task to listen for the "stop" command which shuts down the server
-    tokio::spawn(async move {
-        let stdin = io::stdin();
-        for line in stdin.lock().lines() {
-            if line.unwrap() == "stop" {
-                let _ = tx.send(());
-                return;
-            }
-        }
-    });
+    // // Spawns a task to listen for the "stop" command which shuts down the server
+    // tokio::spawn(async move {
+    //     let stdin = io::stdin();
+    //     for line in stdin.lock().lines() {
+    //         if line.unwrap() == "stop" {
+    //             let _ = tx.send(());
+    //             return;
+    //         }
+    //     }
+    // });
 
-    // Start the server
-    let server = axum::serve(listener, app).with_graceful_shutdown(async {
-        let _ = rx.await;
-        println!(" -> SERVER: shutting down");
-    });
+    axum::serve(listener, app).await.unwrap();
 
-    // Prints an error if an error occurs whie starting the server
-    if let Err(err) = server.await {
-        eprintln!(" -> ERROR: {}", err);
-    }
-    println!(" -> SERVER: gracefully shut down");
+    // // Start the server
+    // let server = axum::serve(listener, app).with_graceful_shutdown(async {
+    //     let _ = rx.await;
+    //     println!(" -> SERVER: shutting down");
+    // });
+
+    // // Prints an error if an error occurs whie starting the server
+    // if let Err(err) = server.await {
+    //     eprintln!(" -> ERROR: {}", err);
+    // }
+    // println!(" -> SERVER: gracefully shut down");
 }
 
 // region: --- Config fn's
@@ -315,8 +318,13 @@ async fn idx_handler(cookies: CookieJar) -> impl IntoResponse {
         ) {
             Ok(_) => match tokio::fs::File::open("login/logins.txt").await {
                 Ok(_) => {
-                    println!(" -> SERVE: index.html");
-                    return Html(include_str!("html/index.html")).into_response();
+                    if *FOOTBALL_MODE.lock().await {
+                        println!(" -> SERVE: index-football.html");
+                        return Html(include_str!("html/index-football.html")).into_response();
+                    } else {
+                        println!(" -> SERVE: index-generic-sport.html");
+                        return Html(include_str!("html/index-generic-sport.html")).into_response();
+                    }
                 }
                 Err(_) => {
                     println!(" -> REDIRECT: login not created yet");
