@@ -224,7 +224,7 @@ async fn main() {
     {
         let server = axum::serve(listener, app).with_graceful_shutdown(async {
             tokio::signal::ctrl_c().await.unwrap();
-            println!(" -> SERVER: shutting down");
+            println!("\n -> SERVER: shutting down");
         });
 
         // Prints an error if an error occurs whie starting the server
@@ -249,12 +249,12 @@ async fn main() {
 
         let server = axum::serve(listener, app).with_graceful_shutdown(async {
             rx.await.unwrap();
-            println!(" -> SERVER: shutting down");
+            println!("\n -> SERVER: shutting down");
         });
 
         // Prints an error if an error occurs whie starting the server
         if let Err(err) = server.await {
-            eprintln!(" -> ERROR: {}", err);
+            eprintln!("\n -> ERROR: {}", err);
         }
     }
 
