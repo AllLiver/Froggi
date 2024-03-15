@@ -42,9 +42,6 @@ use mime::TEXT_JAVASCRIPT;
 // Brings libraries needed for JSON parsing into scope
 use serde::{Deserialize, Serialize};
 
-// Brings standard libraries needed for many things into scope
-// use std::io::{self, BufRead};
-
 // Used for sponsor roll
 use base64::prelude::*;
 
@@ -220,33 +217,48 @@ async fn main() {
     );
     let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
 
-    // // Creates a oneshot channel to be able to shut down the server gracefully
-    // let (tx, rx) = tokio::sync::oneshot::channel();
+    // axum::serve(listener, app).await.unwrap();
 
-    // // Spawns a task to listen for the "stop" command which shuts down the server
-    // tokio::spawn(async move {
-    //     let stdin = io::stdin();
-    //     for line in stdin.lock().lines() {
-    //         if line.unwrap() == "stop" {
-    //             let _ = tx.send(());
-    //             return;
-    //         }
-    //     }
-    // });
+    // Start the server (windows)
+    #[cfg(windows)]
+    {
+        let server = axum::serve(listener, app).with_graceful_shutdown(async {
+            tokio::signal::ctrl_c().await.unwrap();
+            println!(" -> SERVER: shutting down");
+        });
 
-    axum::serve(listener, app).await.unwrap();
+        // Prints an error if an error occurs whie starting the server
+        if let Err(err) = server.await {
+            eprintln!(" -> ERROR: {}", err);
+        }
+    }
 
-    // // Start the server
-    // let server = axum::serve(listener, app).with_graceful_shutdown(async {
-    //     let _ = rx.await;
-    //     println!(" -> SERVER: shutting down");
-    // });
+    // Starts the server (unix)
+    #[cfg(unix)]
+    {
+        let (tx, rx) = tokio::sync::oneshot::channel();
+        tokio::spawn(async {
+            let mut sigterm = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()).unwrap();
+            let mut sigint = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt()).unwrap();
 
-    // // Prints an error if an error occurs whie starting the server
-    // if let Err(err) = server.await {
-    //     eprintln!(" -> ERROR: {}", err);
-    // }
-    // println!(" -> SERVER: gracefully shut down");
+            tokio::select! {
+                _ = sigterm.recv() => {tx.send(()).unwrap()},
+                _ = sigint.recv() => {tx.send(()).unwrap()},
+            };
+        });
+
+        let server = axum::serve(listener, app).with_graceful_shutdown(async {
+            rx.await.unwrap();
+            println!(" -> SERVER: shutting down");
+        });
+
+        // Prints an error if an error occurs whie starting the server
+        if let Err(err) = server.await {
+            eprintln!(" -> ERROR: {}", err);
+        }
+    }
+
+    println!(" -> SERVER: gracefully shut down\n");
 }
 
 // region: --- Config fn's
