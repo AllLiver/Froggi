@@ -51,7 +51,7 @@ use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use tokio::time::sleep;
 use tokio::time::Duration;
 
-const CONFIG_FILE: &'static str = "config.cfg"; // Sets the name of the config file
+const CONFIG_FILE: &'static str = "config.json"; // Sets the name of the config file
 
 // Declares and intializes all the global variables used everywhere in the app
 lazy_static! {
@@ -263,6 +263,18 @@ async fn main() {
 
 // region: --- Config fn's
 
+// chromakey=0, 177, 64
+// listen_addr=0.0.0.0:8080
+// secure_auth_cookie=true
+
+#[derive(Serialize, Deserialize, Debug)]
+struct FroggiConfig {
+    chroma_key: (u8, u8, u8),
+    listen_address: String,
+    listen_port: i32,
+    secure_auth_cookie: bool
+}
+
 // Function that creates and loads configurations from the config file
 async fn read_or_create_config() {
     // Opens or creates the config file if it doesnt exist
@@ -270,50 +282,64 @@ async fn read_or_create_config() {
         Ok(cfg) => cfg,
         Err(_) => {
             println!(" -> CREATE: config file");
-            tokio::fs::write(
-                CONFIG_FILE,
-                "# FROGGI config file\nchromakey=0, 177, 64\nlisten_addr=0.0.0.0:8080\nsecure_auth_cookie=true",
-            )
-            .await
-            .unwrap();
+            let default_config  = FroggiConfig {
+                chroma_key: (0, 177, 64),
+                listen_address: String::from("0.0.0.0"),
+                listen_port: 8080,
+                secure_auth_cookie: true
+            };
+
+            let json = serde_json::to_string(&default_config).expect("Failed to serialize team info");
+            tokio::fs::write(CONFIG_FILE, json)
+                .await
+                .unwrap();
             tokio::fs::read_to_string(CONFIG_FILE).await.unwrap()
         }
     };
 
-    // Split up the config file into lines and filter out comments
-    let lines: Vec<String> = config
-        .split('\n')
-        .filter(|x| !x.starts_with("#"))
-        .map(|x| x.to_string())
-        .collect();
-    println!(" -> CONFIG: {:?}", lines);
+    let config: FroggiConfig =
+        serde_json::from_str(&config).expect("Could not deserialize data!");
 
-    // Loops through the lines and sets the configurations
-    for i in lines {
-        let parts: Vec<&str> = i.split('=').collect();
-        match parts[0] {
-            "chromakey" => {
-                let rgb: Vec<&str> = parts[1].split(',').collect();
-                let r: u8 = rgb[0].trim().parse().unwrap();
-                let g: u8 = rgb[1].trim().parse().unwrap();
-                let b: u8 = rgb[2].trim().parse().unwrap();
-                let mut chromakey = CHROMAKEY.lock().await;
-                *chromakey = (r, g, b);
-            }
-            "listen_addr" => {
-                let mut addr = ADDR.lock().await;
-                *addr = parts[1].trim().to_string();
-            }
-            "secure_auth_cookie" => {
-                if parts[1].trim() == "false" {
-                    *SECURE_AUTH_COOKIE.lock().await = false;
-                } else {
-                    *SECURE_AUTH_COOKIE.lock().await = true;
-                }
-            }
-            _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
-        }
-    }
+    dbg!(&config);
+
+    *CHROMAKEY.lock().await = config.chroma_key;
+    *ADDR.lock().await = format!("{}:{}", config.listen_address, config.listen_port.to_string());
+    *SECURE_AUTH_COOKIE.lock().await = config.secure_auth_cookie;
+
+    // // Split up the config file into lines and filter out comments
+    // let lines: Vec<String> = config
+    //     .split('\n')
+    //     .filter(|x| !x.starts_with("#"))
+    //     .map(|x| x.to_string())
+    //     .collect();
+    // println!(" -> CONFIG: {:?}", lines);
+
+    // // Loops through the lines and sets the configurations
+    // for i in lines {
+    //     let parts: Vec<&str> = i.split('=').collect();
+    //     match parts[0] {
+    //         "chromakey" => {
+    //             let rgb: Vec<&str> = parts[1].split(',').collect();
+    //             let r: u8 = rgb[0].trim().parse().unwrap();
+    //             let g: u8 = rgb[1].trim().parse().unwrap();
+    //             let b: u8 = rgb[2].trim().parse().unwrap();
+    //             let mut chromakey = CHROMAKEY.lock().await;
+    //             *chromakey = (r, g, b);
+    //         }
+    //         "listen_addr" => {
+    //             let mut addr = ADDR.lock().await;
+    //             *addr = parts[1].trim().to_string();
+    //         }
+    //         "secure_auth_cookie" => {
+    //             if parts[1].trim() == "false" {
+    //                 *SECURE_AUTH_COOKIE.lock().await = false;
+    //             } else {
+    //                 *SECURE_AUTH_COOKIE.lock().await = true;
+    //             }
+    //         }
+    //         _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
+    //     }
+    // }
 }
 
 // endregion: --- Config fn's
