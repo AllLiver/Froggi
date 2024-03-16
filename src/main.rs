@@ -305,41 +305,6 @@ async fn read_or_create_config() {
     *CHROMAKEY.lock().await = config.chroma_key;
     *ADDR.lock().await = format!("{}:{}", config.listen_address, config.listen_port.to_string());
     *SECURE_AUTH_COOKIE.lock().await = config.secure_auth_cookie;
-
-    // // Split up the config file into lines and filter out comments
-    // let lines: Vec<String> = config
-    //     .split('\n')
-    //     .filter(|x| !x.starts_with("#"))
-    //     .map(|x| x.to_string())
-    //     .collect();
-    // println!(" -> CONFIG: {:?}", lines);
-
-    // // Loops through the lines and sets the configurations
-    // for i in lines {
-    //     let parts: Vec<&str> = i.split('=').collect();
-    //     match parts[0] {
-    //         "chromakey" => {
-    //             let rgb: Vec<&str> = parts[1].split(',').collect();
-    //             let r: u8 = rgb[0].trim().parse().unwrap();
-    //             let g: u8 = rgb[1].trim().parse().unwrap();
-    //             let b: u8 = rgb[2].trim().parse().unwrap();
-    //             let mut chromakey = CHROMAKEY.lock().await;
-    //             *chromakey = (r, g, b);
-    //         }
-    //         "listen_addr" => {
-    //             let mut addr = ADDR.lock().await;
-    //             *addr = parts[1].trim().to_string();
-    //         }
-    //         "secure_auth_cookie" => {
-    //             if parts[1].trim() == "false" {
-    //                 *SECURE_AUTH_COOKIE.lock().await = false;
-    //             } else {
-    //                 *SECURE_AUTH_COOKIE.lock().await = true;
-    //             }
-    //         }
-    //         _ => println!(" -> CONFIG: unknown config: {}", parts[0]),
-    //     }
-    // }
 }
 
 // endregion: --- Config fn's
