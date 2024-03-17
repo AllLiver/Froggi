@@ -212,7 +212,7 @@ async fn main() {
 
     // Bind the server to the address
     println!(
-        "Listening on: {}\n" /*"Type \"stop\" to do shut down the server gracefully\n"*/,
+        "Listening on: {}\n", /*"Type \"stop\" to do shut down the server gracefully\n"*/
         listen_addr
     );
     let listener = tokio::net::TcpListener::bind(listen_addr).await.unwrap(); // Binds the listener to the address
@@ -238,8 +238,10 @@ async fn main() {
     {
         let (tx, rx) = tokio::sync::oneshot::channel();
         tokio::spawn(async {
-            let mut sigterm = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()).unwrap();
-            let mut sigint = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt()).unwrap();
+            let mut sigterm =
+                tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate()).unwrap();
+            let mut sigint =
+                tokio::signal::unix::signal(tokio::signal::unix::SignalKind::interrupt()).unwrap();
 
             tokio::select! {
                 _ = sigterm.recv() => {tx.send(()).unwrap()},
@@ -272,7 +274,7 @@ struct FroggiConfig {
     chroma_key: (u8, u8, u8),
     listen_address: String,
     listen_port: i32,
-    secure_auth_cookie: bool
+    secure_auth_cookie: bool,
 }
 
 // Function that creates and loads configurations from the config file
@@ -282,28 +284,30 @@ async fn read_or_create_config() {
         Ok(cfg) => cfg,
         Err(_) => {
             println!(" -> CREATE: config file");
-            let default_config  = FroggiConfig {
+            let default_config = FroggiConfig {
                 chroma_key: (0, 177, 64),
                 listen_address: String::from("0.0.0.0"),
                 listen_port: 8080,
-                secure_auth_cookie: true
+                secure_auth_cookie: true,
             };
 
-            let json = serde_json::to_string_pretty(&default_config).expect("Could not serialize config!");
-            tokio::fs::write(CONFIG_FILE, json)
-                .await
-                .unwrap();
+            let json =
+                serde_json::to_string_pretty(&default_config).expect("Could not serialize config!");
+            tokio::fs::write(CONFIG_FILE, json).await.unwrap();
             tokio::fs::read_to_string(CONFIG_FILE).await.unwrap()
         }
     };
 
-    let config: FroggiConfig =
-        serde_json::from_str(&config).expect("Could not deserialize data!");
+    let config: FroggiConfig = serde_json::from_str(&config).expect("Could not deserialize data!");
 
     dbg!(&config);
 
     *CHROMAKEY.lock().await = config.chroma_key;
-    *ADDR.lock().await = format!("{}:{}", config.listen_address, config.listen_port.to_string());
+    *ADDR.lock().await = format!(
+        "{}:{}",
+        config.listen_address,
+        config.listen_port.to_string()
+    );
     *SECURE_AUTH_COOKIE.lock().await = config.secure_auth_cookie;
 }
 
