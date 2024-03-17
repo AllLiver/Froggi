@@ -289,7 +289,7 @@ async fn read_or_create_config() {
                 secure_auth_cookie: true
             };
 
-            let json = serde_json::to_string(&default_config).expect("Failed to serialize team info");
+            let json = serde_json::to_string_pretty(&default_config).expect("Could not serialize config!");
             tokio::fs::write(CONFIG_FILE, json)
                 .await
                 .unwrap();
