@@ -83,7 +83,7 @@ lazy_static! {
     static ref FOUL_AWAY: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref FLAG: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref SECURE_AUTH_COOKIE: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
-    static ref FOOTBALL_MODE: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref FOOTBALL_MODE: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
 }
 
 #[tokio::main]

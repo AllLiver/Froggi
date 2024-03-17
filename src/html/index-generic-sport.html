@@ -1,51 +1,134 @@
-<!-- cargo watch -q -c -w src/ -x run  -->
-<!-- Release Candidtate 1.0.1 -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
-    <link rel="icon" href="/favicon_png" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Froggi Dashboard</title>
+    <title>Scoreboard Software</title>
     <link rel="stylesheet" type="text/css" href="/style.css">
-    <link rel="icon" type="image/png" href="/favicon_png">
     <style>
         body {
-            font-family: 'Open Sans', sans-serif;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        .white-boxes-container {
-            transform: translateY(-5px);
-            position: relative;
-            z-index: 1;
+        nav {
+            background-color: #333;
+            color: #fff;
+            padding: 10px;
         }
 
-        .button {
-            position: relative;
-            z-index: 2;
+        nav ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
         }
 
-
-        .button-hover:hover {
-            background-color: red;
+        nav ul li {
+            margin-right: 20px;
         }
-        
+
+        nav ul li a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .score-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .team-container {
+            text-align: center;
+        }
+
+        .score-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .team-name {
+            font-size: 24px;
+            color: #555;
+        }
+
+        .timer-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .timer {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .timer-display {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .timer-controls button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .timer-controls button:hover {
+            background-color: #555;
+        }
+
+        .extra-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .extra-buttons button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+
+        .extra-buttons button:hover {
+            background-color: #555;
+        }
+
+        .ping {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
     </style>
-    <script src="/htmx.min.js"></script>
-    <script>async function ping() {
-            let start = performance.now(); await fetch('/ping', { method: 'HEAD' }); let end = performance.now(); let pingTime = end - start; document.getElementById('ping').textContent = `Ping: ${pingTime.toFixed()}ms`;
-        }
-        setInterval(ping, 2000);
-    </script>
-    <script src="/app.js"></script>
-    <div hx-put="/show_quarter_css" hx-trigger="every 100ms"></div>
-    <div hx-put="/sponsor_roll_css" hx-trigger="every 100ms"></div>
-    <div hx-put="/countdown_css" hx-trigger="every 100ms"></div>
-    <link rel="preload"
-        href="https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap"
-        as="font" type="font/woff2" crossorigin>
-
 </head>
 
 <body>
@@ -60,20 +143,14 @@
             </ul>
         </header>
     </nav>
-    <!-- Home Score Content -->
-    <div class="score-container">
-        <div class="home">
-            <div hx-put="/hdisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/home_add/1" hx-swap="none">+</button>
-            <p>Points:</p>
-            <div hx-put="/hp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/home_add/-1" hx-swap="none">-</button><br><br>
-            <button class="point-button" hx-post="/home_add/1" hx-swap="none">1 Point</button>
-            <button class="point-button" hx-post="/home_add/2" hx-swap="none">2 Points</button>
-            <button class="point-button" hx-post="/home_add/3" hx-swap="none">3 Points</button>
-        </div>
 
-        <!-- Timer Content-->
+    <div class="score-container">
+        <div class="team-container">
+            <div class="score-box">
+                <p class="score" id="homeScore">0</p>
+                <p class="team-name" id="homeName">Home Team</p>
+            </div>
+        </div>
 
         <div class="timer-container">
             <div class="timer">
@@ -83,91 +160,32 @@
                     <button hx-post="/quick_time/3/0" hx-swap="none">3 Min</button>
                     <button hx-post="/quick_time/1/0" hx-swap="none">1 Min</button>
                 </div>
-
-
-                <div class="timer-elements">
-                    <div hx-put="/time_dashboard" hx-trigger="every 100ms"></div>
-                </div>
-
-                <div class="timer-controls">
-                    <button id="startButton" class="button-hover" hx-post="/tstart" hx-swap="none" hx-trigger="click"
-                    class="timer-button">Start</button>
-                    <button id="stopButton" class="button-hover" hx-post="/tstop" hx-swap="none" hx-trigger="click"
-                        class="timer-button">Stop</button>
-                </div>
-                <div class="timer-controls">
-                    <button hx-post="/mins_up" hx-swap="none" class="timer-button min-button">Min+</button>
-                    <button hx-post="/secs_up" hx-swap="none" class="timer-button min-button">Sec+</button>
-                </div>
-                <div class="timer-controls">
-                    <button hx-post="/mins_down" hx-swap="none" class="timer-button min-minus-button">Min-</button>
-                    <button hx-post="/secs_down" hx-swap="none" class="timer-button min-minus-button">Sec-</button>
-                </div>
             </div>
         </div>
 
-        <!-- Away Score Content -->
-
-        <div class="away">
-            <div hx-put="/adisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/away_add/1" hx-swap="none">+</button>
-            <p>Points:</p>
-            <div hx-put="/ap" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/away_add/-1" hx-swap="none">-</button><br><br>
-            <button class="point-button" hx-post="/away_add/1" hx-swap="none">Add 1 Point</button>
-            <button class="point-button" hx-post="/away_add/2" hx-swap="none">Add 2 Points</button>
-            <button class="point-button" hx-post="/away_add/3" hx-swap="none">Add 3 Points</button>
-
+        <div class="team-container">
+            <div class="score-box">
+                <p class="score" id="awayScore">0</p>
+                <p class="team-name" id="awayName">Away Team</p>
+            </div>
         </div>
     </div>
-
-    <!-- Overlay Bar Preview -->
-
-    <div class="white-boxes-container">
-        <div class="home-box">
-            <img class="logo" src="/home_png" alt="Home" height="28px" width="auto">
-            <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
-        </div>
-
-        <div class="score-box" hx-put="/score" hx-trigger="every 100ms"></div>
-
-        <div class="away-box">
-            <img class="logo" src="/away_png" alt="Away" height="28px" width="auto">
-            <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
-        </div>
-
-        <div class="clock-box">
-            <div hx-put="/time_and_quarter" hx-trigger="every 100ms"></div>
-        </div>
-    </div>
-
-    <!--Quarter Content -->
-
-    <div class="quarter-container">
-        <button id="show-quarter" hx-post="show_quarter" hx-swap="none">Show quarter</button>
-        <button id="quarter1" hx-post="/change_quarter/1" hx-swap="none">Quarter 1</button>
-        <button id="quarter2" hx-post="/change_quarter/2" hx-swap="none">Quarter 2</button>
-        <button id="quarter3" hx-post="/change_quarter/3" hx-swap="none">Quarter 3</button>
-        <button id="quarter4" hx-post="/change_quarter/4" hx-swap="none">Quarter 4</button>
-        <button id="quarter5" hx-post="/change_quarter/5" hx-swap="none"><strong>OT</strong></button>
-    </div>
-
-    <!-- Extra Button Content -->
 
     <div class="extra-buttons">
-        <button id="show-countdown" hx-post="/show_countdown" hx-swap="none">Toggle countdown</button>
-        <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Toggle sponsors</button>
-        <!-- <button id="" hx-post="/popup/flag" hx-swap="none">FLAG</button> -->
-        <button id="foul_a" hx-post="/popup/foul_home" hx-swap="none">Foul Home</button>
-        <button id="foul_h" hx-post="/popup/foul_away" hx-swap="none">Foul Away</button>
-        <button id="" hx-post="/popup/timeout" hx-swap="none">Time Out</button>
-        </div>
+        <button id="toggleCountdown">Toggle Countdown</button>
+        <button id="toggleSponsors">Toggle Sponsors</button>
+        <button id="foulHome">Foul Home</button>
+        <button id="foulAway">Foul Away</button>
+        <button id="timeout">Timeout</button>
     </div>
+
     <div class="ping">
         <p id="ping">Ping: calculating...</p>
         <p id="version">V1.0.1</p>
     </div>
 
+    <script src="/htmx.min.js"></script>
+    <script src="/app.js"></script>
 </body>
 
 </html>
