@@ -37,7 +37,8 @@ Here are some features/updates planned
  - More consistent naming in API and frontend code
  - Logs you can access in the web app
  - Ui popups for team touchdowns, & scoring
- - Accessibility improvements, such as image alts
+ - Front end overhaul
+ - Integration with OCR https://github.com/RenarsKokins/ScoreboardOCR
 
 # Tech Stack
  - Rust with Axum in the backend
