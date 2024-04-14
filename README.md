@@ -17,7 +17,8 @@ After creating a login simply sign in, upload team presets, and start streaming!
 
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
-If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
+If your platform does not have a pre-compiled binary please follow the instructions to [compile]https://github.com/AllLiver/Froggi?tab=readme-ov-file#compilation "how to compile") repository yourself
+_If using windows it is crucial that "quick edit mode" is turned off (Right click command prompt, select properties, and deselect "Quick Edit Mode".)
 
 # Compilation 
 - Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases") (usually main branch is not stable)
@@ -33,9 +34,11 @@ The compiled binary will be in /target/release
 Froggi is an indev project so change is very likley.
 Here are some features/updates planned
  - More consistent naming in API and frontend code
- - Logs you can access in the web app
+ - Web accessible logs
+ - Team Colors will change the gradients on index
  - Ui popups for team touchdowns, & scoring
- - Acsessibility improvements, such as image alts
+ - Integretion with easyOCR
+ - Docker support
 
 # Tech Stack
  - Rust with Axum in the backend
