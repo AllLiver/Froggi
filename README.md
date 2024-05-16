@@ -16,10 +16,10 @@ When logging into the web interface for the first time you will be prompted to c
 After creating a login simply sign in, upload team presets, and start streaming!
 
 # Installation
-NOTICE: froggi in the future will be using docker, and precompiled binaries will no longer be available so if for any reason you prefer to use binaries please compile it yourself  
-Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")  
-If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
-If using precompiled Windows build, it is crucial that quick edit mode is turned off on Command Prompt
+- NOTICE: froggi in the future will be using docker, and precompiled binaries will no longer be available so if for any reason you prefer to use binaries please compile it yourself  
+- Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")  
+- If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/FOSSO?tab=readme-ov-file#compilation "how to compile") repository yourself
+- If using precompiled Windows build, it is crucial that quick edit mode is turned off on Command Prompt
 
 # Compilation 
 - Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases") (usually main branch is not stable)
