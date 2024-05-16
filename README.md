@@ -22,7 +22,7 @@ If your platform does not have a pre-compiled binary please follow the instructi
 
 # Compilation 
 - Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases") (usually main branch is not stable)
-- Install [Rust](https://rustup.rs/ "rustup") if you have not
+- Install [Rust](https://rustup.rs/ "rustup") if it it's not installed
 - Make sure you have basic C build tools (Windows and MacOS usually have them pre-installed)
 - Run this command in the same directory as the cloned repository
 ```
@@ -33,11 +33,11 @@ The compiled binary will be in /target/release
 # Roadmap
 Froggi is an indev project so change is very likely.
 Here are some features/updates planned
- - Docker support
+ - Docker support for stable channel
  - More consistent naming in API and frontend code
- - Logs you can access in the web app
- - Ui popups for team touchdowns, & scoring
- - Front end overhaul
+ - Web-accessible logs
+ - Improved html chips for downs & home scoring
+ - Front end redesign
  - Integration with OCR https://github.com/RenarsKokins/ScoreboardOCR
 
 # Tech Stack
