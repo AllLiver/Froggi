@@ -10,7 +10,8 @@ Here is what each of those files/folders do.
  - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard or countdown page, note it will only load these on app startup
  - teams (folder): this folder contains the images, names, and jersey colors of all team presets you set
  - login (folder): this folder is not for manual editing and contains login information
- - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format  
+ - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format
+ - If using precompiled Windows build, it is crucial that quick edit mode is turned off on Command Prompt
 
 When logging into the web interface for the first time you will be prompted to create a login for the web interface.  
 After creating a login simply sign in, upload team presets, and start streaming!
