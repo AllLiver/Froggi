@@ -857,23 +857,18 @@ async fn load_team_handler(axum::extract::Path(id): axum::extract::Path<String>)
 
 // Handles the file upload for the team's logo
 async fn add_team_handler(mut payload: Multipart) -> impl IntoResponse {
-    const BASE62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-
     let mut home_name = String::from("");
     let mut home_color = String::from("");
 
     let mut away_name = String::from("");
     let mut away_color = String::from("");
 
-    let mut id = String::with_capacity(12);
-    for _ in 0..12 {
-        id.push(BASE62[thread_rng().gen_range(0..BASE62.len())] as char);
-    }
+    let id = gen_id().await;
 
     std::fs::create_dir_all(Path::new(&format!("./teams/{}", id))).unwrap();
 
     // Loops through the fields of the form
-    while let Some(field) = payload.next_field().await.unwrap() {
+    while let Ok(Some(field)) = payload.next_field().await {
         // Gets the name and data of the field
         let name = field.name().unwrap().to_string();
         let data = field.bytes().await.unwrap();
@@ -1000,6 +995,19 @@ async fn sponsor_roll_css_handler() -> Html<&'static str> {
         return Html("<style> #sponsor_roll_img { display: none; } #show-sponsor { background-color: #e9981f; } </style>");
     }
 }
+
+// Sponsor roll uploads
+
+async fn upload_sponsor_handler(mut payload: Multipart) -> impl IntoResponse {
+    while let Ok(Some(field)) = payload.next_field().await {
+        let data = field.bytes().await.unwrap();
+
+        tokio::fs::write(Path::new(&format!("./sponsors/{}.png", gen_id().await)), data).await.unwrap();
+    }
+
+    StatusCode::OK
+}
+
 
 // endregion: --- Sponsor roll
 // region: --- Countdown
@@ -1375,7 +1383,7 @@ struct ChangeDowns {
     yards: String,
 }
 
-async fn set_downs_handler(Form(data): Form<ChangeDowns>) {
+async fn set_downs_handler(Form(data): Form<ChangeDowns>) -> impl IntoResponse {
     if let Ok(downs) = data.down.parse::<u8>() {
         println!(" -> SET: downs {}", downs);
         *DOWNS.lock().await = downs;
@@ -1385,6 +1393,8 @@ async fn set_downs_handler(Form(data): Form<ChangeDowns>) {
         println!(" -> SET: yards {}", yards);
         *YARDS.lock().await = yards;
     }
+
+    StatusCode::OK
 }
 
 // endregion: -- Sponsor roll
@@ -1418,6 +1428,17 @@ async fn popup_css_handler() -> Html<&'static str> {
     } else {
         return Html("");
     }
+}
+
+async fn gen_id() -> String {
+    const BASE62: &[u8] = b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    let mut id = String::with_capacity(12);
+    for _ in 0..12 {
+        id.push(BASE62[thread_rng().gen_range(0..BASE62.len())] as char);
+    }
+
+    id
 }
 
 // endregion: -- Misc fn's
