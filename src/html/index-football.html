@@ -398,27 +398,23 @@
     </div>
 
     <!-- SPECIFIC TO NAFOOTBALL  -->
-    <div class="down">
+    <form hx-post="/set_downs" hx-swap="none">
         <label for="down">Down:</label>
-        <select id="down">
-            <option value="1st down">1st down</option>
-            <option value="2nd down">2nd down</option>
-            <option value="3rd down">3rd down</option>
-            <option value="4th down">4th down</option>
+        <select id="down" name="down">
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
         </select>
-        <div hx-post="/update_down" hx-swap="none" hx-target="#down" hx-indicator=".down select">
-        </div>
+        <label for="yards">To:</label>
+        <input type="text" id="yards" name="yards">
+        <input type="submit">
+    </form>
 
-        <div class="togo">
-            <label for="distance-input">To Go:</label>
-            <input type="text" id="distance-input" yardAmount="YD TO GO">
-            <button onclick="updateToGo()">Update</button>
-        </div>
-
-        <div class="ping">
-            <p id="ping">Ping: calculating...</p>
-            <p id="version">V1.0.1</p>
-        </div>
+    <div class="ping">
+        <p id="ping">Ping: calculating...</p>
+        <p id="version">V1.0.1</p>
+    </div>
 
 </body>
 

@@ -84,6 +84,8 @@ lazy_static! {
     static ref FLAG: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref SECURE_AUTH_COOKIE: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
     static ref FOOTBALL_MODE: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
+    static ref DOWNS: Arc<Mutex<u8>> = Arc::new(Mutex::new(1));
+    static ref YARDS: Arc<Mutex<u32>> = Arc::new(Mutex::new(1));
 }
 
 #[tokio::main]
@@ -192,6 +194,8 @@ async fn main() {
         .route("/favicon.ico", get(favicon_handler))
         // Routes head requests for calculating latency
         .route("/ping", head(|| async { StatusCode::OK }))
+        // Routes for setting downs
+        .route("/set_downs", post(set_downs_handler))
         // Route the 404 page
         .fallback_service(get(|| async {
             println!(" -> 404: not found");
@@ -1363,6 +1367,24 @@ async fn popup_show_handler() -> Html<String> {
         html += &format!("<p {}>Flag on the play</p>", style);
     }
     return Html(html);
+}
+
+#[derive(Deserialize)]
+struct ChangeDowns {
+    down: String,
+    yards: String,
+}
+
+async fn set_downs_handler(Form(data): Form<ChangeDowns>) {
+    if let Ok(downs) = data.down.parse::<u8>() {
+        println!(" -> SET: downs {}", downs);
+        *DOWNS.lock().await = downs;
+    } 
+
+    if let Ok(yards) = data.yards.parse::<u32>() {
+        println!(" -> SET: yards {}", yards);
+        *YARDS.lock().await = yards;
+    }
 }
 
 // endregion: -- Sponsor roll
