@@ -915,7 +915,7 @@ async fn delete_preset_handler(axum::extract::Path(id): axum::extract::Path<Stri
             .await
             .expect("Could not delete id!");
     } else {
-        println!(" -> FAIL: cannot delete {}, doesnt exist!", id);
+        println!(" -> FAIL: cannot delete team preset {}, doesnt exist!", id);
     }
 }
 
@@ -1008,6 +1008,46 @@ async fn upload_sponsor_handler(mut payload: Multipart) -> impl IntoResponse {
     StatusCode::OK
 }
 
+async fn sponsor_img_manage_manage_handler() -> Html<String> {
+    // "
+    //     <div class=\"match-selector\">
+    //         <p>{} vs. {}</p>
+    //         <div style=\"display: inline\">
+    //         <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\" style=\"margin-right: 15px;\"/>
+    //             <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\" style=\"margin-right: 15px;\"/>
+    //         </div>
+    //         <br>
+    //         <button hx-post=\"/load_team/{}\" hx-swap=\"none\" style=\"width: 100%;\">Select</button>
+    //         <button hx-post=\"/delete_preset/{}\" hx-swap=\"none\" style=\"width: 100%; margin-top: 15px;\">Remove</button>
+    //     </div>
+    // ",
+
+    let mut team_presets = tokio::fs::read_dir("./sponsors").await.unwrap();
+    let mut insert_html = String::new();
+
+    while let Ok(Some(id)) = team_presets.next_entry().await {
+        let fname = id.file_name().to_string_lossy().to_string();
+
+        let img_bytes = tokio::fs::read(format!("./sponsors/{}.png", fname)).await.unwrap();
+
+        insert_html += &format!("
+            <div class=\"sponsor-manager\">
+                <img src=\"data:image/png;base64,{}\" height=\"30px\" width=\"auto\" style=\"margin-right: 15px;\"/>
+                <button hx-post=\"/delete_preset/{}\" hx-swap=\"none\" style=\"width: 100%; margin-top: 15px;\">Remove</button>
+            </div>
+        ", BASE64_STANDARD.encode(img_bytes), fname);
+    }
+
+    Html::from(insert_html)
+}
+
+async fn delete_sponsor_img_handler(axum::extract::Path(id): axum::extract::Path<String>) -> impl IntoResponse {
+    if let Err(_) = tokio::fs::remove_file(Path::new(&format!("./sponsors/{}.png", id))).await {
+        println!(" -> FAIL: cannot delete sponsor {}, doesnt exist!", id);
+    }
+
+    StatusCode::OK
+} 
 
 // endregion: --- Sponsor roll
 // region: --- Countdown
