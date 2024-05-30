@@ -740,27 +740,27 @@ async fn show_quarter_css_handler() -> Html<&'static str> {
 
     if *show_quarter {
         if *quarter == 1 {
-            return Html("<style> #show-quarter { background-color: rgb(227, 45, 32); } #quarter1 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: rgb(180, 143, 235); } #quarter1 { background-color: rgb(180, 143, 235); } </style>");
         } else if *quarter == 2 {
-            return Html("<style> #show-quarter { background-color: rgb(227, 45, 32); } #quarter2 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: rgb(180, 143, 235); } #quarter2 { background-color: rgb(180, 143, 235); } </style>");
         } else if *quarter == 3 {
-            return Html("<style> #show-quarter { background-color: rgb(227, 45, 32); } #quarter3 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: rgb(180, 143, 235); } #quarter3 { background-color: rgb(180, 143, 235); } </style>");
         } else if *quarter == 4 {
-            return Html("<style> #show-quarter { background-color: rgb(227, 45, 32); } #quarter4 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: rgb(180, 143, 235); } #quarter4 { background-color: rgb(180, 143, 235); } </style>");
         } else {
-            return Html("<style> #show-quarter { background-color: rgb(227, 45, 32); } #quarter5 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: rgb(180, 143, 235); } #quarter5 { background-color: rgb(180, 143, 235); } </style>");
         }
     } else {
         if *quarter == 1 {
-            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter1 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter1 { background-color: rgb(180, 143, 235); } </style>");
         } else if *quarter == 2 {
-            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter2 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter2 { background-color: rgb(180, 143, 235); } </style>");
         } else if *quarter == 3 {
-            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter3 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter3 { background-color: rgb(180, 143, 235); } </style>");
         } else if *quarter == 4 {
-            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter4 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter4 { background-color: rgb(180, 143, 235); } </style>");
         } else {
-            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter5 { background-color: rgb(227, 45, 32); } </style>");
+            return Html("<style> #show-quarter { background-color: #e9981f; } #quarter5 { background-color: rgb(180, 143, 235); } </style>");
         }
     }
 }
@@ -990,7 +990,7 @@ async fn sponsor_roll_css_handler() -> Html<&'static str> {
     let show_sponsor = SHOW_SPONSOR.lock().await;
 
     if *show_sponsor {
-        return Html("<style> #show-sponsor { background-color: rgb(227, 45, 32); } </style>");
+        return Html("<style> #show-sponsor { background-color: rgb(180, 143, 235); } </style>");
     } else {
         return Html("<style> #sponsor_roll_img { display: none; } #show-sponsor { background-color: #e9981f; } </style>");
     }
@@ -1111,7 +1111,7 @@ async fn show_countdown_handler() {
 
 async fn countdown_css_handler() -> Html<&'static str> {
     if *SHOW_COUNTDOWN.lock().await {
-        return Html("<style> .white-boxes-container { display: none; } #show-countdown { background-color: rgb(227, 45, 32); } </style>");
+        return Html("<style> .white-boxes-container { display: none; } #show-countdown { background-color: rgb(180, 143, 235); } </style>");
     } else {
         return Html("<style> .white-boxes-container { display: flex; } #show-countdown { background-color: #e9981f; } #countdown { display: none; }</style>");
     }

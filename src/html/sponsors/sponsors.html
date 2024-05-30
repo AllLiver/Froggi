@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon_png" type="image/x-icon">
+    <title>Froggi Team Info</title>
+    <link rel="stylesheet" type="text/css" href="/style.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+    </style>
+    <script src="/htmx.min.js"></script>
+    <script src="/app.js"></script>
+    <script>
+        // NO TOUCHY ZONE (especially backend devs)
+        document.addEventListener('DOMContentLoaded', function () {
+            window.previewImage = function (input, previewId) {
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById(previewId).src = e.target.result;
+                        document.getElementById(previewId).style.display = 'block';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+
+            document.querySelector('#logo-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var home = document.getElementById('home_img').value;
+                var away = document.getElementById('away_img').value;
+                if (home && away) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/logo_upload", true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                            console.log("Logo upload request finished and response is ready.");
+                        }
+                    };
+                    xhr.send("home=" + home + "&away=" + away);
+                }
+            });
+
+            document.querySelector('#name-form').addEventListener('submit', function (event) {
+                event.preventDefault();
+                var homeName = document.getElementById('homeName').value;
+                var awayName = document.getElementById('awayName').value;
+                if (homeName && awayName) {
+                    var xhr = new XMLHttpRequest();
+                    xhr.open("POST", "/name_submit", true);
+                    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                    xhr.onreadystatechange = function () {
+                        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                            console.log("Name submit request finished and response is ready.");
+
+                            document.getElementById('homeNameDisplay').textContent = homeName;
+                            document.getElementById('awayNameDisplay').textContent = awayName;
+                        }
+                    };
+                    xhr.send("home=" + homeName + "&away=" + awayName);
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/overlay" target="_blank">Overlay</a></li>
+            <li><a href="/countdown">Countdown</a></li>
+            <li><a href="#">Team Info</a></li>
+            <li><a href="/sponsor" class="active4">Sponsors</a></li>
+        </ul>
+    </header>
+</html>

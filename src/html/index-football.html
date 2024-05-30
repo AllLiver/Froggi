@@ -9,259 +9,194 @@
     <link rel="stylesheet" type="text/css" href="/style.css">
     <link rel="icon" type="image/png" href="/favicon_png">
     <style>
-        .white-boxes-container {
-            transform: translateY(-5px);
-            position: relative;
-            z-index: 1;
-        }
+    /* Internal css so you dont have to route a second css sheet specific to this sport */
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #121212;
+        margin: 0;
+        padding: 0;
+        color: #e0e0e0;
+    }
 
-        .button {
-            position: relative;
-            z-index: 2;
-        }
+    .controls-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        background-color: #1e1e1e;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        margin: 20px auto;
+        max-width: 1200px;
+        width: 100%; 
+    }
 
-        .button-hover:hover {
-            background-image: linear-gradient(to right, #34495E, #326080, #2943b9, #101c54);
-            border-radius: 5px;
-        }
+    .quarter-container,
+    .extra-buttons,
+    .down-togo-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 20px;
+    }
 
-        nav {
-            background-color: #333;
-            overflow: hidden;
-        }
+    .quarter-container button,
+    .extra-buttons button,
+    .togo button {
+        margin: 5px;
+        padding: 15px 25px;
+        background-color: #e9981f;
+        color: #2d2d40;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 1.1em;
+        font-weight: bold;
+    }
 
-        .quarter-container {
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
-        }
+    .quarter-container button:hover,
+    .extra-buttons button:hover,
+    .togo button:hover {
+        background-color: #575757;
+        color: #fff;
+    }
 
-        .quarter-container button {
-            margin: 5px;
-            padding: 10px 20px;
-            background-color: #3A4A53;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
+    .down select,
+    .togo input {
+        padding: 10px;
+        font-size: 1.1em;
+        font-weight: bold;
+        border-radius: 5px;
+        border: 1px solid #555;
+        background-color: #2d2d2d;
+        color: #e0e0e0;
+        margin-right: 10px;
+    }
 
-        .quarter-container button:hover {
-            background-color: #333;
-        }
+    .ping {
+        margin-top: 20px;
+        text-align: center;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
 
-        /* Style for the extra buttons container */
-        .extra-buttons {
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
-        }
+    .score-container {
+        display: flex;
+        justify-content: space-between;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 8px;
+        background-color: #1e1e1e;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
 
-        .extra-buttons button {
-            margin: 5px;
-            padding: 10px 20px;
-            background-color: #3A4A53;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
+    .home,
+    .away,
+    .timer-container {
+        flex: 1;
+        text-align: center;
+    }
 
-        .extra-buttons button:hover,
-        .down,
-        .togo {
-            color: #fff;
-        }
+    .home p,
+    .away p {
+        margin: 10px 0;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
 
-        .down select {
-            padding: 10px;
-            font-size: 16px;
-        }
+    .button-hover:hover,
+    .point-button:hover,
+    .timer-controls button:hover,
+    .quick-timer-buttons button:hover {
+        background-color: #575757;
+        color: #e0e0e0;
+        border-radius: 5px;
+    }
 
-        .togo input {
-            padding: 10px;
-            font-size: 16px;
-        }
+    .point-button,
+    .timer-controls button,
+    .quick-timer-buttons button,
+    .button-hover {
+        margin: 5px;
+        padding: 10px;
+        background-color: #fa9f16;
+        color: #2d2d40;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+        font-size: 1.1em;
+        font-weight: bold;
+    }
 
-        .togo button {
-            padding: 10px 20px;
-            background-color: #3A4A53;
-            color: #fff;
-            border: none;
-            cursor: pointer;
-        }
+    .point-button:hover,
+    .timer-controls button:hover,
+    .quick-timer-buttons button:hover {
+        background-color: #575757;
+        color: #e0e0e0;
+    }
 
-        .togo button:hover {
-            background-color: #333;
-        }
+    .white-boxes-container {
+        transform: translateY(-5px);
+        position: relative;
+        z-index: 1;
+        color: #000;
+        margin-top: 19px;
+    }
 
-        .score-container {
-            display: flex;
-            justify-content: space-between;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 8px;
-        }
+    .button {
+        position: relative;
+        z-index: 2;
+    }
 
+    .button-hover:hover {
+        border-radius: 5px;
+    }
 
-        .home,
-        .away {
-            flex: 1;
-            text-align: center;
-        }
+    .extra-buttons button {
+        background-color: #e9981f;
+        color: #2d2d40;
+    }
 
-        .button-hover:hover {
-            background-color: red;
-            border-radius: 5px;
-        }
+    .extra-buttons button:hover {
+        background-color: #575757;
+        color: #e0e0e0;
+    }
 
-        .point-button,
-        .button-hover {
-            margin: 5px;
-            padding: 10px;
-            background-color: #3A4A53;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .point-button:hover {
-            background-color: #333;
-        }
-
-
-        .timer-container {
-            flex: 1;
-            text-align: center;
-        }
-
-        .timer-controls button {
-            margin: 5px;
-            padding: 10px 20px;
-            background-color: #4b6a7c;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .timer-controls button:hover {
-            background-color: #333;
-        }
-
-        .quick-timer-buttons button {
-            margin: 5px;
-            padding: 10px 15px;
-            background-color: #4b6a7c;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .quick-timer-buttons button:hover {
-            background-color: #333;
-        }
-
-
-        .quarter-container {
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .quarter-container button {
-            margin: 5px;
-            padding: 10px;
-            background-color: #3A4A53;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .quarter-container button:hover {
-            background-color: #333;
-        }
-
-
-        .extra-buttons {
-            padding: 20px;
-            margin-top: 20px;
-            text-align: center;
-        }
-
-        .extra-buttons button {
-            margin: 5px;
-            padding: 10px 20px;
-            background-color: #3A4A53;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .extra-buttons button:hover {
-            background-color: #333;
-        }
-
-
-        .down,
-        .togo {
-            margin-top: 20px;
-            padding: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .down select,
-        .togo input {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .togo button {
-            padding: 10px 20px;
-            background-color: #3A4A53;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        #show-quarter,
-        #show-countdown,
-        #show-sponsor {
-            background-color: #3A4A53 !important;
-        }
-
-        button {
-            background-color: #3A4A53;
-            border: none;
-            color: white;
-            padding: 1% 5%;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 100%;
-            margin: 1.25% 0.625%;
-            border-radius: 3%;
-        }
-
-
+    @media screen and (min-width: 768px) {
         .controls-container {
-            display: flex;
-            justify-content: space-around;
-            padding: 20px;
-            border-radius: 8px;
-            border: 3px solid;
-            border-image-source: linear-gradient(45deg, #2f54f7, #8C2FF7);
-            border-image-slice: 3;
-            border-radius: 3%;
-            background-color: #242424;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: space-between;
         }
+
+        .quarter-container,
+        .extra-buttons,
+        .down-togo-container {
+            width: 48%;
+            margin-bottom: 20px;
+        }
+    }
+
+    .down-togo-container {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+        justify-content: space-around;
+    }
+    .watermark {
+        position: absolute;
+            top: 0px; 
+            left: 5px; 
+            font-size: 12px;
+            color: #3b3b3b; 
+            opacity: 90%;
+
+    }
+</style>
+
     </style>
     <script src="/htmx.min.js"></script>
     <script>async function ping() {
@@ -280,7 +215,6 @@
 </head>
 
 <body>
-
     <nav>
         <header>
             <ul>
@@ -288,21 +222,24 @@
                 <li><a href="/overlay" target="_blank" title="Overlay">Overlay</a></li>
                 <li><a href="/countdown" title="Countdown">Countdown</a></li>
                 <li><a href="/teaminfo" title="Team Info">Team Info</a></li>
+                <li><a href="/sponsors" title="Sponsors">Sponsors</a></li>
             </ul>
         </header>
     </nav>
+    <div class="watermark">github/AllLiver/Froggi</div>
     <!-- Home Score Content -->
     <div class="score-container">
         <div class="home">
             <div hx-put="/hdisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/home_add/1" hx-swap="none">+</button>
+            <button class="button-hover" hx-post="/home_add/1" hx-swap="none"><span class="plus-minus">+</span></button>
             <p>Points:</p>
             <div hx-put="/hp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/home_add/-1" hx-swap="none">-</button><br><br>
+            <button class="button-hover" hx-post="/home_add/-1" hx-swap="none"><span class="plus-minus">-</span></button><br><br>
             <button class="point-button" hx-post="/home_add/1" hx-swap="none">1 Point</button>
             <button class="point-button" hx-post="/home_add/2" hx-swap="none">2 Points</button>
             <button class="point-button" hx-post="/home_add/3" hx-swap="none">3 Points</button>
         </div>
+        
 
         <!-- Timer Content-->
 
@@ -341,14 +278,13 @@
 
         <div class="away">
             <div hx-put="/adisp" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/away_add/1" hx-swap="none">+</button>
+            <button class="button-hover" hx-post="/away_add/1" hx-swap="none"><span class="plus-minus">+</span></button>
             <p>Points:</p>
             <div hx-put="/ap" hx-trigger="every 100ms"></div>
-            <button class="button-hover" hx-post="/away_add/-1" hx-swap="none">-</button><br><br>
+            <button class="button-hover" hx-post="/away_add/-1" hx-swap="none"><span class="plus-minus">-</span></button><br><br>
             <button class="point-button" hx-post="/away_add/1" hx-swap="none">Add 1 Point</button>
             <button class="point-button" hx-post="/away_add/2" hx-swap="none">Add 2 Points</button>
             <button class="point-button" hx-post="/away_add/3" hx-swap="none">Add 3 Points</button>
-
         </div>
     </div>
 
@@ -373,9 +309,7 @@
     </div>
 
     <!--Quarter Content -->
-
     <div class="controls-container">
-        <!-- Quarter Content -->
         <div class="quarter-container">
             <button id="show-quarter" hx-post="show_quarter" hx-swap="none">Show quarter</button>
             <button id="quarter1" hx-post="/change_quarter/1" hx-swap="none">Quarter 1</button>
@@ -385,36 +319,51 @@
             <button id="quarter5" hx-post="/change_quarter/5" hx-swap="none"><strong>OT</strong></button>
         </div>
 
+
         <!-- Extra Button Content -->
         <div class="extra-buttons">
             <button id="show-countdown" hx-post="/show_countdown" hx-swap="none">Toggle countdown</button>
             <button id="show-sponsor" hx-post="show_sponsor_roll" hx-swap="none">Toggle sponsors</button>
+            <button id="alliver-add-backend" hx-post="alliver-add-backend" hx-swap="none">Toggle Downs/To Go</button>
             <button id="flag" hx-post="/popup/flag" hx-swap="none">FLAG</button>
             <button id="foul_a" hx-post="/popup/foul_home" hx-swap="none">Foul Home</button>
             <button id="foul_h" hx-post="/popup/foul_away" hx-swap="none">Foul Away</button>
-            <button id="timeout_H" hx-post="/popup/timeout" hx-swap="none">Time Home</button>
-            <button id="timeout_A" hx-post="/popup/timeout" hx-swap="none">Time Away</button>
+            <button id="timeout_H" hx-post="/popup/timeout" hx-swap="none">T/O Home</button>
+            <button id="timeout_A" hx-post="/popup/timeout" hx-swap="none">T/O Away</button>
+        </div>
+
+        <!-- Down and To Go Content -->
+        <div class="down-togo-container">
+            <div class="down">
+                <label for="down">Down:</label>
+                <select id="down">
+                    <option value="1st down">1st down</option>
+                    <option value="2nd down">2nd down</option>
+                    <option value="3rd down">3rd down</option>
+                    <option value="4th down">4th down</option>
+                </select>
+                <div hx-post="/update_down" hx-swap="none" hx-target="#down" hx-indicator=".down select">
+                </div>
+            </div>
+
+
+            <div class="togo">
+                <label for="distance-input">Yds To Go:</label>
+                <input type="text" id="distance-input" yardAmount="YD TO GO" hx-post="/update_to_go" hx-swap="none">
+            </div>
+        </div>
+
+
+        <div class="ping">
+            <p id="ping">Ping: calculating...</p>
+            <p id="version">V1.0.1</p>
         </div>
     </div>
+    <script>
+        function updateToGo() {
+        }
 
-    <!-- SPECIFIC TO NAFOOTBALL  -->
-    <form hx-post="/set_downs" hx-swap="none">
-        <label for="down">Down:</label>
-        <select id="down" name="down">
-            <option value="1">1st</option>
-            <option value="2">2nd</option>
-            <option value="3">3rd</option>
-            <option value="4">4th</option>
-        </select>
-        <label for="yards">To:</label>
-        <input type="text" id="yards" name="yards">
-        <input type="submit">
-    </form>
-
-    <div class="ping">
-        <p id="ping">Ping: calculating...</p>
-        <p id="version">V1.0.1</p>
-    </div>
+    </script>
 
 </body>
 

@@ -43,13 +43,26 @@
         updateSponsorImage();
     </script>
     <style>
+        /* Hide the cursor on supported clients */
         body {
             cursor: none;
             color: black;
         }
 
+        /* Universally hide cursor on supported clients */
         * {
             cursor: none !important;
+        }
+
+        /* Style the score-container with more CURVES */
+        .white-boxes-container>div {
+            border-radius: 4px;
+
+        }
+
+        .sponsor-container,
+        .popup-container {
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -71,6 +84,10 @@
         <div class="clock-box">
             <div hx-put="/time_and_quarter" hx-trigger="every 10ms"></div>
         </div>
+        <div class="down&togo-box">
+            <div hx-put="/alliver-baclend" hx-trigger="every 10ms"></div>
+        </div>
+
     </div>
     <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div>
     <div hx-put="/countdown_display" hx-trigger="every 10ms" id="countdown"

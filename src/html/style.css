@@ -1,15 +1,15 @@
 /* Fonts */
-  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Lato:wght@900&family=Open+Sans&family=Protest+Strike&family=Roboto&display=swap');
 
 /* Hide Scrollbar */
-  ::-webkit-scrollbar {
+::-webkit-scrollbar {
     display: none;
 }
 
 
 * {
-    -ms-overflow-style: none;  
-    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 /* Header Styles */
@@ -21,7 +21,7 @@ header ul {
     padding: 0;
     overflow: hidden;
     position: fixed;
-    top: -10px; 
+    top: -10px;
     right: 0;
 }
 
@@ -40,31 +40,31 @@ header li a {
 header li a:hover {
     background-color: #111;
 }
-  
 
-  header ul {
+
+header ul {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
-  
-  header ul li {
+}
+
+header ul li {
     list-style: none;
     margin-left: 20px;
-  }
-  
-  header ul li a {
+}
+
+header ul li a {
     text-decoration: none;
     padding: 6px 15px;
     color: #fff;
     border-radius: 20px;
-  }
-  
-  header ul li a:hover,
-  header ul li a.active4 {
+}
+
+header ul li a:hover,
+header ul li a.active4 {
     background: #fff;
     color: #1e1e1e;
-  }
+}
 
 
 /* General Styles */
@@ -80,7 +80,10 @@ ul li {
     padding: 1px;
 }
 
-h1, h2, h3, p {
+h1,
+h2,
+h3,
+p {
     color: white;
 }
 
@@ -92,26 +95,26 @@ button {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-    font-size: 100%; 
+    font-size: 100%;
     margin: 1.25% 0.625%;
     cursor: pointer;
     border-radius: 3%;
 }
 
 button:hover {
-    background-color: #e9981fe3; 
-    color: white; 
+    background-color: #e9981fe3;
+    color: white;
     transform: scale(1.01);
 }
 
 
-  #ping {
+#ping {
     position: fixed;
     bottom: 0;
     right: 0;
     padding: 10px;
-    background-color: rgba(0, 0, 0, 0.5); 
-    color: white; 
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
 }
 
 #version {
@@ -119,24 +122,26 @@ button:hover {
     bottom: 0;
     left: 0;
     padding: 10px;
-    background-color: rgba(0, 0, 0, 0.5); 
-    color: white; 
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
 }
 
 button.active {
     background-color: rgb(44, 194, 194);
 }
+
 .active {
-    background-color:rgb(44, 194, 194);
+    background-color: rgb(44, 194, 194);
     color: white;
 }
 
-input[type="text"], input[type="submit"] {
+input[type="text"],
+input[type="submit"] {
     width: 100%;
 }
 
 .submit-button {
-    margin-top: 20px; 
+    margin-top: 20px;
 }
 
 /* Overlay Styles */
@@ -149,7 +154,10 @@ input[type="text"], input[type="submit"] {
     border-radius: 4%;
 }
 
-.home-box, .score-box, .away-box, .clock-box {
+.home-box,
+.score-box,
+.away-box,
+.clock-box {
     height: 30px;
     background-color: white;
     margin: 3px;
@@ -165,7 +173,8 @@ input[type="text"], input[type="submit"] {
     text-align: center;
 }
 
-.home-box, .away-box {
+.home-box,
+.away-box {
     width: 15%;
     font-family: 'Protest Strike', sans-serif;
     display: flex;
@@ -173,7 +182,8 @@ input[type="text"], input[type="submit"] {
 
 }
 
-.score-box, .clock-box {
+.score-box,
+.clock-box {
     font-family: 'Lato', sans-serif;
 }
 
@@ -217,9 +227,9 @@ input[type="text"], input[type="submit"] {
     transform: translateX(-50%);
     background: rgb(255, 255, 255);
     border-radius: 8%;
-    padding: 10px; 
-    min-width: 100px; 
-    max-width: 150px; 
+    padding: 10px;
+    min-width: 100px;
+    max-width: 150px;
     overflow: hidden;
     max-height: 28px;
     font-size: 24px;
@@ -250,10 +260,10 @@ input[type="text"], input[type="submit"] {
 .popup-container p {
     background: transparent;
     color: white;
-    position: relative; 
+    position: relative;
     z-index: 10;
-    margin: 0; 
-    white-space: nowrap; 
+    margin: 0;
+    white-space: nowrap;
 }
 
 @keyframes rotate {
@@ -271,7 +281,7 @@ input[type="text"], input[type="submit"] {
     width: 60%;
     border: 2px solid;
     padding: 20px;
-    margin: 10px 0; 
+    margin: 10px 0;
     background-color: #242424;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
@@ -279,8 +289,8 @@ input[type="text"], input[type="submit"] {
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    border: 2px solid; 
-    border-image-source: linear-gradient(to right, #2f54f7, #8C2FF7); 
+    border: 2px solid;
+    border-image-source: linear-gradient(to right, #2f54f7, #8C2FF7);
     border-image-slice: 1;
     border-image-width: 2px;
     border-image-outset: 0;
@@ -288,15 +298,15 @@ input[type="text"], input[type="submit"] {
 }
 
 .timer-container h2 {
-    padding: 2% 8%; 
-    font-size: 120%; 
+    padding: 2% 8%;
+    font-size: 120%;
 }
 
 .timer-controls {
     display: flex;
     align-items: center;
     margin: 0;
-    margin-top: 10px; 
+    margin-top: 10px;
     padding: 15px;
     width: 400px !important;
     font-size: 120%;
@@ -304,7 +314,7 @@ input[type="text"], input[type="submit"] {
 
 .timer-elements {
     padding: 4% 8%;
-    font-size: 120%; 
+    font-size: 120%;
     text-align: center;
 }
 
@@ -313,17 +323,17 @@ input[type="text"], input[type="submit"] {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, 1fr);
     gap: 10px;
-    padding: 4.1% 4.3%; 
+    padding: 4.1% 4.3%;
     font-size: 120%;
-    width: auto; 
+    width: auto;
 }
 
 
 .timer-controls button,
 .timer-elements button {
-    padding: 2px 8px; 
-    margin: 5px; 
-    font-size: 120%; 
+    padding: 2px 8px;
+    margin: 5px;
+    font-size: 120%;
     width: 200px;
 }
 
@@ -334,15 +344,15 @@ input[type="text"], input[type="submit"] {
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
-    justify-content: center; 
-    align-items: center; 
+    justify-content: center;
+    align-items: center;
     padding: 20px;
     background-color: #242424;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
     color: white;
-    width: 50%; 
-    margin: 0 auto; 
+    width: 50%;
+    margin: 0 auto;
 }
 
 .countdown-container h2 {
@@ -350,20 +360,23 @@ input[type="text"], input[type="submit"] {
     font-size: 120%;
 }
 
-.countdown-controls, .show-countdown {
+.countdown-controls,
+.show-countdown {
     display: flex;
     align-items: center;
     margin: 0;
 }
 
-#show-countdown:active, #show-sponsor:active {
+#show-countdown:active,
+#show-sponsor:active {
     background-color: red;
 }
 
 .countdown-elements {
     padding: 4% 8%;
     text-align: center;
-    font-size: 2em; /* Adjust as needed */
+    font-size: 2em;
+    /* Adjust as needed */
     font-weight: bold;
 
 }
@@ -375,17 +388,18 @@ input[type="text"], input[type="submit"] {
     gap: 10px;
     padding: 4% 8%;
     font-size: 120%;
-    
+
 }
 
 .countdown {
-    position: relative; 
-    top: 0; 
-    left: 0; 
+    position: relative;
+    top: 0;
+    left: 0;
 }
 
 .countdown-controls button,
-.countdown-elements button, .show-countdown {
+.countdown-elements button,
+.show-countdown {
     padding: 2px 8px;
     margin: 5px;
     font-size: 120%;
@@ -394,17 +408,17 @@ input[type="text"], input[type="submit"] {
 
 .show-countdown-button {
     text-align: center;
-    transform: scale(1.30); 
+    transform: scale(1.30);
 }
 
 #show-countdown.on {
-    background-color: #e32d20; 
+    background-color: #e32d20;
     color: white;
 }
 
 
 #show-sponsors.on {
-    background-color: #e32d20; 
+    background-color: #e32d20;
     color: white;
 }
 
@@ -412,22 +426,25 @@ input[type="text"], input[type="submit"] {
     background-color: #4CAF50;
     color: white;
 }
+
 .selected {
-    background-color: red 
+    background-color: red
 }
 
-.startButton:hover, .stopButton:hover {
-    background-color: red; 
+.startButton:hover,
+.stopButton:hover {
+    background-color: red;
 }
 
 #title {
-    width: 35%;  
+    width: 35%;
 }
 
 /* Team Styles */
 
-.away, .home {
-    width: 200px; 
+.away,
+.home {
+    width: 200px;
     border-style: solid;
     border-width: 2px;
     background-color: #242424;
@@ -446,24 +463,30 @@ input[type="text"], input[type="submit"] {
     border-color: #2f54f7;
 }
 
-.home button:nth-child(n+5), .away button:nth-child(n+5),
-.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
+.home button:nth-child(n+5),
+.away button:nth-child(n+5),
+.home button:nth-child(-n+4),
+.away button:nth-child(-n+4) {
     display: block;
     width: 100%;
-    min-width: 100%; 
+    min-width: 100%;
     margin: 10px 0;
     padding: 10px;
     font-size: 16px;
 }
-.home button:nth-child(n+5), .away button:nth-child(n+5),
-.home button:nth-child(-n+4), .away button:nth-child(-n+4) {
+
+.home button:nth-child(n+5),
+.away button:nth-child(n+5),
+.home button:nth-child(-n+4),
+.away button:nth-child(-n+4) {
     display: block;
     width: 100%;
-    min-width: 100%; 
+    min-width: 100%;
     margin: 10px 0;
     padding: 10px;
     font-size: 16px;
 }
+
 .team-form {
     display: flex;
     justify-content: space-between;
@@ -524,9 +547,15 @@ input[type="text"] {
 }
 
 .point-button {
-    width: 100px;  
-    height: 50px;  
+    width: 100px;
+    height: 50px;
 }
+
+.plus-minus {
+    font-size: 1.5em;
+    /* Adjust the font size as needed */
+}
+
 
 /* Teaminfo Styles */
 
@@ -566,7 +595,7 @@ input[type="file"] {
 }
 
 #name-form {
-    margin-top: 50px; 
+    margin-top: 50px;
     max-width: 500px;
     margin: 0 auto;
     background-color: #242424;
@@ -602,7 +631,7 @@ input[type="file"] {
 }
 
 #logo-form {
-    margin-bottom: 30px; 
+    margin-bottom: 30px;
 }
 
 .logo-upload {
@@ -615,8 +644,8 @@ input[type="file"] {
 }
 
 .teaminfo-container {
-align-items: stretch;
-justify-content: center;
+    align-items: stretch;
+    justify-content: center;
 
 
 }
@@ -637,7 +666,7 @@ justify-content: center;
     display: block;
     margin-left: auto;
     margin-right: auto;
-    
+
 }
 
 .team-selector {
@@ -645,24 +674,26 @@ justify-content: center;
     flex-wrap: wrap;
 }
 
-.team-selector > * {
+.team-selector>* {
     margin: 15px;
     border-radius: 3px;
 }
 
-.team-selector > div:nth-child(odd) {
-    background-color: #1b1b1b; /* You happy? */
+.team-selector>div:nth-child(odd) {
+    background-color: #1b1b1b;
+    /* You happy? */
 }
 
-.team-selector > div:nth-child(even) {
-    background-color: #1b1b1a; /* You happy? */
+.team-selector>div:nth-child(even) {
+    background-color: #1b1b1a;
+    /* You happy? */
 }
 
 .match-selector {
-    background-color: #f2f2f2; 
-    border-radius: 10px; 
-    padding: 10px; 
-    margin: 5px; 
+    background-color: #f2f2f2;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 5px;
 }
 
 
@@ -674,20 +705,23 @@ justify-content: center;
 
 hr {
     border: 0;
-    height: 1px; 
-    background-image: -webkit-linear-gradient(left, #000, #000 50%, #fff 50%, #fff); 
-    background-size: 10px 100%; 
+    height: 1px;
+    background-image: -webkit-linear-gradient(left, #000, #000 50%, #fff 50%, #fff);
+    background-size: 10px 100%;
 }
 
-#home_name, #away_name {
-    width: 35%; 
-    height: 35%;  
+#home_name,
+#away_name {
+    width: 35%;
+    height: 35%;
 }
 
 .clicked {
-    background-color: #4CAF50; /* green */
+    background-color: #4CAF50;
+    /* green */
     color: white;
 }
+
 /* Login Styling */
 
 #submit {
@@ -753,7 +787,7 @@ hr {
     width: 300px;
     padding: 20px;
     border-radius: 8px;
-    margin: 0 auto; 
+    margin: 0 auto;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     color: white;
     display: flex;
@@ -777,6 +811,7 @@ hr {
     background-color: #333;
     color: white;
 }
+
 .create-login-container input[type="submit"] {
     background-color: #3c993f;
     color: white;
@@ -817,21 +852,24 @@ hr {
     }
 
     #quarter5 {
-        height: 60px; 
+        height: 60px;
     }
 
 }
 
-/* Lighthouse User/Acsessability Optimizations */
+/* Acsessability Optimizations */
 div.timer {
     font-family: monospace;
     font-weight: bold;
     min-height: 50px;
-    min-width: 200px; 
+    min-width: 200px;
     font-size: 20px;
 }
 
-.quarter-container, .home-box, .away-box, .button {
-    min-height: 10px; 
-    min-width: 200px; 
+.quarter-container,
+.home-box,
+.away-box,
+.button {
+    min-height: 10px;
+    min-width: 200px;
 }

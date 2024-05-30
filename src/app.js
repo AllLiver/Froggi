@@ -1,3 +1,4 @@
+// General
 htmx.on('startButton', 'htmx:afterRequest', function () {
     document.getElementById('startButton').classList.add('selected');
     document.getElementById('stopButton').classList.remove('selected');
@@ -34,6 +35,27 @@ document.addEventListener('DOMContentLoaded', function () {
         stopButton.classList.add('selected');
         startButton.classList.remove('selected');
     });
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to handle button click event
+    function handleButtonClick(event) {
+        // Resetting the color of all buttons to default
+        const buttons = document.querySelectorAll('.timer-controls button');
+        buttons.forEach(button => {
+            button.style.backgroundColor = '#fa9f16';
+        });
+
+        // Changing the color of the selected button
+        event.target.style.backgroundColor = '#b48feb';
+    }
+
+    // Adding click event listeners to start and stop buttons
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+
+    startButton.addEventListener('click', handleButtonClick);
+    stopButton.addEventListener('click', handleButtonClick);
 });
 
 // Teaminfo
