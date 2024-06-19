@@ -7,7 +7,7 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
-    <script src="/htmx.min.js"></script>
+    <script src="/htmx.js"></script>
     <script src="/sse.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
@@ -59,7 +59,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-away" hx-post="/away-points/update/-1">-</button>
                             <div class="counter">
-                                <div id="away-counter" class="counter-value">0</div>
+                                <div id="away-counter" class="counter-value" hx-ext="sse" sse-connect="/away-points/sse" sse-swap="message">0</div>
                                 <div class="counter-subtext">Away</div>
                             </div>
                             <button class="button-increment-away" hx-post="/away-points/update/1">+</button>

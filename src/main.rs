@@ -83,7 +83,7 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route("/", get(index_handler))
         .route("/styles.css", get(css_handler))
-        .route("/htmx.min.js", get(htmx_js_handler))
+        .route("/htmx.js", get(htmx_js_handler))
         .route("/sse.js", get(sse_js_handler))
         .route("/app.js", get(app_js_handler))
         .route("/favicon.png", get(favicon_handler))
@@ -95,6 +95,7 @@ async fn main() -> Result<()> {
         .route("/home-points/update/:a", post(home_points_update_handler))
         .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
+        .route("/away-points/sse", get(away_points_sse_handler))
         .with_state(state)
         .fallback(get(not_found_handler));
 
@@ -156,7 +157,7 @@ async fn htmx_js_handler() -> impl IntoResponse {
     Response::builder()
         .status(StatusCode::OK)
         .header(CONTENT_TYPE, "application/javascript")
-        .body(String::from(include_str!("./html/js/htmx.min.js")))
+        .body(String::from(include_str!("./html/js/htmx.js")))
         .unwrap()
 }
 
@@ -475,7 +476,7 @@ async fn home_points_update_handler(
             *home_points = (*home_points as i32 + a) as u32;
         }
 
-        println!("home: {}", *home_points);
+        // println!("home: {}", *home_points);
 
         return Response::builder()
             .status(StatusCode::OK)
@@ -501,7 +502,7 @@ async fn away_points_update_handler(
             *away_points = (*away_points as i32 + a) as u32;
         }
 
-        println!("away: {}", *away_points);
+        // println!("away: {}", *away_points);
 
         return Response::builder()
             .status(StatusCode::OK)
@@ -515,9 +516,20 @@ async fn away_points_update_handler(
     }
 }
 
-#[debug_handler]
 async fn home_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let state = Arc::clone(&state.home_points);
+
+    let stream = stream::unfold(state, |state| async {
+        let team_points = state.lock().await.clone().to_string();
+        Some((Ok(Event::default().data(team_points).event("message")), state))
+    })
+    .throttle(tokio::time::Duration::from_millis(5));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
+async fn away_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let state = Arc::clone(&state.away_points);
 
     let stream = stream::unfold(state, |state| async {
         let team_points = state.lock().await.clone().to_string();
