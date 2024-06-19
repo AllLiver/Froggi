@@ -1,21 +1,17 @@
 [package]
 name = "froggi"
-version = "1.0.0"
+version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+anyhow = "1.0.86"
 argon2 = "0.5.3"
-axum = { version = "0.7.4", features = ["multipart"] }
-axum-extra = { version = "0.9.2", features = ["cookie"] }
-base64 = "0.21.7"
-hyper = "1.1.0"
-jsonwebtoken = "9.2.0"
-lazy_static = "1.4.0"
-mime = "0.3.17"
+axum = { version = "0.7.5", features = ["macros"] }
+axum-extra = { version = "0.9.3", features = ["cookie"] }
+base64 = "0.22.1"
+jsonwebtoken = "9.3.0"
 rand = "0.8.5"
-serde = { version = "1.0.196", features = ["derive"] }
-serde_json = "1.0.113"
-tokio = { version = "1.35.1", features = ["full", "signal"] }
-uuid = { version = "1.7.0", features = ["v4"] }
+serde = { version = "1.0.203", features = ["derive"] }
+serde_json = "1.0.117"
+tokio = { version = "1.38.0", features = ["full"] }
+uuid = { version = "1.8.0", features = ["v4"] }

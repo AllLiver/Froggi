@@ -1,13 +1,4 @@
 /target
+/secret
+/login.json
 /config.json
-/config.cfg
-/home.png
-/away.png
-/sponsors
-/home_name
-/away_name
-/teams
-/.ds_store
-/.DS_Store
-/login
-/froggi.tar

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Create Login</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="/styles.css">
+        <script src="/htmx.min.js"></script>
+    </head>
+    <body>
+        <h1>Create Login</h1>
+        <form hx-post="/login/create" hx-swap="innerHTML" hx-target="#message_create_login">
+            <labal for="username">Username: </labal>
+            <input type="text" name="username" id="username"><br>
+
+            <label for="password">Password: </label>
+            <input type="password" name="password" id="password"><br>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" name="confirm_password" id="confirm_password"><br>
+
+            <input type="submit">
+            <img class="htmx-indicator" src="/spinner.svg">
+        </form>
+        <div id="message_create_login"></div>
+    </body>
+</html>
