@@ -7,6 +7,7 @@
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
+    <script src="/htmx.min.js"></script>
     <link rel="icon" href="favicon.png">
 </head>
 
@@ -39,12 +40,12 @@
                     <h2 class="score-title">Score</h2>
                     <div class="section home-section">
                         <div class="counter-container">
-                            <button class="button-decrement-home" hx-post="/decrement/home">-</button>
+                            <button class="button-decrement-home" hx-post="/home-points/update/-1" hx-swap="none">-</button>
                             <div class="counter">
                                 <div id="home-counter" class="counter-value">0</div>
                                 <div class="counter-subtext">Home</div>
                             </div>
-                            <button class="button-increment-home" hx-post="/increment/home">+</button>
+                            <button class="button-increment-home" hx-post="/home-points/update/1" hx-swap="none">+</button>
                         </div>
                         <button class="button-quick-score-home" hx-post="/quickscore/home/1">Add 1 point</button>
                         <button class="button-quick-score-home" hx-post="/quickscore/home/2">Add 2 points</button>
@@ -53,12 +54,12 @@
                     </div>
                     <div class="section away-section">
                         <div class="counter-container">
-                            <button class="button-decrement-away" hx-post="/decrement/away">-</button>
+                            <button class="button-decrement-away" hx-post="/away-points/update/-1">-</button>
                             <div class="counter">
                                 <div id="away-counter" class="counter-value">0</div>
                                 <div class="counter-subtext">Away</div>
                             </div>
-                            <button class="button-increment-away" hx-post="/increment/away">+</button>
+                            <button class="button-increment-away" hx-post="/away-points/update/1">+</button>
                         </div>
                         <button class="button-quick-score-away" hx-post="/quickscore/away/1">Add 1 point</button>
                         <button class="button-quick-score-away" hx-post="/quickscore/away/2">Add 2 points</button>

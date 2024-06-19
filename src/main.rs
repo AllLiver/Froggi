@@ -5,26 +5,38 @@ use argon2::{
     Argon2,
 };
 use axum::{
-    http::{
+    debug_handler, extract::{Path, State}, http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
     }, response::IntoResponse, routing::{get, post}, Form, Router
 };
-use axum_extra::extract::cookie::{Cookie, SameSite, CookieJar};
+use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::time::UNIX_EPOCH;
+use std::{sync::Arc, time::UNIX_EPOCH};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
-    signal,
+    signal, sync::Mutex,
 };
 use uuid::Uuid;
 
+#[derive(Clone)]
+struct AppState {
+    home_points: Arc<Mutex<u32>>,
+    away_points: Arc<Mutex<u32>>,
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Initialize the application state
+    let state = AppState {
+        home_points: Arc::new(Mutex::new(0)),
+        away_points: Arc::new(Mutex::new(0)),
+    };
+
     // Validate required files and directories
     if let Err(_) = File::open("secret.key").await {
         println!("Initializing secret.key");
@@ -42,13 +54,21 @@ async fn main() -> Result<()> {
 
     if let Err(_) = File::open("config.json").await {
         println!("Initializing config.json");
-        let mut f = File::create("config.json").await.expect("Cannot create config.json");
+        let mut f = File::create("config.json")
+            .await
+            .expect("Cannot create config.json");
 
         let default_config = Config {
-            secure_auth_cookie: true
+            secure_auth_cookie: true,
         };
 
-        f.write_all(serde_json::to_string_pretty(&default_config).expect("Could not serialize default config").as_bytes()).await.expect("Could not initialize config.json")
+        f.write_all(
+            serde_json::to_string_pretty(&default_config)
+                .expect("Could not serialize default config")
+                .as_bytes(),
+        )
+        .await
+        .expect("Could not initialize config.json")
     }
 
     let app = Router::new()
@@ -64,6 +84,9 @@ async fn main() -> Result<()> {
         .route("/login", post(login_handler))
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
+        .route("/home-points/update/:a", post(home_points_update_handler))
+        .route("/away-points/update/:a", post(away_points_update_handler))
+        .with_state(state)
         .fallback(get(not_found_handler));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
@@ -80,11 +103,9 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-// Basic structs
-
 #[derive(Serialize, Deserialize)]
 struct Config {
-    secure_auth_cookie: bool
+    secure_auth_cookie: bool,
 }
 
 // region: basic pages
@@ -94,13 +115,13 @@ async fn index_handler(jar: CookieJar) -> impl IntoResponse {
         return Response::builder()
             .status(StatusCode::OK)
             .body(String::from(include_str!("./html/index.html")))
-            .unwrap()
+            .unwrap();
     } else {
-        return Response::builder() 
+        return Response::builder()
             .status(StatusCode::SEE_OTHER)
             .header(LOCATION, HeaderValue::from_static("/login"))
             .body(String::new())
-            .unwrap()
+            .unwrap();
     }
 }
 
@@ -343,11 +364,17 @@ async fn auth_cookie_builder(username: String) -> String {
 
     let mut config_str = String::new();
 
-    let config_f = File::open("config.json").await.expect("Could not open config.json");
+    let config_f = File::open("config.json")
+        .await
+        .expect("Could not open config.json");
     let mut buf_reader = BufReader::new(config_f);
-    buf_reader.read_to_string(&mut config_str).await.expect("Could not read config.json");
+    buf_reader
+        .read_to_string(&mut config_str)
+        .await
+        .expect("Could not read config.json");
 
-    let config: Config = serde_json::from_str(&config_str).expect("Could not deserialize config.json");
+    let config: Config =
+        serde_json::from_str(&config_str).expect("Could not deserialize config.json");
 
     let cookie = Cookie::build(("AuthToken", token))
         .path("/")
@@ -364,11 +391,20 @@ async fn verify_auth(jar: CookieJar) -> bool {
 
         let mut secret = String::new();
 
-        let secret_f = File::open("secret.key").await.expect("Could not open secret.key");
+        let secret_f = File::open("secret.key")
+            .await
+            .expect("Could not open secret.key");
         let mut buf_reader = BufReader::new(secret_f);
-        buf_reader.read_to_string(&mut secret).await.expect("Could not read secret.key");
+        buf_reader
+            .read_to_string(&mut secret)
+            .await
+            .expect("Could not read secret.key");
 
-        if let Ok(_) = decode::<Claims>(&auth_token.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
+        if let Ok(_) = decode::<Claims>(
+            &auth_token.value(),
+            &DecodingKey::from_secret(secret.as_bytes()),
+            &validation,
+        ) {
             return true;
         } else {
             return false;
@@ -379,7 +415,53 @@ async fn verify_auth(jar: CookieJar) -> bool {
 }
 
 // endregion: login
+// region: team routing
 
+async fn home_points_update_handler(Path(a): Path<i32>, jar: CookieJar, State(state): State<AppState>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut home_points = state.home_points.lock().await;
+
+        if *home_points as i32 + a >= 0 {
+            *home_points = (*home_points as i32 + a) as u32;
+        }
+
+        println!("home: {}", *home_points);
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap()
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap()
+    }
+}
+
+async fn away_points_update_handler(Path(a): Path<i32>, jar: CookieJar, State(state): State<AppState>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut away_points = state.away_points.lock().await;
+
+        if *away_points as i32 + a >= 0 {
+            *away_points = (*away_points as i32 + a) as u32;
+        }
+
+        println!("away: {}", *away_points);
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap()
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap()
+    }
+}
+
+// endregion: team routing
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
 async fn shutdown_signal() {
     let ctrl_c = async {
