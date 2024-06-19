@@ -761,10 +761,17 @@ body {
 .flag-home:hover, .flag-away:hover,
 .show-countdown:hover,
 .button-lock-interface:hover,
-.button-quick-quarter:hover,  .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover {
+.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover .show-sponsors:hover {
     transform: scale(1.01); 
 }
 
+.watermark {
+    position: absolute;
+    bottom: 3px;
+    left: 5px;
+    font-size: 12px;
+    color: #f5f5f580; 
+}
 
 /* * Login */   
      canvas {
