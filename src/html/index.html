@@ -1,12 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>FROGGI</title>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="/styles.css">
-        <script src="/htmx.min.js"></script>
-    </head>
-    <body>
-        <h1>FROGGI</h1>
-    </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+    <title>Scoreboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
+</head>
+
+<body>
+    <!--TODO: Hamburgermenu styling, login, overlay, favicon, remove h2 from downs/togo, change downs & Togo incremental colors to white?  -->
+    <nav>
+        <button class="hamburger-menu" onclick="toggleMenu()">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </button>
+        <ul class="sidenavbar">
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Sponsors</a></li>
+            <li><a href="#">Overlay</a></li>
+        </ul>
+    </nav>
+
+
+    <div class="main-container">
+        <div class="left-column">
+            <div class="preview">
+                <a href="overlay.html">
+                    <div class="preview-rectangle"></div>
+                </a>
+            </div>
+
+            <div class="score-container">
+                <div class="score-rectangle">
+                    <h2 class="score-title">Score</h2>
+                    <div class="section home-section">
+                        <div class="counter-container">
+                            <button class="button-decrement-home" hx-post="/decrement/home">-</button>
+                            <div class="counter">
+                                <div id="home-counter" class="counter-value">0</div>
+                                <div class="counter-subtext">Home</div>
+                            </div>
+                            <button class="button-increment-home" hx-post="/increment/home">+</button>
+                        </div>
+                        <button class="button-quick-score-home" hx-post="/quickscore/home/1">Add 1 point</button>
+                        <button class="button-quick-score-home" hx-post="/quickscore/home/2">Add 2 points</button>
+                        <button class="button-quick-score-home" hx-post="/quickscore/home/3">Add 3 points</button>
+                        <button class="flag-home">Flag Home</button>
+                    </div>
+                    <div class="section away-section">
+                        <div class="counter-container">
+                            <button class="button-decrement-away" hx-post="/decrement/away">-</button>
+                            <div class="counter">
+                                <div id="away-counter" class="counter-value">0</div>
+                                <div class="counter-subtext">Away</div>
+                            </div>
+                            <button class="button-increment-away" hx-post="/increment/away">+</button>
+                        </div>
+                        <button class="button-quick-score-away" hx-post="/quickscore/away/1">Add 1 point</button>
+                        <button class="button-quick-score-away" hx-post="/quickscore/away/2">Add 2 points</button>
+                        <button class="button-quick-score-away" hx-post="/quickscore/away/3">Add 3 points</button>
+                        <button class="flag-away">Flag Away</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="downs">
+                <div class="downs-rectangle">
+                    <h2 class="downs-title">Downs & Togo</h2>
+                    <div class="downs-container">
+                        <div class="counter-container">
+                            <button class="button-decrement-togo" hx-post="/decrement/togo">-</button>
+                            <div class="counter">
+                                <div id="togo-counter" class="counter-value">0</div>
+                                <div class="counter-subtext">TO-GO</div>
+                            </div>
+                            <button class="button-increment-togo" hx-post="/increment/togo">+</button>
+                        </div>
+                        <div class="button-grid">
+                            <button class="button-quick-down" hx-post="/quickscore/down/1">1st down</button>
+                            <button class="button-quick-down" hx-post="/quickscore/down/2">2nd down</button>
+                            <button class="button-quick-down" hx-post="/quickscore/down/3">3rd down</button>
+                            <button class="button-quick-down" hx-post="/quickscore/down/4">4th down</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="net-stats">
+                <div class="net-stats-rectangle">
+                    <h2 class="net-stats-title">Statistics</h2>
+                    <div class="net-stats-content">
+                        <div class="stat-item">
+                            <label>Ping:</label>
+                            <span id="ping-value">-- ms</span>
+                        </div>
+                        <div class="stat-item">
+                            <label>Version:</label>
+                            <span id="version-value">1.0.0</span>
+                        </div>
+                        <div class="stat-item">
+                            <label>Uptime:</label>
+                            <span id="uptime-value">00:00:00</span>
+                        </div>
+                        <button class="button-lock-interface"><strong>Lock Interface</strong></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="middle-column">
+            <div class="countdown">
+                <div class="countdown-rectangle">
+                    <div class="counter-section">
+                        <div class="counter-container">
+                            <button class="button-decrement-countdown" hx-post="/decrement/countdown/minutes">-</button>
+                            <div class="counter">
+                                <div id="countdown-counter-minutes" class="countdown">0</div>
+                                <div class="counter-subtext">Minutes</div>
+                            </div>
+                            <button class="button-increment-countdown" hx-post="/increment/countdown/minutes">+</button>
+                        </div>
+                        <h2 class="countdown-title">Countdown</h2>
+                        <div class="counter-container">
+                            <button class="button-decrement-countdown" hx-post="/decrement/countdown/seconds">-</button>
+                            <div class="counter">
+                                <div id="countdown-counter-seconds" class="countdown">0</div>
+                                <div class="counter-subtext">Seconds</div>
+                            </div>
+                            <button class="button-increment-countdown" hx-post="/increment/countdown/seconds">+</button>
+                        </div>
+                    </div>
+                    <div class="countdown-controls">
+                        <button class="button-start-countdown" hx-post="/start/countdown">Start Countdown</button>
+                        <button class="button-stop-countdown" hx-post="/stop/countdown">Stop Countdown</button>
+                    </div>
+                    <div class="quick-time-buttons">
+                        <button class="button-quick-countdown" hx-post="/quicktime/20">20:00</button>
+                        <button class="button-quick-countdown" hx-post="/quicktime/15">15:00</button>
+                        <button class="button-quick-countdown" hx-post="/quicktime/10">10:00</button>
+                        <button class="button-quick-countdown" hx-post="/quicktime/5">5:00</button>
+                    </div>
+                    <div class="countdown-actions">
+                        <input type="text" id="countdown-clock-text" maxlength="25"
+                            placeholder="Countdown Display Text">
+                        <button class="show-countdown">Show Countdown</button>
+                    </div>
+                </div>
+            </div>
+            <div class="quarter-rectangle">
+                <div class="quarter-container">
+                    <div class="counter-container">
+                        <button class="button-decrement-quarter" hx-post="/decrement/quarter">-</button>
+                        <div class="counter">
+                            <div id="quarter-counter" class="counter-value">1</div>
+                            <div class="counter-subtext">Quarter</div>
+                        </div>
+                        <button class="button-increment-quarter" hx-post="/increment/quarter">+</button>
+                    </div>
+                    <div class="quarter-buttons">
+                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/1">1st Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/2">2nd Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/3">3rd Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/4">4th Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/ot">Overtime</button>
+                    </div>
+                </div>
+            </div>
+            <div class="clock">
+                <div class="clock-rectangle">
+                    <div class="counter-section">
+                        <div class="counter-container">
+                            <button class="button-decrement-clock" hx-post="/decrement/clock/minutes">-</button>
+                            <div class="counter">
+                                <div id="clock-counter-minutes" class="countdown">0</div>
+                                <div class="counter-subtext">Minutes</div>
+                            </div>
+                            <button class="button-increment-clock" hx-post="/increment/clock/minutes">+</button>
+                        </div>
+                        <h2 class="countdown-title">Clock</h2>
+                        <div class="counter-container">
+                            <button class="button-decrement-clock" hx-post="/decrement/clock/seconds">-</button>
+                            <div class="counter">
+                                <div id="clock-counter-seconds" class="countdown">0</div>
+                                <div class="counter-subtext">Seconds</div>
+                            </div>
+                            <button class="button-increment-clock" hx-post="/increment/clock/seconds">+</button>
+                        </div>
+                    </div>
+                    <div class="countdown-controls">
+                        <button class="button-start-clock" hx-post="/start/clock">Start Clock</button>
+                        <button class="button-stop-clock" hx-post="/stop/clock">Stop Clock</button>
+                    </div>
+                    <div class="quick-time-buttons">
+                        <button class="button-quick-clock" hx-post="/quicktime/12">12:00</button>
+                        <button class="button-quick-clock" hx-post="/quicktime/9">9:00</button>
+                        <button class="button-quick-clock" hx-post="/quicktime/6">6:00</button>
+                        <button class="button-quick-clock" hx-post="/quicktime/3">3:00</button>
+                    </div>
+                </div>
+            </div>
+            
+            
+
+        <script src="app.js"></script>
+</body>
+
 </html>
