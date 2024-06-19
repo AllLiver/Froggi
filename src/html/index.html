@@ -4,13 +4,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
-    <title>Scoreboard</title>
+    <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
+    <link rel="icon" href="favicon.png">
 </head>
 
 <body>
-    <!--TODO: Hamburgermenu styling, login, overlay, favicon, remove h2 from downs/togo, change downs & Togo incremental colors to white?  -->
+    <!--TODO: Hamburgermenu styling, overlay, favicon, remove h2 from downs/togo, change downs & Togo incremental colors to white?  -->
     <nav>
         <button class="hamburger-menu" onclick="toggleMenu()">
             <span class="line"></span>
@@ -19,7 +20,7 @@
         </button>
         <ul class="sidenavbar">
             <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Sponsors</a></li>
+            <li><a href="#">Sponsors & Teaminfo</a></li>
             <li><a href="#">Overlay</a></li>
         </ul>
     </nav>
@@ -202,7 +203,12 @@
                     </div>
                 </div>
             </div>
-            
+            <div class="sponsors">
+                <div class="sponsors-rectangle">
+                    <button class="show-sponsors">Show Sponsors</button>
+                    </div>
+            </div>
+
             
 
         <script src="app.js"></script>

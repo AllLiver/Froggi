@@ -101,6 +101,66 @@ body {
     margin-left: 3px;
 }
 
+.clock-rectangle {
+    background-color: #1d1e22;
+    width: 686px;
+    height: 25vh;
+    border-radius: 16.5px;
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+    margin-bottom: 7px;
+    margin-left: 3px;
+}
+
+.create-login-rectangle {
+    background-color: #1d1e22;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.95;
+    width: 100%;
+    max-width: 400px; 
+    position: relative;
+}
+
+.login-rectangle {
+    background-color: #1d1e22;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0.95;
+    width: 100%;
+    max-width: 400px;
+    position: relative;
+}
+
+.sponsors-rectangle {
+    background-color: #1d1e22;
+    width: 686px;
+    height: 65px;
+    border-radius: 16.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    overflow: hidden;
+    padding: 5px;
+    position: relative;
+    margin-bottom: 7px;
+    margin-left: 3px;
+}
+
 /* Title positioning */
 .score-title {
     position: absolute;
@@ -162,7 +222,7 @@ body {
     background-color: #27a644;
 }
 
-.button-decrement-countdown, .button-increment-countdown, .button-increment-quarter, .button-decrement-quarter {
+.button-decrement-countdown, .button-increment-countdown, .button-increment-quarter, .button-decrement-quarter, .button-increment-clock, .button-decrement-clock {
     background-color: #fff;
     color: #000;
     border: none;
@@ -507,7 +567,7 @@ body {
     opacity: 0.9;
 }
 
-.button-quick-time {
+.button-quick-time, .button-quick-countdown {
     background-color: #27a644;
     color: white;
     border: none;
@@ -519,7 +579,7 @@ body {
     margin: 7px;
 }
 
-.show-countdown {
+.show-countdown, .show-sponsors {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -670,7 +730,7 @@ body {
         font-size: 18px;
     }
 
-    .button-quick-time {
+    .button-quick-time, .button-quick-countdown {
         width: 140px;
         font-size: 14px;
     }
@@ -697,10 +757,195 @@ body {
 .button-quick-score-home:hover, .button-quick-score-away:hover,
 .button-quick-down:hover,
 .button-start-countdown:hover, .button-stop-countdown:hover,
-.button-quick-time:hover,
+.button-quick-time:hover, .button-quick-countdown:hover,
 .flag-home:hover, .flag-away:hover,
 .show-countdown:hover,
 .button-lock-interface:hover,
-.button-quick-quarter:hover {
+.button-quick-quarter:hover,  .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover {
     transform: scale(1.01); 
 }
+
+
+/* * Login */   
+     canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: -1; 
+        }
+
+        .create-login-rectangle h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ffffff;
+        }
+
+        .create-login-rectangle label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            align-self: flex-start; 
+        }
+
+        .create-login-rectangle input[type="text"],
+        .create-login-rectangle input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .create-login-rectangle input[type="submit"] {
+            background-color: #27a644;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .login-rectangle h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #ffffff;
+        }
+
+        .login-rectangle label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #ffffff;
+            align-self: flex-start;
+        }
+
+        .login-rectangle input[type="text"],
+        .login-rectangle input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .login-rectangle input[type="submit"] {
+            background-color: #27a644;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+
+        /* Clock Box */
+        .clock-controls {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .clock-controls-left,
+        .clock-controls-right {
+            width: 50%;
+        }
+        
+        .button-start-clock,
+        .button-stop-clock {
+            background-color: #fc3232;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            font-size: 20px;
+            cursor: pointer;
+            width: 100%; 
+            border-radius: 5px;
+            white-space: nowrap; 
+        }
+        
+        .button-quick-clock {
+            background-color: #27a644;
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            width: 100%; 
+            height: 44px;
+            border-radius: 5px;
+            margin: 7px;
+        }
+        
+        .show-clock {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .clock-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        #clock-text {
+            width: calc(100% - 120px);
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            margin-bottom: 3px;
+        }
+        
+        .clock-actions button {
+            flex-shrink: 0; 
+        }
+        
+        @media (max-width: 768px) {
+            .clock-rectangle {
+                width: calc(100% - 16px);
+                margin-left: 8px;
+            }
+        
+            .button-start-clock,
+            .button-stop-clock,
+            .button-quick-clock {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .clock-rectangle {
+                width: calc(100% - 20px);
+                margin-left: 3px;
+            }
+        
+            .button-quick-clock {
+                font-size: 14px;
+            }
+        
+            #clock-text {
+                width: calc(100% - 100px);
+            }
+        }
