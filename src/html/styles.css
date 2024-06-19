@@ -354,6 +354,15 @@ body {
     color: #fff;
 }
 
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+#ping-value {
+    white-space: nowrap;
+}
+
 /* Navbar */
 .off-screen-menu {
     background-color: #fff; 
