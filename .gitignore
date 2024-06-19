@@ -1,4 +1,4 @@
 /target
-/secret
+/secret.key
 /login.json
 /config.json

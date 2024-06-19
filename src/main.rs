@@ -26,18 +26,18 @@ use uuid::Uuid;
 #[tokio::main]
 async fn main() -> Result<()> {
     // Validate required files and directories
-    if let Err(_) = File::open("secret").await {
-        println!("Initializing secret file");
-        let mut f = File::create("secret")
+    if let Err(_) = File::open("secret.key").await {
+        println!("Initializing secret.key");
+        let mut f = File::create("secret.key")
             .await
-            .expect("Could not create secret file");
+            .expect("Could not create secret.key");
 
         let key: [u8; 32] = rand::thread_rng().gen();
         let secret = BASE64_STANDARD.encode(key);
 
         f.write_all(secret.as_bytes())
             .await
-            .expect("Could not init secret file");
+            .expect("Could not init secret.key");
     }
 
     if let Err(_) = File::open("config.json").await {
@@ -315,13 +315,13 @@ async fn login_handler(Form(data): Form<Login>) -> impl IntoResponse {
 async fn auth_cookie_builder(username: String) -> String {
     let mut secret = String::new();
 
-    let secret_f = File::open("secret")
+    let secret_f = File::open("secret.key")
         .await
-        .expect("Could not open secret file");
+        .expect("Could not open secret.key");
     let mut buf_reader = BufReader::new(secret_f);
 
     if let Err(_) = buf_reader.read_to_string(&mut secret).await {
-        panic!("Cannot read secret file! Generating a auth token with an empty private key is unsecure!");
+        panic!("Cannot read secret.key! Generating a auth token with an empty private key is unsecure!");
     };
 
     let claims = Claims {
@@ -364,9 +364,9 @@ async fn verify_auth(jar: CookieJar) -> bool {
 
         let mut secret = String::new();
 
-        let secret_f = File::open("secret").await.expect("Could not open secret file");
+        let secret_f = File::open("secret.key").await.expect("Could not open secret.key");
         let mut buf_reader = BufReader::new(secret_f);
-        buf_reader.read_to_string(&mut secret).await.expect("Could not read secret file");
+        buf_reader.read_to_string(&mut secret).await.expect("Could not read secret.key");
 
         if let Ok(_) = decode::<Claims>(&auth_token.value(), &DecodingKey::from_secret(secret.as_bytes()), &validation) {
             return true;
