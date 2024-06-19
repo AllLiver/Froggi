@@ -363,6 +363,32 @@ body {
     white-space: nowrap;
 }
 
+.interface-locked {
+    pointer-events: none;
+    opacity: 0.5;
+    filter: grayscale(100%);
+    position: relative; 
+}
+
+.button-lock-interface {
+    z-index: 20;
+    position: relative; 
+    pointer-events: auto;
+}
+
+#lockInterfaceBtn {
+z-index: 999;
+pointer-events: auto;
+}
+
+.unlock-interface-btn {
+    display: none; 
+    z-index: 30; 
+    position: relative; 
+    pointer-events: auto;
+}
+
+
 /* Navbar */
 .off-screen-menu {
     background-color: #fff; 
@@ -389,12 +415,15 @@ body {
 
 /* Hamburger menu and off-screen menu */
 .hamburger-menu {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     background: none;
     border: none;
     cursor: pointer;
     padding: 10px;
-    margin-right: 20px;
 }
+
 
 .line {
     display: block;
@@ -422,10 +451,10 @@ body {
     position: fixed;
     top: 0;
     right: 0;
-    height: auto;
+    height: auto; 
     width: 250px;
     z-index: 1000;
-    background-color: #1d1e22; 
+    background-color: rgba(29, 30, 34, 0.9); 
     box-shadow: -10px 0 20px rgba(0, 0, 0, 0.2); 
     display: flex;
     flex-direction: column;
@@ -433,8 +462,11 @@ body {
     transform: translateX(100%);
     transition: transform 0.3s ease;
     list-style-type: none;
-    border-radius: 10.5px;
-    margin-top: 10px;
+    border-top-left-radius: 10px; 
+    border-bottom-left-radius: 10px; 
+    padding-top: 1vh; 
+    padding-bottom: 1vh;
+    margin-top: 6vh;
 }
 
 
@@ -444,11 +476,10 @@ body {
 
 
 .sidenavbar a {
-    background-color: #fff;
-    color: #000; 
+    color: #fff; 
     text-decoration: none;
     font-size: 18px;
-    padding: 15px;
+    padding: 5px;
     display: block;
     transition: background-color 0.3s ease;
     border-radius: 10.5px;
@@ -458,7 +489,7 @@ body {
 }
 
 .sidenavbar a:hover {
-    background-color: #27a644; 
+    background-color: #252525; 
     color: #fff; 
 }
 
@@ -770,7 +801,7 @@ body {
 .flag-home:hover, .flag-away:hover,
 .show-countdown:hover,
 .button-lock-interface:hover,
-.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover .show-sponsors:hover {
+.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover {
     transform: scale(1.01); 
 }
 
@@ -965,3 +996,9 @@ body {
                 width: calc(100% - 100px);
             }
         }
+
+
+
+
+
+        /*& Overlay.html styles */

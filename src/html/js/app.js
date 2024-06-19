@@ -1,6 +1,7 @@
 const version = '1.0.0';  // * Change this if you want to change the version that is displayed in the net-stats container.
 const pingTime = '3000';  // * Change this if you want to change how often the ping is updated (in milliseconds), the default is 3000ms (3 seconds).
 const pingUrl = 'http://localhost:3000'; // * Change this to your localhost port, the default port is 3000
+const lockInterfaceBtn = document.getElementById('lockInterfaceBtn');
 function updateVersion() {
     const versionElement = document.getElementById('version-value');
     versionElement.textContent = version;
@@ -41,6 +42,35 @@ function updatePing() {
         }
     });
 }
+
+
+lockInterfaceBtn.addEventListener('click', function(event) {
+    if (event.target !== lockInterfaceBtn) {
+        document.body.classList.toggle('interface-locked');
+        
+        if (document.body.classList.contains('interface-locked')) {
+            lockInterfaceBtn.innerHTML = '<strong>Unlock Interface</strong>';
+            localStorage.setItem('lockState', 'locked');
+        } else {
+            lockInterfaceBtn.innerHTML = '<strong>Lock Interface</strong>';
+            localStorage.setItem('lockState', 'unlocked');
+        }
+    }
+});
+
+// When refreshed load the lock state from local storage, if locked add the class to the index
+window.addEventListener('load', function() {
+    const lockState = localStorage.getItem('lockState');
+    
+    if (lockState === 'locked') {
+        document.body.classList.add('interface-locked');
+        lockInterfaceBtn.innerHTML = '<strong>Unlock Interface</strong>';
+    } else {
+        document.body.classList.remove('interface-locked');
+        lockInterfaceBtn.innerHTML = '<strong>Lock Interface</strong>';
+    }
+});
+
 
 updateVersion();
 updatePing();

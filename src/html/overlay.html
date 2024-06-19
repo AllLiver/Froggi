@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
+    <script src="/htmx.js"></script>
+    <script src="/sse.js"></script>
+    <script>
+        // Auto Fullscreen
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        });
+        function updateSponsorImage() {
+        }
+        updateSponsorImage();
+    </script>
+    <link rel="icon" href="/favicon.png">
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; 
+             background-color: rgb(0, 177, 64);
+        }
+
+        #overlay {
+            background-color: rgb(0, 177, 64);
+            cursor: none;
+            color: black;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end; /* Align items to the bottom of the container */
+            padding: 10px;
+            flex: 1; /* Take remaining vertical space */
+            height: 100vh;
+        }
+
+        .rectangle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end; /* Align items to the bottom of the container */
+            width: calc(100% - 20px); /* Full width minus padding */
+            max-width: 800px; /* Optional: Limit max width of the container */
+            margin: 0 auto; /* Center the container horizontally */
+            padding: 10px; /* Adjust padding as needed */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+
+        .rectangle-home, .rectangle-away, .rectangle-quarter, .rectangle-score, .rectangle-down-togo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            height: 3vh; 
+            width: auto; 
+            padding: 0 10px; 
+            border-radius: 3.5px;
+            font-size: 1em;
+            margin: 0.2vw;
+        }
+
+        .logo {
+            height: 28px;
+            width: auto;
+            margin-right: 5px;
+        }
+
+        .team-name {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-score {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .rectangle-quarter {
+            background-color: #fff;
+            height: 3vh; 
+            min-width: 6vw; 
+            padding: 0 10px; 
+            border-radius: 3.5px;
+            font-size: 1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .rectangle-quarter {
+            background-color: #fff;
+            height: 3vh; 
+            width: 3vw; 
+            padding: 0 10px; 
+            border-radius: 3.5px;
+            font-size: 1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .rectangle-away, .rectangle-home {
+            background-color: #fff;
+            height: 3vh; 
+            min-width: 9vw; 
+            padding: 0 10px; 
+            border-radius: 3.5px;
+            font-size: 1em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        
+    </style>
+</head>
+
+<body>
+    <div id="overlay">
+        <div class="rectangle-container">
+            <div class="rectangle-home">
+                <img class="logo" src="home_png" alt="Home" height="28px" width="auto">
+                <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
+            </div>
+            <div class="rectangle-away">
+                <img class="logo" src="away_png" alt="Away" height="28px" width="auto">
+                <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
+            </div>
+            <div class="rectangle-quarter">
+                <div hx-put="/time_and_quarter" hx-trigger="every 10ms">12:00 - 1st</div>
+            </div>
+            <div class="rectangle-score">
+                <h3>12-12</h3>
+            </div>
+            <div class="rectangle-down-togo">
+               <h3>1st & 10</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional sections outside overlay -->
+    <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div>
+    <div id="countdown" hx-put="/countdown_display" hx-trigger="every 10ms"></div>
+    <div class="popup-container" id="popupContainer" hx-put="/popup" hx-trigger="every 10ms">
+        <p id="popupText"></p>
+    </div>
+
+</body>
+
+</html>
