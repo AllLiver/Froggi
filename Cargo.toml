@@ -6,12 +6,14 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.86"
 argon2 = "0.5.3"
-axum = { version = "0.7.5", features = ["macros"] }
+axum = { version = "0.7.5", features = ["macros", "tokio"] }
 axum-extra = { version = "0.9.3", features = ["cookie"] }
 base64 = "0.22.1"
+futures-util = "0.3.30"
 jsonwebtoken = "9.3.0"
 rand = "0.8.5"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
 tokio = { version = "1.38.0", features = ["full"] }
+tokio-stream = "0.1.15"
 uuid = { version = "1.8.0", features = ["v4"] }

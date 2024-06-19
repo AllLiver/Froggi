@@ -12,22 +12,24 @@ use axum::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
     },
-    response::IntoResponse,
+    response::{sse::{Event, KeepAlive}, IntoResponse, Sse},
     routing::{get, post},
     Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
+use futures_util::{stream, Stream};
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::{sync::Arc, time::UNIX_EPOCH};
+use std::{convert::Infallible, sync::Arc, time::UNIX_EPOCH};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
     sync::Mutex,
 };
+use tokio_stream::StreamExt as _ ;
 use uuid::Uuid;
 
 #[derive(Clone)]
@@ -91,6 +93,7 @@ async fn main() -> Result<()> {
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
         .route("/home-points/update/:a", post(home_points_update_handler))
+        .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
         .with_state(state)
         .fallback(get(not_found_handler));
@@ -176,7 +179,6 @@ async fn app_js_handler() -> impl IntoResponse {
 // endregion: js routing
 // region: image routing
 
-#[debug_handler]
 async fn favicon_handler() -> impl IntoResponse {
     Response::builder()
         .status(StatusCode::OK)
@@ -513,7 +515,21 @@ async fn away_points_update_handler(
     }
 }
 
+#[debug_handler]
+async fn home_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let state = Arc::clone(&state.home_points);
+
+    let stream = stream::unfold(state, |state| async {
+        let team_points = state.lock().await.clone().to_string();
+        Some((Ok(Event::default().data(team_points).event("message")), state))
+    })
+    .throttle(tokio::time::Duration::from_millis(5));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
 // endregion: team routing
+
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
 async fn shutdown_signal() {
     let ctrl_c = async {
