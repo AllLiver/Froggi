@@ -5,10 +5,16 @@ use argon2::{
     Argon2,
 };
 use axum::{
-    debug_handler, extract::{Path, State}, http::{
+    body::Body,
+    debug_handler,
+    extract::{Path, State},
+    http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
-    }, response::IntoResponse, routing::{get, post}, Form, Router
+    },
+    response::IntoResponse,
+    routing::{get, post},
+    Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
@@ -19,7 +25,8 @@ use std::{sync::Arc, time::UNIX_EPOCH};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
-    signal, sync::Mutex,
+    signal,
+    sync::Mutex,
 };
 use uuid::Uuid;
 
@@ -74,11 +81,10 @@ async fn main() -> Result<()> {
     let app = Router::new()
         .route("/", get(index_handler))
         .route("/styles.css", get(css_handler))
-        .route(
-            "/htmx.min.js",
-            get(|| async { include_str!("./html/htmx.min.js") }),
-        )
-        .route("/app.js", get(|| async { include_str!("./html/app.js") }))
+        .route("/htmx.min.js", get(htmx_js_handler))
+        .route("/sse.js", get(sse_js_handler))
+        .route("/app.js", get(app_js_handler))
+        .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
         .route("/login", get(login_page_handler))
         .route("/login", post(login_handler))
@@ -141,7 +147,45 @@ async fn not_found_handler() -> impl IntoResponse {
 }
 
 // endregion: basic pages
+// region: js routing
+
+async fn htmx_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("./html/js/htmx.min.js")))
+        .unwrap()
+}
+
+async fn sse_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("./html/js/sse.js")))
+        .unwrap()
+}
+
+async fn app_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("./html/js/app.js")))
+        .unwrap()
+}
+
+// endregion: js routing
 // region: image routing
+
+#[debug_handler]
+async fn favicon_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, HeaderValue::from_static("image/x-icon"))
+        .body(Body::from(
+            include_bytes!("./html/img/favicon.png").to_vec(),
+        ))
+        .unwrap()
+}
 
 async fn spinner_handler() -> impl IntoResponse {
     Response::builder()
@@ -417,7 +461,11 @@ async fn verify_auth(jar: CookieJar) -> bool {
 // endregion: login
 // region: team routing
 
-async fn home_points_update_handler(Path(a): Path<i32>, jar: CookieJar, State(state): State<AppState>) -> impl IntoResponse {
+async fn home_points_update_handler(
+    Path(a): Path<i32>,
+    jar: CookieJar,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut home_points = state.home_points.lock().await;
 
@@ -430,16 +478,20 @@ async fn home_points_update_handler(Path(a): Path<i32>, jar: CookieJar, State(st
         return Response::builder()
             .status(StatusCode::OK)
             .body(String::new())
-            .unwrap()
+            .unwrap();
     } else {
         return Response::builder()
             .status(StatusCode::UNAUTHORIZED)
             .body(String::new())
-            .unwrap()
+            .unwrap();
     }
 }
 
-async fn away_points_update_handler(Path(a): Path<i32>, jar: CookieJar, State(state): State<AppState>) -> impl IntoResponse {
+async fn away_points_update_handler(
+    Path(a): Path<i32>,
+    jar: CookieJar,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut away_points = state.away_points.lock().await;
 
@@ -452,12 +504,12 @@ async fn away_points_update_handler(Path(a): Path<i32>, jar: CookieJar, State(st
         return Response::builder()
             .status(StatusCode::OK)
             .body(String::new())
-            .unwrap()
+            .unwrap();
     } else {
         return Response::builder()
             .status(StatusCode::UNAUTHORIZED)
             .body(String::new())
-            .unwrap()
+            .unwrap();
     }
 }
 
