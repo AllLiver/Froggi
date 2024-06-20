@@ -5,18 +5,13 @@ use argon2::{
     Argon2,
 };
 use axum::{
-    body::Body,
-    extract::{Path, State},
-    http::{
+    body::Body, debug_handler, extract::{Path, State}, http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
-    },
-    response::{
+    }, response::{
         sse::{Event, KeepAlive},
         Html, IntoResponse, Sse,
-    },
-    routing::{get, post, put},
-    Form, Router,
+    }, routing::{get, post, put}, Form, Router
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
@@ -39,6 +34,8 @@ use tokio::{
 use tokio_stream::StreamExt as _;
 use uuid::Uuid;
 
+const SSE_THROTTLE_MILLIS: u64 = 5;
+
 lazy_static! {
     static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
     static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
@@ -50,6 +47,7 @@ lazy_static! {
 struct AppState {
     home_points: Arc<Mutex<u32>>,
     away_points: Arc<Mutex<u32>>,
+    quarter: Arc<Mutex<u8>>
 }
 
 #[tokio::main]
@@ -58,6 +56,7 @@ async fn main() -> Result<()> {
     let state = AppState {
         home_points: Arc::new(Mutex::new(0)),
         away_points: Arc::new(Mutex::new(0)),
+        quarter: Arc::new(Mutex::new(1))
     };
 
     // Validate required files and directories
@@ -95,6 +94,8 @@ async fn main() -> Result<()> {
     }
 
     let app = Router::new()
+
+        // Basic routes
         .route("/", get(index_handler))
         .route("/overlay", get(overlay_handler))
         .route("/styles.css", get(css_handler))
@@ -103,15 +104,21 @@ async fn main() -> Result<()> {
         .route("/app.js", get(app_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
+
+        // Login routes
         .route("/login", get(login_page_handler))
         .route("/login/", get(login_page_handler))
         .route("/login", post(login_handler))
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
+        
+        // Point routes
         .route("/home-points/update/:a", post(home_points_update_handler))
         .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
         .route("/away-points/sse", get(away_points_sse_handler))
+
+        // Game clock routes
         .route("/game-clock/sse/:o", get(game_clock_sse_handler))
         .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
         .route("/game-clock/set/:mins", post(game_clock_set_handler))
@@ -119,6 +126,13 @@ async fn main() -> Result<()> {
             "/game-clock/update/:mins/:secs",
             post(game_clock_update_handler),
         )
+
+        // Quarter routes
+        .route("/quarter/sse", get(quarter_sse_handler))
+        .route("/quarter/set/:q", post(quarter_set_handler))
+        .route("/quarter/update/:a", post(quarter_update_handler))
+
+        // Information routes, state, and fallback
         .route(
             "/version",
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
@@ -580,7 +594,7 @@ async fn home_points_sse_handler(
             (state, shutdown_state),
         ))
     })
-    .throttle(tokio::time::Duration::from_millis(5));
+    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
@@ -602,7 +616,7 @@ async fn away_points_sse_handler(
             (state, shutdown_state),
         ))
     })
-    .throttle(tokio::time::Duration::from_millis(5));
+    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
@@ -641,7 +655,7 @@ async fn uptime_sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible
             ))
         },
     )
-    .throttle(tokio::time::Duration::from_millis(5));
+    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
@@ -750,12 +764,76 @@ async fn game_clock_sse_handler(
             ))
         },
     )
-    .throttle(tokio::time::Duration::from_millis(5));
+    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
 // endregion: time
+// region: quarters
+
+async fn quarter_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let quarter_mutex = Arc::clone(&state.quarter);
+    let shutdown_state = Arc::clone(&SHUTDOWN);
+
+    let stream = stream::unfold((quarter_mutex, shutdown_state), |(quarter_mutex, shutdown_state)| async {
+        let shutdown = *shutdown_state.read().await;
+        let quarter = *quarter_mutex.lock().await;
+
+        let event_body = match quarter {
+            1 => "1",
+            2 => "2",
+            3 => "3",
+            4 => "4",
+            _ => "OT"
+        };
+
+        let event_type = if shutdown { "shutdown" } else { "message" };
+
+        Some((Ok(Event::default().data(event_body).event(event_type)), (quarter_mutex, shutdown_state)))
+    })
+    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
+async fn quarter_set_handler(jar: CookieJar, Path(q): Path<u8>, State(state): State<AppState>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        *state.quarter.lock().await = q;
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn quarter_update_handler(jar: CookieJar, State(state): State<AppState>, Path(a): Path<i8>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut quarter = state.quarter.lock().await;
+        
+        if *quarter as i8 + a >= 1 && *quarter as i8 + a <= 5 {
+            *quarter = (*quarter as i8 + a) as u8;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+// endregion: quarters
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
 async fn shutdown_signal() {

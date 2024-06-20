@@ -158,19 +158,19 @@
             <div class="quarter-rectangle">
                 <div class="quarter-container">
                     <div class="counter-container">
-                        <button class="button-decrement-quarter" hx-post="/decrement/quarter">-</button>
+                        <button class="button-decrement-quarter" hx-post="/quarter/update/-1" hx-swap="none">-</button>
                         <div class="counter">
-                            <div id="quarter-counter" class="counter-value">1</div>
+                            <div id="quarter-counter" class="counter-value" hx-ext="sse" sse-connect="/quarter/sse" sse-swap="message" sse-close="shutdown">1</div>
                             <div class="counter-subtext">Quarter</div>
                         </div>
-                        <button class="button-increment-quarter" hx-post="/increment/quarter">+</button>
+                        <button class="button-increment-quarter" hx-post="/quarter/update/1" hx-swap="none">+</button>
                     </div>
                     <div class="quarter-buttons">
-                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/1">1st Quarter</button>
-                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/2">2nd Quarter</button>
-                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/3">3rd Quarter</button>
-                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/4">4th Quarter</button>
-                        <button class="button-quick-quarter" hx-post="/quickscore/quarter/ot">Overtime</button>
+                        <button class="button-quick-quarter" hx-post="/quarter/set/1" hx-swap="none">1st Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quarter/set/2" hx-swap="none">2nd Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quarter/set/3" hx-swap="none">3rd Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quarter/set/4" hx-swap="none">4th Quarter</button>
+                        <button class="button-quick-quarter" hx-post="/quarter/set/5" hx-swap="none">Overtime</button>
                     </div>
                 </div>
             </div>
