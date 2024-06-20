@@ -111,16 +111,18 @@ async fn main() -> Result<()> {
         .with_state(state)
         .fallback(get(not_found_handler));
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
-        .await
-        .context("Could not bind TCP listener")?;
+    if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
+        println!(" -> LISTENING ON: 0.0.0.0:3000");
 
-    println!(" -> LISTENING ON: 0.0.0.0:3000");
+        axum::serve(listener, app)
+            .with_graceful_shutdown(shutdown_signal())
+            .await
+            .context("Could not serve app")?;
+    } else {
+        panic!("Could not bind tcp listener!");
+    }
 
-    axum::serve(listener, app)
-        .with_graceful_shutdown(shutdown_signal())
-        .await
-        .context("Could not serve app")?;
+    
 
     Ok(())
 }
