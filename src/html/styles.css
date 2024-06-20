@@ -171,6 +171,13 @@ body {
     font-size: 2.22vh;
 }
 
+.net-stats-title {
+    font-size: 2vh;
+    margin: 0 0.52vw;
+    color: #fff; 
+}
+
+
 /* Section styles */
 .section {
     display: flex;
@@ -264,13 +271,6 @@ body {
     margin: 6px;
 }
 
-/* Button grid */
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3px;
-    margin-top: 15px;
-}
 
 /* Downs container */
 .downs-container {
@@ -281,13 +281,6 @@ body {
     text-align: center;
 }
 
-/* Adjustments for button grid */
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 3px;
-    margin-top: 15px;
-}
  
 /* Net stats container */
 
@@ -300,11 +293,14 @@ body {
     padding: 0.52vw 1.85vh;
     border-radius: 5px;
     margin-right: 2.08vw; 
-    margin-left: 0.78vw;
+    margin-left: 0.5w;
         z-index: 20;
         position: relative; 
         pointer-events: auto;
+    width: 7vw;
+    height: auto; 
 }
+
 
 .net-stats-content {
     display: flex;
@@ -358,6 +354,7 @@ pointer-events: auto;
     position: relative; 
     pointer-events: auto;
 }
+
 
 
 /* Navbar */
@@ -473,18 +470,6 @@ pointer-events: auto;
     font-size: 2.22vh;
 }
 
-
-/* Adjustments for button grid */
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); 
-    gap: 3px;
-    margin-top: 15px;
-}
-
-
-
-
 /* Columns */
 .left-column, .middle-column {
     display: flex;
@@ -552,14 +537,14 @@ pointer-events: auto;
 }
 
 
-.countdown-controls, .quick-time-buttons {
+.countdown-controls, .quick-time-buttons, .quick-down-buttons {
     width: 100%;
     display: flex;
     justify-content: space-around;
     margin-bottom: 10px;
 }
 
-.quick-time-buttons {
+.quick-time-buttons, .quick-down-buttons {
     margin-top: 10px;
 }
 
@@ -600,6 +585,7 @@ pointer-events: auto;
     box-sizing: border-box; 
     padding: 10px; 
     background-color: #000;
+    color: #fff;
     margin-bottom: 0.28vh;
 }
 
@@ -609,7 +595,7 @@ pointer-events: auto;
     border: none;
     font-size: 1.85vh;
     cursor: pointer;
-    width: 6vw;
+    width: 6.5vw;
     height: 4.07vh;
     border-radius: 5px;
     display: flex;
@@ -695,13 +681,6 @@ pointer-events: auto;
         white-space: nowrap; 
     }
 
-    .button-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(11.85vh, 1fr)); 
-        gap: 3px;
-        margin-top: 15px;
-    }
-
     .main-container {
         flex-direction: column;
     }
@@ -713,13 +692,11 @@ pointer-events: auto;
 
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
     .net-stats-rectangle {
-        width: calc(100% - 16px);
         margin-left: 8px;
     }
 }
-@media (max-width: 768px) {
 
-}
+
 
 
 
@@ -739,10 +716,6 @@ pointer-events: auto;
     .button-quick-down {
         width: 110px;
         font-size: 14px;
-    }
-
-    .button-grid {
-        grid-template-columns: repeat(1, 1fr);
     }
 
     .countdown-title {
@@ -767,7 +740,7 @@ pointer-events: auto;
     }
 }
 
-@media only screen and (min-device-width: 768px) and (max-device-width: 102.22vh) and (orientation: landscape) { /* Zooms the ipad out 0.75% of desktop */
+@media only screen and (min-device-width: 768px) and (max-device-width: 102.22vh) and (orientation: landscape) { 
     .main-container {
         transform: scale(0.75);
         transform-origin: 0 0;

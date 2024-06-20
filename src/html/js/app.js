@@ -1,5 +1,5 @@
 const version = '2.0.0';  // * Change this if you want to change the version that is displayed in the net-stats container.
-const pingTime = '3000';  // * Change this if you want to change how often the ping is updated (in milliseconds), the default is 3000ms (3 seconds).
+const pingTime = '1000';  // * Change this if you want to change how often the ping is updated (in milliseconds), the default is 3000ms (3 seconds).
 const pingUrl = 'http://localhost:3000'; // * Change this to your localhost port, the default port is 3000
 const lockInterfaceBtn = document.getElementById('lockInterfaceBtn');
 function updateVersion() {
@@ -74,5 +74,5 @@ window.addEventListener('load', function() {
 
 updateVersion();
 updatePing();
-//* Updates ping every 3 seconds (3000ms)
+//* Updates ping every 1 second (1000ms)
 setInterval(updatePing, pingTime);
