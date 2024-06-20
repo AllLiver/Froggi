@@ -50,9 +50,9 @@
                             <button class="button-increment-home" hx-post="/home-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-home" hx-post="/quickscore/home/1">Add 1 point</button>
-                        <button class="button-quick-score-home" hx-post="/quickscore/home/2">Add 2 points</button>
-                        <button class="button-quick-score-home" hx-post="/quickscore/home/3">Add 3 points</button>
+                        <button class="button-quick-score-home" hx-post="/home-points/update/1" hx-swap="none">Add 1 point</button>
+                        <button class="button-quick-score-home" hx-post="/home-points/update/2" hx-swap="none">Add 2 points</button>
+                        <button class="button-quick-score-home" hx-post="/home-points/update/3" hx-swap="none">Add 3 points</button>
                         <button class="flag-home">Flag Home</button>
                     </div>
                     <div class="section away-section">
@@ -64,9 +64,9 @@
                             </div>
                             <button class="button-increment-away" hx-post="/away-points/update/1" hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-away" hx-post="/quickscore/away/1">Add 1 point</button>
-                        <button class="button-quick-score-away" hx-post="/quickscore/away/2">Add 2 points</button>
-                        <button class="button-quick-score-away" hx-post="/quickscore/away/3">Add 3 points</button>
+                        <button class="button-quick-score-away" hx-post="/away-points/update/1" hx-swap="none">Add 1 point</button>
+                        <button class="button-quick-score-away" hx-post="/away-points/update/2" hx-swap="none">Add 2 points</button>
+                        <button class="button-quick-score-away" hx-post="/away-points/update/3" hx-swap="none">Add 3 points</button>
                         <button class="flag-away">Flag Away</button>
                     </div>
                 </div>
@@ -178,32 +178,32 @@
                 <div class="clock-rectangle">
                     <div class="counter-section">
                         <div class="counter-container">
-                            <button class="button-decrement-clock" hx-post="/decrement/clock/minutes">-</button>
+                            <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="clock-counter-minutes" class="countdown">0</div>
+                                <div id="clock-counter-minutes" class="countdown" hx-ext="sse" sse-connect="/game-clock/sse/minutes" sse-swap="message" sse-close="shutdown">0</div>
                                 <div class="counter-subtext">Minutes</div>
                             </div>
-                            <button class="button-increment-clock" hx-post="/increment/clock/minutes">+</button>
+                            <button class="button-increment-clock" hx-post="/game-clock/update/1/0" hx-swap="none">+</button>
                         </div>
                         <h2 class="countdown-title">Clock</h2>
                         <div class="counter-container">
-                            <button class="button-decrement-clock" hx-post="/decrement/clock/seconds">-</button>
+                            <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="clock-counter-seconds" class="countdown">0</div>
+                                <div id="clock-counter-seconds" class="countdown" hx-ext="sse" sse-connect="/game-clock/sse/seconds" sse-swap="message" sse-close="shutdown">0</div>
                                 <div class="counter-subtext">Seconds</div>
                             </div>
-                            <button class="button-increment-clock" hx-post="/increment/clock/seconds">+</button>
+                            <button class="button-increment-clock" hx-post="/game-clock/update/0/1" hx-swap="none">+</button>
                         </div>
                     </div>
                     <div class="countdown-controls">
-                        <button class="button-start-clock" hx-post="/start/clock">Start Clock</button>
-                        <button class="button-stop-clock" hx-post="/stop/clock">Stop Clock</button>
+                        <button class="button-start-clock" hx-post="/game-clock/ctl/start" hx-swap="none">Start Clock</button>
+                        <button class="button-stop-clock" hx-post="/game-clock/ctl/stop" hx-swap="none">Stop Clock</button>
                     </div>
                     <div class="quick-time-buttons">
-                        <button class="button-quick-clock" hx-post="/quicktime/12">12:00</button>
-                        <button class="button-quick-clock" hx-post="/quicktime/9">9:00</button>
-                        <button class="button-quick-clock" hx-post="/quicktime/6">6:00</button>
-                        <button class="button-quick-clock" hx-post="/quicktime/3">3:00</button>
+                        <button class="button-quick-clock" hx-post="/game-clock/set/12" hx-swap="none">12:00</button>
+                        <button class="button-quick-clock" hx-post="/game-clock/set/9" hx-swap="none">9:00</button>
+                        <button class="button-quick-clock" hx-post="/game-clock/set/6" hx-swap="none">6:00</button>
+                        <button class="button-quick-clock" hx-post="/game-clock/set/3" hx-swap="none">3:00</button>
                     </div>
                 </div>
             </div>

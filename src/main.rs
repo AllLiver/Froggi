@@ -42,6 +42,8 @@ use uuid::Uuid;
 lazy_static! {
     static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
     static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    static ref GAME_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
 #[derive(Clone)]
@@ -110,6 +112,13 @@ async fn main() -> Result<()> {
         .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
         .route("/away-points/sse", get(away_points_sse_handler))
+        .route("/game-clock/sse/:o", get(game_clock_sse_handler))
+        .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
+        .route("/game-clock/set/:mins", post(game_clock_set_handler))
+        .route(
+            "/game-clock/update/:mins/:secs",
+            post(game_clock_update_handler),
+        )
         .route(
             "/version",
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
@@ -120,6 +129,7 @@ async fn main() -> Result<()> {
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
         tokio::spawn(uptime_ticker());
+        tokio::spawn(game_clock_ticker());
         println!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
@@ -605,10 +615,9 @@ async fn uptime_ticker() {
 
     loop {
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        let uptime = (Instant::now() - start_time).as_secs() as usize;
-
         let mut uptime_secs = UPTIME_SECS.lock().await;
-        *uptime_secs = uptime;
+
+        *uptime_secs = (Instant::now() - start_time).as_secs() as usize;
     }
 }
 
@@ -629,6 +638,115 @@ async fn uptime_sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible
             Some((
                 Ok(Event::default().data(time_string).event(event_type)),
                 (uptime_mutex, shutdown_state),
+            ))
+        },
+    )
+    .throttle(tokio::time::Duration::from_millis(5));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
+async fn game_clock_ticker() {
+    loop {
+        let call_time = Instant::now();
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        
+        if *GAME_CLOCK_START.lock().await {
+            *GAME_CLOCK.lock().await -= (Instant::now() - call_time).as_secs() as usize;
+        }
+    }
+}
+
+async fn game_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut game_clock_start = GAME_CLOCK_START.lock().await;
+
+        if a == "start" {
+            *game_clock_start = true;
+        } else if a == "stop" {
+            *game_clock_start = false;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn game_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        *GAME_CLOCK.lock().await = mins * 60;
+
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn game_clock_update_handler(
+    jar: CookieJar,
+    Path((mins, secs)): Path<(isize, isize)>,
+) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut game_clock = GAME_CLOCK.lock().await;
+        let time_diff = mins * 60 + secs;
+
+        if *game_clock as isize + time_diff >= 0 {
+            *game_clock = (*game_clock as isize + time_diff) as usize;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn game_clock_sse_handler(
+    Path(o): Path<String>,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let game_clock_mutex = Arc::clone(&GAME_CLOCK);
+    let shutdown_state = Arc::clone(&SHUTDOWN);
+
+    let stream = stream::unfold(
+        (game_clock_mutex, shutdown_state, o),
+        |(game_clock_mutex, shutdown_state, o)| async {
+            let shutdown = *shutdown_state.read().await;
+            let game_clock = *game_clock_mutex.lock().await;
+
+            let mut time_display = String::new();
+
+            if o == "minutes" {
+                time_display = (game_clock / 60).to_string();
+            } else if o == "seconds" {
+                time_display = (game_clock % 60).to_string();
+            } else if o == "both" {
+                time_display = format!("{}:{}", game_clock / 60, game_clock % 60);
+            }
+
+            let event_type = if shutdown { "shutdown" } else { "message" };
+
+            Some((
+                Ok(Event::default().data(time_display).event(event_type)),
+                (game_clock_mutex, shutdown_state, o),
             ))
         },
     )
