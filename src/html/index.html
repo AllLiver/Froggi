@@ -107,7 +107,7 @@
                         </div>
                         <div class="stat-item">
                             <label>Uptime:</label>
-                            <span id="uptime-value">00:00:00</span>
+                            <span id="uptime-value" hx-ext="sse" sse-connect="/uptime-sse" sse-swap="message" sse-close="shutdown">00:00:00</span>
                         </div>
                         <button class="button-lock-interface" id="lockInterfaceBtn"><strong>Lock Interface</strong></button>
                     </div>
