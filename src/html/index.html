@@ -31,7 +31,7 @@
     <div class="main-container">
         <div class="left-column">
             <div class="preview">
-                <a href="overlay.html">
+                <a href="/overlay">
                     <div class="preview-rectangle"></div>
                 </a>
             </div>
@@ -121,32 +121,32 @@
                 <div class="countdown-rectangle">
                     <div class="counter-section">
                         <div class="counter-container">
-                            <button class="button-decrement-countdown" hx-post="/decrement/countdown/minutes">-</button>
+                            <button class="button-decrement-countdown" hx-post="/countdown-clock/update/-1/0" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="countdown-counter-minutes" class="countdown">0</div>
+                                <div id="countdown-counter-minutes" class="countdown" hx-ext="sse" sse-connect="/countdown-clock/sse/minutes" sse-swap="message" sse-close="shutdown">0</div>
                                 <div class="counter-subtext">Minutes</div>
                             </div>
-                            <button class="button-increment-countdown" hx-post="/increment/countdown/minutes">+</button>
+                            <button class="button-increment-countdown" hx-post="/countdown-clock/update/1/0" hx-swap="none">+</button>
                         </div>
                         <h2 class="countdown-title">Countdown</h2>
                         <div class="counter-container">
-                            <button class="button-decrement-countdown" hx-post="/decrement/countdown/seconds">-</button>
+                            <button class="button-decrement-countdown" hx-post="/countdown-clock/update/0/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="countdown-counter-seconds" class="countdown">0</div>
+                                <div id="countdown-counter-seconds" class="countdown" hx-ext="sse" sse-connect="/countdown-clock/sse/seconds" sse-swap="message" sse-close="shutdown">0</div>
                                 <div class="counter-subtext">Seconds</div>
                             </div>
-                            <button class="button-increment-countdown" hx-post="/increment/countdown/seconds">+</button>
+                            <button class="button-increment-countdown" hx-post="/countdown-clock/update/0/1" hx-swap="none">+</button>
                         </div>
                     </div>
                     <div class="countdown-controls">
-                        <button class="button-start-countdown" hx-post="/start/countdown">Start Countdown</button>
-                        <button class="button-stop-countdown" hx-post="/stop/countdown">Stop Countdown</button>
+                        <button class="button-start-countdown" hx-post="/countdown-clock/ctl/start" hx-swap="none">Start Countdown</button>
+                        <button class="button-stop-countdown" hx-post="/countdown-clock/ctl/stop" hx-swap="none">Stop Countdown</button>
                     </div>
                     <div class="quick-time-buttons">
-                        <button class="button-quick-countdown" hx-post="/quicktime/20">20:00</button>
-                        <button class="button-quick-countdown" hx-post="/quicktime/15">15:00</button>
-                        <button class="button-quick-countdown" hx-post="/quicktime/10">10:00</button>
-                        <button class="button-quick-countdown" hx-post="/quicktime/5">5:00</button>
+                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/20" hx-swap="none">20:00</button>
+                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/15" hx-swap="none">15:00</button>
+                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/10" hx-swap="none">10:00</button>
+                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/5" hx-swap="none">5:00</button>
                     </div>
                     <div class="countdown-actions">
                         <input type="text" id="countdown-clock-text" maxlength="25"
