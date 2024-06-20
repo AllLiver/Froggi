@@ -15,7 +15,7 @@ body {
 /* Rectangles */
 .score-rectangle {
     background-color: #1d1e22;
-    width: 686px;
+    width: 686px; 
     height: 330px;
     border-radius: 16.5px;
     display: flex;
@@ -197,9 +197,7 @@ body {
 /* Increment and decrement buttons */
 .button-increment-home, .button-decrement-home,
 .button-increment-away, .button-decrement-away,
-.button-increment-togo, .button-decrement-togo,
-.button-increment-down, .button-decrement-down {
-    background-color: #007BFF;
+.button-increment-togo, .button-decrement-togo{
     color: white;
     border: none;
     padding: 10px;
@@ -210,19 +208,15 @@ body {
     border-radius: 5px;
 }
 
+.button-increment-home, .button-decrement-home {
+    background-color: #007BFF;
+}
+
 .button-increment-away, .button-decrement-away {
     background-color: #ff8601;
 }
 
-.button-increment-togo, .button-decrement-togo {
-    background-color: #27a644;
-}
-
-.button-increment-down, .button-decrement-down {
-    background-color: #27a644;
-}
-
-.button-decrement-countdown, .button-increment-countdown, .button-increment-quarter, .button-decrement-quarter, .button-increment-clock, .button-decrement-clock {
+.button-decrement-countdown, .button-increment-countdown, .button-increment-quarter, .button-decrement-quarter, .button-increment-clock, .button-decrement-clock, .button-increment-togo, .button-decrement-togo  {
     background-color: #fff;
     color: #000;
     border: none;
@@ -673,12 +667,7 @@ pointer-events: auto;
     text-align: center;
 }
 
-@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) {
-    .main-container {
-        transform: scale(0.75);
-        transform-origin: 0 0;
-    }
-}
+
 /* Responsive design */
 @media (max-width: 1024px) {
     .main-container {
@@ -697,14 +686,14 @@ pointer-events: auto;
         width: 250px;
     }
 
-    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle {
+    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
         width: calc(100% - 10px);
         margin-left: 3px;
     }
 }
 
 @media (max-width: 768px) {
-    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle {
+    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
         width: calc(100% - 16px);
         margin-left: 8px;
         margin-bottom: 10px;
@@ -745,9 +734,8 @@ pointer-events: auto;
     }
 }
 
-
 @media (max-width: 480px) {
-    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle {
+    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
         width: calc(100% - 20px);
         margin-left: 3px;
     }
@@ -788,11 +776,19 @@ pointer-events: auto;
     }
 }
 
+@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) and (orientation: landscape) { /* Zooms the ipad out 0.75% of desktop */
+    .main-container {
+        transform: scale(0.75);
+        transform-origin: 0 0;
+    }
+}
+
+
+
 /* Hover effect */
 .button-increment-home:hover, .button-decrement-home:hover,
 .button-increment-away:hover, .button-decrement-away:hover,
-.button-increment-togo:hover, .button-decrement-togo:hover,
-.button-increment-down:hover, .button-decrement-down:hover,
+.button-increment-togo:hover, .button-decrement-togo:hover, .button-decrement-down:hover,
 .button-decrement-countdown:hover, .button-increment-countdown:hover, .button-decrement-quarter, .button-increment-quarter,
 .button-quick-score-home:hover, .button-quick-score-away:hover,
 .button-quick-down:hover,

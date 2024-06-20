@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous"> <!--Ensure data is not tampered with-->
     <script src="/htmx.js"></script>
     <script src="/sse.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
 
 <body>
-    <!--TODO: popup, countdown, sponsor on overlay & fix gaps on overlay after alliver puts in teaminfo, remove h2 from downs/togo, change downs & Togo incremental colors to white?, name overlay.html elements different from index  -->
+    <!--TODO: Logout, popup, countdown, sponsor on overlay & fix gaps on overlay after alliver puts in teaminfo, change downs & Togo incremental colors to white?, name overlay.html elements different from index  -->
     <nav>
         <button class="hamburger-menu" onclick="toggleMenu()">
             <span class="line"></span>
@@ -23,7 +23,7 @@
         <ul class="sidenavbar">
             <li><a href="#">Dashboard</a></li>
             <li><a href="#">Sponsors & Teaminfo</a></li>
-            <li><a href="#">Overlay</a></li>
+            <li><a href="/overlay">Overlay</a></li>
         </ul>
     </nav>
 
@@ -44,7 +44,7 @@
                             <button class="button-decrement-home" hx-post="/home-points/update/-1"
                                 hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="home-counter" class="counter-value" hx-ext="sse" sse-connect="/home-points/sse" sse-swap="message">0</div>
+                                <div id="home-counter" class="counter-value" hx-ext="sse" sse-connect="/home-points/sse" sse-swap="message" sse-close="shutdown">0</div>
                                 <div class="counter-subtext">Home</div>
                             </div>
                             <button class="button-increment-home" hx-post="/home-points/update/1"
@@ -59,7 +59,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-away" hx-post="/away-points/update/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="away-counter" class="counter-value" hx-ext="sse" sse-connect="/away-points/sse" sse-swap="message">0</div>
+                                <div id="away-counter" class="counter-value" hx-ext="sse" sse-connect="/away-points/sse" sse-swap="message" sse-close="shutdown">0</div>
                                 <div class="counter-subtext">Away</div>
                             </div>
                             <button class="button-increment-away" hx-post="/away-points/update/1" hx-swap="none">+</button>
@@ -74,7 +74,6 @@
 
             <div class="downs">
                 <div class="downs-rectangle">
-                    <h2 class="downs-title">Downs & Togo</h2>
                     <div class="downs-container">
                         <div class="counter-container">
                             <button class="button-decrement-togo" hx-post="/decrement/togo">-</button>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-
+<!--* Adapted from froggi 1.0's overlay, adding the support for downs-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
-    <title>Dashboard</title>
+    <title>Overlay</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
     <script src="/htmx.js"></script>
@@ -42,24 +42,24 @@
             color: black;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end; /* Align items to the bottom of the container */
+            align-items: flex-end; 
             padding: 10px;
-            flex: 1; /* Take remaining vertical space */
+            flex: 1; 
             height: 100vh;
         }
 
-        .rectangle-container {
+        .overlay-rectangle-container {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end; /* Align items to the bottom of the container */
-            width: calc(100% - 20px); /* Full width minus padding */
-            max-width: 800px; /* Optional: Limit max width of the container */
-            margin: 0 auto; /* Center the container horizontally */
-            padding: 10px; /* Adjust padding as needed */
-            box-sizing: border-box; /* Include padding in width calculation */
+            align-items: flex-end; 
+            width: calc(100% - 20px); 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 10px; 
+            box-sizing: border-box; 
         }
 
-        .rectangle-home, .rectangle-away, .rectangle-quarter, .rectangle-score, .rectangle-down-togo {
+        .overlay-rectangle-home, .overlay-rectangle-away, .overlay-rectangle-quarter,  overlay-rectangle-score, .overlay-rectangle-down-togo {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -88,7 +88,7 @@
             font-weight: bold;
         }
 
-        .rectangle-quarter {
+        .overlay-rectangle-quarter {
             background-color: #fff;
             height: 3vh; 
             min-width: 6vw; 
@@ -100,7 +100,7 @@
             align-items: center;
         }
         
-        .rectangle-quarter {
+        .overlay-rectangle-quarter {
             background-color: #fff;
             height: 3vh; 
             width: 3vw; 
@@ -112,7 +112,7 @@
             align-items: center;
         }
 
-        .rectangle-away, .rectangle-home {
+        .overlay-rectangle-away, .overlay-rectangle-home {
             background-color: #fff;
             height: 3vh; 
             min-width: 9vw; 
@@ -130,22 +130,22 @@
 
 <body>
     <div id="overlay">
-        <div class="rectangle-container">
-            <div class="rectangle-home">
+        <div class=" overlay-rectangle-container">
+            <div class=" overlay-rectangle-home">
                 <img class="logo" src="home_png" alt="Home" height="28px" width="auto">
                 <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
             </div>
-            <div class="rectangle-away">
+            <div class=" overlay-rectangle-away">
                 <img class="logo" src="away_png" alt="Away" height="28px" width="auto">
                 <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
             </div>
-            <div class="rectangle-quarter">
+            <div class=" overlay-rectangle-quarter">
                 <div hx-put="/time_and_quarter" hx-trigger="every 10ms">12:00 - 1st</div>
             </div>
-            <div class="rectangle-score">
+            <div class=" overlay-rectangle-score">
                 <h3>12-12</h3>
             </div>
-            <div class="rectangle-down-togo">
+            <div class=" overlay-rectangle-down-togo">
                <h3>1st & 10</h3>
             </div>
         </div>

@@ -6,7 +6,6 @@ use argon2::{
 };
 use axum::{
     body::Body,
-    debug_handler,
     extract::{Path, State},
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
@@ -20,6 +19,7 @@ use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
 use futures_util::{stream, Stream};
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
+use lazy_static::lazy_static;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::{convert::Infallible, sync::Arc, time::UNIX_EPOCH};
@@ -27,15 +27,19 @@ use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
-    sync::Mutex,
+    sync::{Mutex, RwLock},
 };
 use tokio_stream::StreamExt as _ ;
 use uuid::Uuid;
 
+lazy_static!(
+    static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
+);
+
 #[derive(Clone)]
 struct AppState {
     home_points: Arc<Mutex<u32>>,
-    away_points: Arc<Mutex<u32>>,
+    away_points: Arc<Mutex<u32>>
 }
 
 #[tokio::main]
@@ -43,7 +47,7 @@ async fn main() -> Result<()> {
     // Initialize the application state
     let state = AppState {
         home_points: Arc::new(Mutex::new(0)),
-        away_points: Arc::new(Mutex::new(0)),
+        away_points: Arc::new(Mutex::new(0))
     };
 
     // Validate required files and directories
@@ -82,6 +86,7 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         .route("/", get(index_handler))
+        .route("/overlay", get(overlay_handler))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
         .route("/sse.js", get(sse_js_handler))
@@ -132,6 +137,21 @@ async fn index_handler(jar: CookieJar) -> impl IntoResponse {
             .header(LOCATION, HeaderValue::from_static("/login"))
             .body(String::new())
             .unwrap();
+    }
+}
+
+async fn overlay_handler() -> impl IntoResponse {
+    if let Ok(_) = File::open("login.json").await {
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::from(include_str!("./html/overlay.html")))
+            .unwrap()
+    } else {
+        return Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header(LOCATION, HeaderValue::from_static("/login/create"))
+            .body(String::new())
+            .unwrap()
     }
 }
 
@@ -518,10 +538,15 @@ async fn away_points_update_handler(
 
 async fn home_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let state = Arc::clone(&state.home_points);
+    let shutdown_state = Arc::clone(&SHUTDOWN);
 
-    let stream = stream::unfold(state, |state| async {
+    let stream = stream::unfold((state, shutdown_state), |(state, shutdown_state)| async {
         let team_points = state.lock().await.clone().to_string();
-        Some((Ok(Event::default().data(team_points).event("message")), state))
+        let shutdown = *shutdown_state.read().await;
+
+        let event_type = if shutdown { "shutdown" } else { "message" };
+
+        Some((Ok(Event::default().data(team_points).event(event_type)), (state, shutdown_state)))
     })
     .throttle(tokio::time::Duration::from_millis(5));
 
@@ -530,10 +555,15 @@ async fn home_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stre
 
 async fn away_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let state = Arc::clone(&state.away_points);
+    let shutdown_state = Arc::clone(&SHUTDOWN);
 
-    let stream = stream::unfold(state, |state| async {
+    let stream = stream::unfold((state, shutdown_state), |(state, shutdown_state)| async {
         let team_points = state.lock().await.clone().to_string();
-        Some((Ok(Event::default().data(team_points).event("message")), state))
+        let shutdown = *shutdown_state.read().await;
+
+        let event_type = if shutdown { "shutdown" } else { "message" };
+
+        Some((Ok(Event::default().data(team_points).event(event_type)), (state, shutdown_state)))
     })
     .throttle(tokio::time::Duration::from_millis(5));
 
@@ -548,6 +578,9 @@ async fn shutdown_signal() {
         signal::ctrl_c()
             .await
             .expect("failed to install Ctrl+C handler");
+
+        let mut shutdown = SHUTDOWN.write().await;
+        *shutdown = true;
     };
 
     #[cfg(unix)]
@@ -556,10 +589,17 @@ async fn shutdown_signal() {
             .expect("failed to install signal handler")
             .recv()
             .await;
+
+        let mut shutdown = SHUTDOWN.write().await;
+        *shutdown = true;
     };
 
     #[cfg(not(unix))]
-    let terminate = std::future::pending::<()>();
+    let terminate = async { 
+        std::future::pending::<()>();
+        let mut shutdown = SHUTDOWN.write().await;
+        *shutdown = true;
+    };
 
     tokio::select! {
         _ = ctrl_c => {},
