@@ -11,8 +11,8 @@ use axum::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
     },
-    response::{sse::{Event, KeepAlive}, IntoResponse, Sse},
-    routing::{get, post},
+    response::{sse::{Event, KeepAlive}, Html, IntoResponse, Sse},
+    routing::{get, post, put},
     Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
@@ -101,6 +101,7 @@ async fn main() -> Result<()> {
         .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
         .route("/away-points/sse", get(away_points_sse_handler))
+        .route("/version", put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }))
         .with_state(state)
         .fallback(get(not_found_handler));
 
