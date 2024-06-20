@@ -170,13 +170,6 @@ body {
     font-size: 2.22vh;
 }
 
-.downs-title {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    font-size: 2.22vh;
-}
-
 /* Section styles */
 .section {
     display: flex;
@@ -200,11 +193,11 @@ body {
 .button-increment-togo, .button-decrement-togo{
     color: white;
     border: none;
-    padding: 10px;
+    padding: 0.93vh;
     margin: 5px;
     font-size: 1.85vh;
     cursor: pointer;
-    width: 50px;
+    width: 2.6vw;
     border-radius: 5px;
 }
 
@@ -220,11 +213,11 @@ body {
     background-color: #fff;
     color: #000;
     border: none;
-    padding: 10px;
-    margin: 5px;
+    padding: 0.93vh;
+    margin: 0.46vh;
     font-size: 1.85vh;
     cursor: pointer;
-    width: 50px;
+    width: 2.6vw;
     border-radius: 5px;
 }
 
@@ -233,9 +226,9 @@ body {
 .counter, .countdown-counter {
     font-size: 2.22vh;
     margin: 0 10px;
-    min-width: 50px;
+    min-width: 2.6vw;
     text-align: center;
-    padding: 10px;
+    padding: 0.93vh;
     border-radius: 5px;
     background-color: #fff;
     color: #000000;
@@ -264,7 +257,7 @@ body {
     border: none;
     font-size: 1.85vh;
     cursor: pointer;
-    width: 160px;
+    width: 8.33vw;
     height: 4.07vh;
     border-radius: 5px;
     margin: 6px;
@@ -373,7 +366,7 @@ pointer-events: auto;
 .off-screen-menu {
     background-color: #fff; 
     height: 100vh; 
-    width: 300px; 
+    width: 15.63vw; 
     max-width: 80%; 
     position: fixed;
     top: 0;
@@ -407,8 +400,8 @@ pointer-events: auto;
 
 .line {
     display: block;
-    width: 30px;
-    height: 3px;
+    width: 1.56vw;
+    height: 0.28vh;
     background-color: #fff;
     margin: 5px 0;
     transition: transform 0.3s ease;
@@ -432,7 +425,7 @@ pointer-events: auto;
     top: 0;
     right: 0;
     height: auto; 
-    width: 250px;
+    width: 13.02vw;
     z-index: 1000;
     background-color: rgba(29, 30, 34, 0.9); 
     box-shadow: -10px 0 1.85vh rgba(0, 0, 0, 0.2); 
@@ -532,7 +525,7 @@ pointer-events: auto;
     color: white;
     border: none;
     padding: 10px;
-    margin: 5px;
+    margin: 0.46vh;
     font-size: 1.85vh;
     cursor: pointer;
     width: 45%;
@@ -604,8 +597,8 @@ pointer-events: auto;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 60%;
+    width: 100%; 
+    height: 4vh;
     background-color: #fff;
     color: #000;
     border-radius: 10.5px;
@@ -618,7 +611,7 @@ pointer-events: auto;
     box-sizing: border-box; 
     padding: 10px; 
     background-color: #000;
-    margin-bottom: 3px;
+    margin-bottom: 0.28vh;
 }
 
 .button-quick-quarter {
@@ -643,7 +636,7 @@ pointer-events: auto;
     align-items: center;    
     flex-wrap: wrap;
     gap: 0.73vw;
-    margin-top: 15px;
+    margin-top: 1.39vh;
 }
 
 .quarter-container{
@@ -770,6 +763,34 @@ pointer-events: auto;
     }
 }
 
+
+@media (max-width: 768px) {
+    .clock-rectangle {
+        width: calc(100% - 16px);
+        margin-left: 8px;
+    }
+
+    .button-start-clock,
+    .button-stop-clock,
+    .button-quick-clock {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .clock-rectangle {
+        width: calc(100% - 1.85vh);
+        margin-left: 3px;
+    }
+
+    .button-quick-clock {
+        font-size: 14px;
+    }
+
+    #clock-text {
+        width: calc(100% - 100px);
+    }
+}
 
 
 /* Hover effect */
@@ -952,34 +973,6 @@ pointer-events: auto;
             flex-shrink: 0; 
         }
         
-        @media (max-width: 768px) {
-            .clock-rectangle {
-                width: calc(100% - 16px);
-                margin-left: 8px;
-            }
-        
-            .button-start-clock,
-            .button-stop-clock,
-            .button-quick-clock {
-                font-size: 16px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .clock-rectangle {
-                width: calc(100% - 1.85vh);
-                margin-left: 3px;
-            }
-        
-            .button-quick-clock {
-                font-size: 14px;
-            }
-        
-            #clock-text {
-                width: calc(100% - 100px);
-            }
-        }
-
 
 
 
