@@ -3,7 +3,7 @@ WORKDIR /usr/src/myapp
 COPY . .
 RUN cargo install --path .
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 RUN rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/cargo/bin/froggi /usr/local/bin/froggi
 
