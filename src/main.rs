@@ -25,7 +25,11 @@ use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use lazy_static::lazy_static;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::{convert::Infallible, sync::Arc, time::UNIX_EPOCH};
+use std::{
+    convert::Infallible,
+    sync::Arc,
+    time::{Instant, UNIX_EPOCH},
+};
 use tokio::{
     fs::File,
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
@@ -37,6 +41,7 @@ use uuid::Uuid;
 
 lazy_static! {
     static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
+    static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
 }
 
 #[derive(Clone)]
@@ -109,10 +114,12 @@ async fn main() -> Result<()> {
             "/version",
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
         )
+        .route("/uptime-sse", get(uptime_sse_handler))
         .with_state(state)
         .fallback(get(not_found_handler));
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
+        tokio::spawn(uptime_ticker());
         println!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
@@ -591,6 +598,46 @@ async fn away_points_sse_handler(
 }
 
 // endregion: team routing
+// region: time
+
+async fn uptime_ticker() {
+    let start_time = Instant::now();
+
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        let uptime = (Instant::now() - start_time).as_secs() as usize;
+
+        let mut uptime_secs = UPTIME_SECS.lock().await;
+        *uptime_secs = uptime;
+    }
+}
+
+async fn uptime_sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let uptime_mutex = Arc::clone(&UPTIME_SECS);
+    let shutdown_state = Arc::clone(&SHUTDOWN);
+
+    let stream = stream::unfold(
+        (uptime_mutex, shutdown_state),
+        |(uptime_mutex, shutdown_state)| async {
+            let shutdown = *shutdown_state.read().await;
+            let uptime = *uptime_mutex.lock().await;
+
+            let time_string = format!("{}:{}:{}", uptime / 3600, (uptime % 3600) / 60, uptime % 60);
+
+            let event_type = if shutdown { "shutdown" } else { "message" };
+
+            Some((
+                Ok(Event::default().data(time_string).event(event_type)),
+                (uptime_mutex, shutdown_state),
+            ))
+        },
+    )
+    .throttle(tokio::time::Duration::from_millis(5));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
+// endregion: time
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
 async fn shutdown_signal() {

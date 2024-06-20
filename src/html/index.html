@@ -13,17 +13,17 @@
 </head>
 
 <body>
-    <!--TODO: Logout, popup, countdown, sponsor on overlay & fix gaps on overlay after alliver puts in teaminfo, change downs & Togo incremental colors to white?, name overlay.html elements different from index  -->
+    <!--TODO: IMPORTANTL FIX NET STATS ON IPAD Logout, popup, countdown, sponsor on overlay & fix gaps on overlay after alliver puts in teaminfo, change downs & Togo incremental colors to white?, name overlay.html elements different from index, resotre countdown increment width, triple digit ping scoots the ui  -->
     <nav>
         <button class="hamburger-menu" onclick="toggleMenu()">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
-        </button>
+        </button> 
         <ul class="sidenavbar">
-            <li><a href="#">Dashboard</a></li>
-            <li><a href="#">Sponsors & Teaminfo</a></li>
-            <li><a href="/overlay">Overlay</a></li>
+            <li><a href="">Dashboard</a></li>
+            <li><a href="/teaminfo.html">Sponsors & Teaminfo</a></li>
+            <li><a href="/overlay.html">Overlay</a></li>
         </ul>
     </nav>
 
@@ -107,11 +107,11 @@
                         </div>
                         <div class="stat-item">
                             <label>Uptime:</label>
-                            <span id="uptime-value">00:00:00</span>
+                            <span id="uptime-value" hx-ext="sse" sse-connect="/uptime-sse" sse-swap="message" sse-close="shutdown">00:00:00</span>
                         </div>
                         <button class="button-lock-interface" id="lockInterfaceBtn"><strong>Lock Interface</strong></button>
                     </div>
-                    <div class="watermark">AllLiver/Frogg</div>
+                    <div class="watermark">Froggi</div>
                 </div>
             </div>
         </div>
