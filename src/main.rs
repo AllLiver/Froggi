@@ -5,13 +5,19 @@ use argon2::{
     Argon2,
 };
 use axum::{
-    body::Body, debug_handler, extract::{Path, State}, http::{
+    body::Body,
+    debug_handler,
+    extract::{Path, State},
+    http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
-    }, response::{
+    },
+    response::{
         sse::{Event, KeepAlive},
         Html, IntoResponse, Sse,
-    }, routing::{get, post, put}, Form, Router
+    },
+    routing::{get, post, put},
+    Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
@@ -41,13 +47,15 @@ lazy_static! {
     static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref GAME_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref COUNTDOWN_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    static ref COUNTDOWN_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
 #[derive(Clone)]
 struct AppState {
     home_points: Arc<Mutex<u32>>,
     away_points: Arc<Mutex<u32>>,
-    quarter: Arc<Mutex<u8>>
+    quarter: Arc<Mutex<u8>>,
 }
 
 #[tokio::main]
@@ -56,7 +64,7 @@ async fn main() -> Result<()> {
     let state = AppState {
         home_points: Arc::new(Mutex::new(0)),
         away_points: Arc::new(Mutex::new(0)),
-        quarter: Arc::new(Mutex::new(1))
+        quarter: Arc::new(Mutex::new(1)),
     };
 
     // Validate required files and directories
@@ -94,7 +102,6 @@ async fn main() -> Result<()> {
     }
 
     let app = Router::new()
-
         // Basic routes
         .route("/", get(index_handler))
         .route("/overlay", get(overlay_handler))
@@ -104,20 +111,17 @@ async fn main() -> Result<()> {
         .route("/app.js", get(app_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
-
         // Login routes
         .route("/login", get(login_page_handler))
         .route("/login/", get(login_page_handler))
         .route("/login", post(login_handler))
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
-        
         // Point routes
         .route("/home-points/update/:a", post(home_points_update_handler))
         .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
         .route("/away-points/sse", get(away_points_sse_handler))
-
         // Game clock routes
         .route("/game-clock/sse/:o", get(game_clock_sse_handler))
         .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
@@ -126,12 +130,21 @@ async fn main() -> Result<()> {
             "/game-clock/update/:mins/:secs",
             post(game_clock_update_handler),
         )
-
+        // Countdown clock routes
+        .route("/countdown-clock/sse/:o", get(countdown_clock_sse_handler))
+        .route("/countdown-clock/ctl/:o", post(countdown_clock_ctl_handler))
+        .route(
+            "/countdown-clock/set/:mins",
+            post(countdown_clock_set_handler),
+        )
+        .route(
+            "/countdown-clock/update/:mins/:secs",
+            post(countdown_clock_update_handler),
+        )
         // Quarter routes
         .route("/quarter/sse", get(quarter_sse_handler))
         .route("/quarter/set/:q", post(quarter_set_handler))
         .route("/quarter/update/:a", post(quarter_update_handler))
-
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -144,6 +157,7 @@ async fn main() -> Result<()> {
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
         tokio::spawn(uptime_ticker());
         tokio::spawn(game_clock_ticker());
+        tokio::spawn(countdown_clock_ticker());
         println!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
@@ -664,7 +678,7 @@ async fn game_clock_ticker() {
     loop {
         let call_time = Instant::now();
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        
+
         if *GAME_CLOCK_START.lock().await {
             *GAME_CLOCK.lock().await -= (Instant::now() - call_time).as_secs() as usize;
         }
@@ -696,7 +710,6 @@ async fn game_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl I
 async fn game_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
     if verify_auth(jar).await {
         *GAME_CLOCK.lock().await = mins * 60;
-
 
         return Response::builder()
             .status(StatusCode::OK)
@@ -769,35 +782,155 @@ async fn game_clock_sse_handler(
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
-// endregion: time
-// region: quarters
+async fn countdown_clock_ticker() {
+    loop {
+        let call_time = Instant::now();
+        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
 
-async fn quarter_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let quarter_mutex = Arc::clone(&state.quarter);
+        if *COUNTDOWN_CLOCK_START.lock().await {
+            *COUNTDOWN_CLOCK.lock().await -= (Instant::now() - call_time).as_secs() as usize;
+        }
+    }
+}
+
+async fn countdown_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
+
+        if a == "start" {
+            *countdown_clock_start = true;
+        } else if a == "stop" {
+            *countdown_clock_start = false;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn countdown_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        *COUNTDOWN_CLOCK.lock().await = mins * 60;
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn countdown_clock_update_handler(
+    jar: CookieJar,
+    Path((mins, secs)): Path<(isize, isize)>,
+) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut coundown_clock = COUNTDOWN_CLOCK.lock().await;
+        let time_diff = mins * 60 + secs;
+
+        if *coundown_clock as isize + time_diff >= 0 {
+            *coundown_clock = (*coundown_clock as isize + time_diff) as usize;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn countdown_clock_sse_handler(
+    Path(o): Path<String>,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let countdown_clock_mutex = Arc::clone(&COUNTDOWN_CLOCK);
     let shutdown_state = Arc::clone(&SHUTDOWN);
 
-    let stream = stream::unfold((quarter_mutex, shutdown_state), |(quarter_mutex, shutdown_state)| async {
-        let shutdown = *shutdown_state.read().await;
-        let quarter = *quarter_mutex.lock().await;
+    let stream = stream::unfold(
+        (countdown_clock_mutex, shutdown_state, o),
+        |(countdown_clock_mutex, shutdown_state, o)| async {
+            let shutdown = *shutdown_state.read().await;
+            let countdown_clock = *countdown_clock_mutex.lock().await;
 
-        let event_body = match quarter {
-            1 => "1",
-            2 => "2",
-            3 => "3",
-            4 => "4",
-            _ => "OT"
-        };
+            let mut time_display = String::new();
 
-        let event_type = if shutdown { "shutdown" } else { "message" };
+            if o == "minutes" {
+                time_display = (countdown_clock / 60).to_string();
+            } else if o == "seconds" {
+                time_display = (countdown_clock % 60).to_string();
+            } else if o == "both" {
+                time_display = format!("{}:{}", countdown_clock / 60, countdown_clock % 60);
+            }
 
-        Some((Ok(Event::default().data(event_body).event(event_type)), (quarter_mutex, shutdown_state)))
-    })
+            let event_type = if shutdown { "shutdown" } else { "message" };
+
+            Some((
+                Ok(Event::default().data(time_display).event(event_type)),
+                (countdown_clock_mutex, shutdown_state, o),
+            ))
+        },
+    )
     .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
-async fn quarter_set_handler(jar: CookieJar, Path(q): Path<u8>, State(state): State<AppState>) -> impl IntoResponse {
+// endregion: time
+// region: quarters
+
+async fn quarter_sse_handler(
+    State(state): State<AppState>,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+    let quarter_mutex = Arc::clone(&state.quarter);
+    let shutdown_state = Arc::clone(&SHUTDOWN);
+
+    let stream = stream::unfold(
+        (quarter_mutex, shutdown_state),
+        |(quarter_mutex, shutdown_state)| async {
+            let shutdown = *shutdown_state.read().await;
+            let quarter = *quarter_mutex.lock().await;
+
+            let event_body = match quarter {
+                1 => "1",
+                2 => "2",
+                3 => "3",
+                4 => "4",
+                _ => "OT",
+            };
+
+            let event_type = if shutdown { "shutdown" } else { "message" };
+
+            Some((
+                Ok(Event::default().data(event_body).event(event_type)),
+                (quarter_mutex, shutdown_state),
+            ))
+        },
+    )
+    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
+
+    Sse::new(stream).keep_alive(KeepAlive::default())
+}
+
+async fn quarter_set_handler(
+    jar: CookieJar,
+    Path(q): Path<u8>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         *state.quarter.lock().await = q;
 
@@ -813,10 +946,14 @@ async fn quarter_set_handler(jar: CookieJar, Path(q): Path<u8>, State(state): St
     }
 }
 
-async fn quarter_update_handler(jar: CookieJar, State(state): State<AppState>, Path(a): Path<i8>) -> impl IntoResponse {
+async fn quarter_update_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(a): Path<i8>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut quarter = state.quarter.lock().await;
-        
+
         if *quarter as i8 + a >= 1 && *quarter as i8 + a <= 5 {
             *quarter = (*quarter as i8 + a) as u8;
         }
