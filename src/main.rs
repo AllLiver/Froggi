@@ -615,7 +615,7 @@ async fn shutdown_signal() {
 
     #[cfg(not(unix))]
     let terminate = async {
-        let _ = std::future::pending::<()>();
+        let _ = std::future::pending::<()>().await;
         let mut shutdown = SHUTDOWN.write().await;
         *shutdown = true;
     };
