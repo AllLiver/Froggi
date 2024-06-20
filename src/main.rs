@@ -122,7 +122,7 @@ async fn main() -> Result<()> {
         panic!("Could not bind tcp listener!");
     }
 
-    
+    println!("Shut down gracefully");
 
     Ok(())
 }
