@@ -11,7 +11,10 @@ use axum::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
     },
-    response::{sse::{Event, KeepAlive}, Html, IntoResponse, Sse},
+    response::{
+        sse::{Event, KeepAlive},
+        Html, IntoResponse, Sse,
+    },
     routing::{get, post, put},
     Form, Router,
 };
@@ -29,17 +32,17 @@ use tokio::{
     signal,
     sync::{Mutex, RwLock},
 };
-use tokio_stream::StreamExt as _ ;
+use tokio_stream::StreamExt as _;
 use uuid::Uuid;
 
-lazy_static!(
+lazy_static! {
     static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
-);
+}
 
 #[derive(Clone)]
 struct AppState {
     home_points: Arc<Mutex<u32>>,
-    away_points: Arc<Mutex<u32>>
+    away_points: Arc<Mutex<u32>>,
 }
 
 #[tokio::main]
@@ -47,7 +50,7 @@ async fn main() -> Result<()> {
     // Initialize the application state
     let state = AppState {
         home_points: Arc::new(Mutex::new(0)),
-        away_points: Arc::new(Mutex::new(0))
+        away_points: Arc::new(Mutex::new(0)),
     };
 
     // Validate required files and directories
@@ -101,7 +104,10 @@ async fn main() -> Result<()> {
         .route("/home-points/sse", get(home_points_sse_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
         .route("/away-points/sse", get(away_points_sse_handler))
-        .route("/version", put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }))
+        .route(
+            "/version",
+            put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
+        )
         .with_state(state)
         .fallback(get(not_found_handler));
 
@@ -146,13 +152,13 @@ async fn overlay_handler() -> impl IntoResponse {
         return Response::builder()
             .status(StatusCode::OK)
             .body(String::from(include_str!("./html/overlay.html")))
-            .unwrap()
+            .unwrap();
     } else {
         return Response::builder()
             .status(StatusCode::SEE_OTHER)
             .header(LOCATION, HeaderValue::from_static("/login/create"))
             .body(String::new())
-            .unwrap()
+            .unwrap();
     }
 }
 
@@ -537,7 +543,9 @@ async fn away_points_update_handler(
     }
 }
 
-async fn home_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+async fn home_points_sse_handler(
+    State(state): State<AppState>,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let state = Arc::clone(&state.home_points);
     let shutdown_state = Arc::clone(&SHUTDOWN);
 
@@ -547,14 +555,19 @@ async fn home_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stre
 
         let event_type = if shutdown { "shutdown" } else { "message" };
 
-        Some((Ok(Event::default().data(team_points).event(event_type)), (state, shutdown_state)))
+        Some((
+            Ok(Event::default().data(team_points).event(event_type)),
+            (state, shutdown_state),
+        ))
     })
     .throttle(tokio::time::Duration::from_millis(5));
 
     Sse::new(stream).keep_alive(KeepAlive::default())
 }
 
-async fn away_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
+async fn away_points_sse_handler(
+    State(state): State<AppState>,
+) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
     let state = Arc::clone(&state.away_points);
     let shutdown_state = Arc::clone(&SHUTDOWN);
 
@@ -564,7 +577,10 @@ async fn away_points_sse_handler(State(state): State<AppState>) -> Sse<impl Stre
 
         let event_type = if shutdown { "shutdown" } else { "message" };
 
-        Some((Ok(Event::default().data(team_points).event(event_type)), (state, shutdown_state)))
+        Some((
+            Ok(Event::default().data(team_points).event(event_type)),
+            (state, shutdown_state),
+        ))
     })
     .throttle(tokio::time::Duration::from_millis(5));
 
@@ -596,8 +612,8 @@ async fn shutdown_signal() {
     };
 
     #[cfg(not(unix))]
-    let terminate = async { 
-        std::future::pending::<()>();
+    let terminate = async {
+        let _ = std::future::pending::<()>();
         let mut shutdown = SHUTDOWN.write().await;
         *shutdown = true;
     };
