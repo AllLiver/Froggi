@@ -97,6 +97,7 @@ async fn main() -> Result<()> {
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
         .route("/login", get(login_page_handler))
+        .route("/login/", get(login_page_handler))
         .route("/login", post(login_handler))
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
