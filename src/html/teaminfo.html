@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <title>Teaminfo & Sponsors</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
+        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
+    <script src="/htmx.js"></script>
+    <script src="/sse.js"></script>
+    <link rel="icon" href="/favicon.png">
+    <style>
+        /* Teaminfo, sponsors, teampresets styles */
+        .teaminfo-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 1.85vh;
+            margin-top: 4.63vh;
+        }
+
+        .teaminfo-rectangle,
+        .sponsor-rectangle,
+        .teaminfo-presets-rectangle {
+            background-color: #1d1e22;
+            border-radius: 10px;
+            padding: 1.04vw;
+            margin: 1.04vw;
+            width: calc(33% - 2.08vw);
+            box-sizing: border-box;
+        }
+
+        .teaminfo-title,
+        .sponsor-rectangle h1,
+        .teaminfo-presets-rectangle h2 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin: 10px 0 5px;
+        }
+
+        form input[type="text"],
+        form input[type="file"],
+        form input[type="color"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+
+        form input[type="color"] {
+            width: 100%;
+            margin-bottom: 0.93vh;
+            outline: 3px solid white;
+        }
+
+        .submit-button {
+            background-color: #27a644;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        form#homeinfo label[for="home-name"],
+        form#homeinfo label[for="home-logo"] {
+            color: #007BFF;
+        }
+
+        form#awayinfo label[for="away-name"],
+        form#awayinfo label[for="away-logo"] {
+            color: #ff8601;
+        }
+
+        .logo-previews {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .logo-previews img {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .teaminfo-rectangle,
+            .sponsor-rectangle,
+            .teaminfo-presets-rectangle {
+                width: calc(100% - 2.08vw);
+            }
+        }
+
+        .nav-active {
+            border: none;
+  outline: none;
+  background-color: #919191;
+  cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <button class="hamburger-menu" onclick="toggleMenu()">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </button>
+        <ul class="sidenavbar">
+            <li><a href="/index">Dashboard</a></li>
+            <li><a href="/teaminfo.html" class="nav-active">Sponsors & Teaminfo</a></li>
+            <li><a href="/overlay">Overlay</a></li>
+        </ul>
+    </nav>
+    <div class="teaminfo-container">
+        <div class="teaminfo-rectangle">
+            <h2 class="teaminfo-title">Score</h2>
+            <form id="homeinfo" hx-post="/submit_homeinfo" hx-target=".logo-previews" hx-swap="innerHTML">
+                <label for="home-name">Home Name</label>
+                <input type="text" id="home-name" name="home-name" required maxlength="25">
+                <label for="home-logo">Home Logo</label>
+                <input type="file" id="home-logo" name="home-logo" accept="image/*" required>
+                <label for="home-color">Main Jersey Color</label>
+                <input type="color" id="home-color" name="home-color">
+                <input type="submit" value="Submit" class="submit-button" hx-post="/submit_homeinfo" hx-swap="none">
+            </form>
+            <form id="awayinfo" hx-post="/submit_awayinfo" hx-target=".logo-previews" hx-swap="innerHTML">
+                <label for="away-name">Away Name</label>
+                <input type="text" id="away-name" name="away-name" required maxlength="25">
+                <label for="away-logo">Away Logo</label>
+                <input type="file" id="away-logo" name="away-logo" accept="image/*" required>
+                <label for="away-color">Main Jersey Color</label>
+                <input type="color" id="away-color" name="away-color">
+                <input type="submit" value="Submit" class="submit-button" hx-post="/submit_awayinfo" hx-swap="none">
+            </form>
+            <div class="logo-previews">
+                <img id="home-logo-preview" alt="Home Logo Preview">
+                <img id="away-logo-preview" alt="Away Logo Preview">
+            </div>
+        </div>
+        <div class="sponsor-rectangle">
+            <h1>Sponsors</h1>
+            <form id="sponsor-form" hx-post="/submit_sponsor" hx-target=".sponsor-rectangle" hx-swap="innerHTML">
+                <label for="sponsorname">Sponsor Season & Sport</label>
+                <input type="text" id="sponsorname" name="sponsorname" required>
+                <label for="sponsorlogo">Sponsor's Logo (select multiple)</label>
+                <input type="file" id="sponsorlogo" name="sponsorlogo" accept="image/png, image/jpeg" multiple required>
+                <input type="submit" value="Submit" class="submit-button" hx-post="/submit_sponsor" hx-swap="none">
+            </form>
+        </div>
+        <div class="teaminfo-presets-rectangle">
+            <h2>Team Presets</h2>
+            <div class="team-selector" hx-get="/team_selectors" hx-trigger="load"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const navbar = document.querySelector('.sidenavbar');
+            navbar.classList.toggle('active');
+        }
+
+        document.getElementById('home-logo').addEventListener('change', function (event) {
+            processImage(event, 'home-logo-preview');
+        });
+        document.getElementById('away-logo').addEventListener('change', function (event) {
+            processImage(event, 'away-logo-preview');
+        });
+
+        function processImage(event, previewElementId) {
+            if (event.target.files && event.target.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    var img = new Image();
+                    img.onload = function () {
+                        var canvas = document.createElement('canvas');
+                        var ctx = canvas.getContext('2d');
+                        canvas.width = 50;
+                        canvas.height = 50;
+                        ctx.drawImage(img, 0, 0, 50, 50);
+
+                        var previewImg = document.getElementById(previewElementId);
+                        previewImg.src = canvas.toDataURL();
+                        previewImg.style.display = 'block';
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.sidenavbar a');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

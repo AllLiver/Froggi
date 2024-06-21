@@ -5,7 +5,7 @@ body {
     font-family: "franklin-gothic-atf", sans-serif;
     font-weight: 500;
     font-style: normal;
-    font-size: 16px;
+    font-size: 0.83vw;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -281,7 +281,6 @@ body {
     text-align: center;
 }
 
- 
 /* Net stats container */
 
 .button-lock-interface {
@@ -294,9 +293,9 @@ body {
     border-radius: 5px;
     margin-right: 2.08vw; 
     margin-left: 0.5w;
-        z-index: 20;
-        position: relative; 
-        pointer-events: auto;
+    z-index: 20;
+    position: relative; 
+    pointer-events: auto;
     width: 7vw;
     height: auto; 
 }
@@ -414,7 +413,6 @@ pointer-events: auto;
     transform: translateY(-8px) rotate(-45deg);
 }
 
-/* Side navigation bar */
 .sidenavbar {
     position: fixed;
     top: 0;
@@ -468,6 +466,13 @@ pointer-events: auto;
     color: #fff; 
     cursor: pointer;
     font-size: 2.22vh;
+}
+
+.nav-active {
+    border: none;
+    outline: none;
+    background-color: #919191;
+    cursor: pointer;
 }
 
 /* Columns */
@@ -738,6 +743,11 @@ pointer-events: auto;
     .off-screen-menu {
         width: 10.42vw;
     }
+    .teaminfo-rectangle,
+    .sponsor-rectangle,
+    .teaminfo-presets-rectangle {
+        width: calc(100% - 2.08vw);
+    }
 }
 
 @media only screen and (min-device-width: 768px) and (max-device-width: 102.22vh) and (orientation: landscape) { 
@@ -798,7 +808,7 @@ pointer-events: auto;
 .flag-home:hover, .flag-away:hover,
 .show-countdown:hover,
 .button-lock-interface:hover,
-.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover {
+.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover, .submit-button:hover {
     transform: scale(1.01); 
 }
 
@@ -971,3 +981,90 @@ pointer-events: auto;
 
 
         /*& Overlay.html styles */
+
+        /* Teaminfo, sponsors, teampresets styles */
+        .teaminfo-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            padding: 1.85vh;
+            margin-top: 4.63vh;
+        }
+
+        .teaminfo-rectangle,
+        .sponsor-rectangle,
+        .teaminfo-presets-rectangle {
+            background-color: #1d1e22;
+            border-radius: 10px;
+            padding: 1.04vw;
+            margin: 1.04vw;
+            width: calc(33% - 2.08vw);
+            box-sizing: border-box;
+        }
+
+        .teaminfo-title,
+        .sponsor-rectangle h1,
+        .teaminfo-presets-rectangle h2 {
+            text-align: center;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form label {
+            margin: 10px 0 5px;
+        }
+
+        form input[type="text"],
+        form input[type="file"],
+        form input[type="color"] {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #fff;
+            color: #000;
+        }
+
+        form input[type="color"] {
+            width: 100%;
+            margin-bottom: 0.93vh;
+            outline: 3px solid white;
+        }
+
+        .submit-button {
+            background-color: #27a644;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+        }
+
+        form#homeinfo label[for="home-name"],
+        form#homeinfo label[for="home-logo"],
+        form label[for="home-color"] {
+            color: #007BFF;
+        }
+
+        form#awayinfo label[for="away-name"],
+        form#awayinfo label[for="away-logo"],
+        form label[for="away-color"] {
+            color: #ff8601;
+        }
+
+        .logo-previews {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+
+        .logo-previews img {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 1px solid #fff;
+            border-radius: 5px;
+        }
