@@ -609,11 +609,14 @@ async fn game_clock_ticker() {
         let call_time = Instant::now();
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
         let mut game_clock = GAME_CLOCK.lock().await;
+        let mut game_clock_start = GAME_CLOCK_START.lock().await;
 
-        if *GAME_CLOCK_START.lock().await {
+        if *game_clock_start {
             let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
             if *game_clock as isize + time_diff >= 0 {
                 *game_clock = (*game_clock as isize + time_diff) as usize;
+            } else {
+                *game_clock_start = false;
             }
         }
     }
@@ -662,6 +665,7 @@ async fn game_clock_update_handler(
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
     if verify_auth(jar).await {
+
         let mut game_clock = GAME_CLOCK.lock().await;
         let time_diff = mins * 60 + secs;
 
@@ -700,9 +704,16 @@ async fn countdown_clock_ticker() {
     loop {
         let call_time = Instant::now();
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
+        let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
 
-        if *COUNTDOWN_CLOCK_START.lock().await {
-            *COUNTDOWN_CLOCK.lock().await -= (Instant::now() - call_time).as_secs() as usize;
+        if *countdown_clock_start {
+            let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
+            if *countdown_clock as isize + time_diff >= 0 {
+                *countdown_clock = (*countdown_clock as isize + time_diff) as usize;
+            } else {
+                *countdown_clock_start = false;
+            }
         }
     }
 }
