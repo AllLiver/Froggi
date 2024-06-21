@@ -217,7 +217,7 @@
 <script>
     function testLatency() {
         var startTime = Date.now();
-        fetch(window.location.href) // Fetch data from the same location
+        fetch(window.location.href) 
             .then(function(response) {
                 var endTime = Date.now();
                 var latency = endTime - startTime;
@@ -233,6 +233,6 @@
         setTimeout(updatePing, 1000); // Update ping value every 1 second
     }
 
-    updatePing(); // Start the ping update process
+    updatePing(); 
     </script>
 </html>
