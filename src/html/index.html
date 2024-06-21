@@ -221,7 +221,7 @@
             .then(function(response) {
                 var endTime = Date.now();
                 var latency = endTime - startTime;
-                document.getElementById('ping-value').textContent = 'Ping: ' + latency + ' ms';
+                document.getElementById('ping-value').textContent = latency + ' ms';
             })
             .catch(function(err) {
                 console.error('Error fetching data:', err);
