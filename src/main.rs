@@ -13,21 +13,18 @@ use axum::{
         HeaderName, HeaderValue, Response, StatusCode,
     },
     response::{
-        sse::{Event, KeepAlive},
-        Html, IntoResponse, Sse,
+        Html, IntoResponse,
     },
     routing::{get, post, put},
     Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
-use futures_util::{stream, Stream};
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use lazy_static::lazy_static;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 use std::{
-    convert::Infallible,
     sync::Arc,
     time::{Instant, UNIX_EPOCH},
 };
@@ -37,10 +34,7 @@ use tokio::{
     signal,
     sync::{Mutex, RwLock},
 };
-use tokio_stream::StreamExt as _;
 use uuid::Uuid;
-
-const SSE_THROTTLE_MILLIS: u64 = 5;
 
 lazy_static! {
     static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
@@ -107,7 +101,6 @@ async fn main() -> Result<()> {
         .route("/overlay", get(overlay_handler))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
-        .route("/sse.js", get(sse_js_handler))
         .route("/app.js", get(app_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
@@ -119,11 +112,11 @@ async fn main() -> Result<()> {
         .route("/login/create", post(create_login_handler))
         // Point routes
         .route("/home-points/update/:a", post(home_points_update_handler))
-        .route("/home-points/sse", get(home_points_sse_handler))
+        .route("/home-points/display", put(home_points_display_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
-        .route("/away-points/sse", get(away_points_sse_handler))
+        .route("/away-points/display", put(away_points_display_handler))
         // Game clock routes
-        .route("/game-clock/sse/:o", get(game_clock_sse_handler))
+        .route("/game-clock/display/:o", put(game_clock_display_handler))
         .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
         .route("/game-clock/set/:mins", post(game_clock_set_handler))
         .route(
@@ -131,7 +124,7 @@ async fn main() -> Result<()> {
             post(game_clock_update_handler),
         )
         // Countdown clock routes
-        .route("/countdown-clock/sse/:o", get(countdown_clock_sse_handler))
+        .route("/countdown-clock/display/:o", put(countdown_clock_display_handler))
         .route("/countdown-clock/ctl/:o", post(countdown_clock_ctl_handler))
         .route(
             "/countdown-clock/set/:mins",
@@ -142,7 +135,7 @@ async fn main() -> Result<()> {
             post(countdown_clock_update_handler),
         )
         // Quarter routes
-        .route("/quarter/sse", get(quarter_sse_handler))
+        .route("/quarter/display", put(quarter_display_handler))
         .route("/quarter/set/:q", post(quarter_set_handler))
         .route("/quarter/update/:a", post(quarter_update_handler))
         // Information routes, state, and fallback
@@ -150,7 +143,7 @@ async fn main() -> Result<()> {
             "/version",
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
         )
-        .route("/uptime-sse", get(uptime_sse_handler))
+        .route("/uptime-display", put(uptime_display_handler))
         .with_state(state)
         .fallback(get(not_found_handler));
 
@@ -233,14 +226,6 @@ async fn htmx_js_handler() -> impl IntoResponse {
         .status(StatusCode::OK)
         .header(CONTENT_TYPE, "application/javascript")
         .body(String::from(include_str!("./html/js/htmx.js")))
-        .unwrap()
-}
-
-async fn sse_js_handler() -> impl IntoResponse {
-    Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, "application/javascript")
-        .body(String::from(include_str!("./html/js/sse.js")))
         .unwrap()
 }
 
@@ -591,48 +576,12 @@ async fn away_points_update_handler(
     }
 }
 
-async fn home_points_sse_handler(
-    State(state): State<AppState>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let state = Arc::clone(&state.home_points);
-    let shutdown_state = Arc::clone(&SHUTDOWN);
-
-    let stream = stream::unfold((state, shutdown_state), |(state, shutdown_state)| async {
-        let team_points = state.lock().await.clone().to_string();
-        let shutdown = *shutdown_state.read().await;
-
-        let event_type = if shutdown { "shutdown" } else { "message" };
-
-        Some((
-            Ok(Event::default().data(team_points).event(event_type)),
-            (state, shutdown_state),
-        ))
-    })
-    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
-
-    Sse::new(stream).keep_alive(KeepAlive::default())
+async fn home_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
+    Html::from(state.home_points.lock().await.to_string())
 }
 
-async fn away_points_sse_handler(
-    State(state): State<AppState>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let state = Arc::clone(&state.away_points);
-    let shutdown_state = Arc::clone(&SHUTDOWN);
-
-    let stream = stream::unfold((state, shutdown_state), |(state, shutdown_state)| async {
-        let team_points = state.lock().await.clone().to_string();
-        let shutdown = *shutdown_state.read().await;
-
-        let event_type = if shutdown { "shutdown" } else { "message" };
-
-        Some((
-            Ok(Event::default().data(team_points).event(event_type)),
-            (state, shutdown_state),
-        ))
-    })
-    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
-
-    Sse::new(stream).keep_alive(KeepAlive::default())
+async fn away_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
+    Html::from(state.away_points.lock().await.to_string())
 }
 
 // endregion: team routing
@@ -649,38 +598,23 @@ async fn uptime_ticker() {
     }
 }
 
-async fn uptime_sse_handler() -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let uptime_mutex = Arc::clone(&UPTIME_SECS);
-    let shutdown_state = Arc::clone(&SHUTDOWN);
+async fn uptime_display_handler() -> impl IntoResponse {
+    let uptime = UPTIME_SECS.lock().await;
 
-    let stream = stream::unfold(
-        (uptime_mutex, shutdown_state),
-        |(uptime_mutex, shutdown_state)| async {
-            let shutdown = *shutdown_state.read().await;
-            let uptime = *uptime_mutex.lock().await;
-
-            let time_string = format!("{}:{}:{}", uptime / 3600, (uptime % 3600) / 60, uptime % 60);
-
-            let event_type = if shutdown { "shutdown" } else { "message" };
-
-            Some((
-                Ok(Event::default().data(time_string).event(event_type)),
-                (uptime_mutex, shutdown_state),
-            ))
-        },
-    )
-    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
-
-    Sse::new(stream).keep_alive(KeepAlive::default())
+    Html::from(format!("{}:{}:{}", *uptime / 3600, (*uptime % 3600) / 60, *uptime % 60))
 }
 
 async fn game_clock_ticker() {
     loop {
         let call_time = Instant::now();
         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        let mut game_clock = GAME_CLOCK.lock().await;
 
         if *GAME_CLOCK_START.lock().await {
-            *GAME_CLOCK.lock().await -= (Instant::now() - call_time).as_secs() as usize;
+            let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
+            if *game_clock as isize + time_diff >= 0 {
+                *game_clock = (*game_clock as isize + time_diff) as usize;
+            }
         }
     }
 }
@@ -728,6 +662,7 @@ async fn game_clock_update_handler(
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
     if verify_auth(jar).await {
+        println!("test");
         let mut game_clock = GAME_CLOCK.lock().await;
         let time_diff = mins * 60 + secs;
 
@@ -747,39 +682,19 @@ async fn game_clock_update_handler(
     }
 }
 
-async fn game_clock_sse_handler(
-    Path(o): Path<String>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let game_clock_mutex = Arc::clone(&GAME_CLOCK);
-    let shutdown_state = Arc::clone(&SHUTDOWN);
+async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse {
+    let game_clock = GAME_CLOCK.lock().await;
+    let mut time_display = String::new();
 
-    let stream = stream::unfold(
-        (game_clock_mutex, shutdown_state, o),
-        |(game_clock_mutex, shutdown_state, o)| async {
-            let shutdown = *shutdown_state.read().await;
-            let game_clock = *game_clock_mutex.lock().await;
+    if o == "minutes" {
+        time_display = (*game_clock / 60).to_string();
+    } else if o == "seconds" {
+        time_display = (*game_clock % 60).to_string();
+    } else if o == "both" {
+        time_display = format!("{}:{}", *game_clock / 60, *game_clock % 60);
+    }
 
-            let mut time_display = String::new();
-
-            if o == "minutes" {
-                time_display = (game_clock / 60).to_string();
-            } else if o == "seconds" {
-                time_display = (game_clock % 60).to_string();
-            } else if o == "both" {
-                time_display = format!("{}:{}", game_clock / 60, game_clock % 60);
-            }
-
-            let event_type = if shutdown { "shutdown" } else { "message" };
-
-            Some((
-                Ok(Event::default().data(time_display).event(event_type)),
-                (game_clock_mutex, shutdown_state, o),
-            ))
-        },
-    )
-    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
-
-    Sse::new(stream).keep_alive(KeepAlive::default())
+    Html::from(time_display)
 }
 
 async fn countdown_clock_ticker() {
@@ -855,75 +770,38 @@ async fn countdown_clock_update_handler(
     }
 }
 
-async fn countdown_clock_sse_handler(
-    Path(o): Path<String>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let countdown_clock_mutex = Arc::clone(&COUNTDOWN_CLOCK);
-    let shutdown_state = Arc::clone(&SHUTDOWN);
 
-    let stream = stream::unfold(
-        (countdown_clock_mutex, shutdown_state, o),
-        |(countdown_clock_mutex, shutdown_state, o)| async {
-            let shutdown = *shutdown_state.read().await;
-            let countdown_clock = *countdown_clock_mutex.lock().await;
 
-            let mut time_display = String::new();
+async fn countdown_clock_display_handler(Path(o): Path<String>,) -> impl IntoResponse {
+    let countdown_clock = COUNTDOWN_CLOCK.lock().await;
+    let mut time_display = String::new();
 
-            if o == "minutes" {
-                time_display = (countdown_clock / 60).to_string();
-            } else if o == "seconds" {
-                time_display = (countdown_clock % 60).to_string();
-            } else if o == "both" {
-                time_display = format!("{}:{}", countdown_clock / 60, countdown_clock % 60);
-            }
+    if o == "minutes" {
+        time_display = (*countdown_clock / 60).to_string();
+    } else if o == "seconds" {
+        time_display = (*countdown_clock % 60).to_string();
+    } else if o == "both" {
+        time_display = format!("{}:{}", *countdown_clock / 60, *countdown_clock % 60);
+    }
 
-            let event_type = if shutdown { "shutdown" } else { "message" };
-
-            Some((
-                Ok(Event::default().data(time_display).event(event_type)),
-                (countdown_clock_mutex, shutdown_state, o),
-            ))
-        },
-    )
-    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
-
-    Sse::new(stream).keep_alive(KeepAlive::default())
+    return Html::from(time_display)
 }
 
 // endregion: time
 // region: quarters
 
-async fn quarter_sse_handler(
-    State(state): State<AppState>,
-) -> Sse<impl Stream<Item = Result<Event, Infallible>>> {
-    let quarter_mutex = Arc::clone(&state.quarter);
-    let shutdown_state = Arc::clone(&SHUTDOWN);
+async fn quarter_display_handler(State(state): State<AppState>) -> impl IntoResponse {
+    let quarter = state.quarter.lock().await;
 
-    let stream = stream::unfold(
-        (quarter_mutex, shutdown_state),
-        |(quarter_mutex, shutdown_state)| async {
-            let shutdown = *shutdown_state.read().await;
-            let quarter = *quarter_mutex.lock().await;
+    let event_body = match *quarter {
+        1 => "1",
+        2 => "2",
+        3 => "3",
+        4 => "4",
+        _ => "OT",
+    };
 
-            let event_body = match quarter {
-                1 => "1",
-                2 => "2",
-                3 => "3",
-                4 => "4",
-                _ => "OT",
-            };
-
-            let event_type = if shutdown { "shutdown" } else { "message" };
-
-            Some((
-                Ok(Event::default().data(event_body).event(event_type)),
-                (quarter_mutex, shutdown_state),
-            ))
-        },
-    )
-    .throttle(tokio::time::Duration::from_millis(SSE_THROTTLE_MILLIS));
-
-    Sse::new(stream).keep_alive(KeepAlive::default())
+    Html::from(event_body)
 }
 
 async fn quarter_set_handler(

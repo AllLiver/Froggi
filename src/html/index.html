@@ -43,7 +43,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-home" hx-post="/countdown-clock/update/-1/0" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="countdown-counter-minutes" class="countdown" hx-ext="sse" sse-connect="/countdown-clock/sse/minutes" sse-swap="message" sse-close="shutdown">0</div>
+                                <div id="countdown-counter-minutes" class="countdown" hx-put="/home-points/display" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Home</div>
                             </div>
                             <button class="button-increment-home" hx-post="/home-points/update/1" hx-swap="none">+</button>
@@ -57,7 +57,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-away" hx-post="/away-points/update/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="away-counter" class="counter-value" hx-ext="sse" sse-connect="/away-points/sse" sse-swap="message" sse-close="shutdown">0</div>
+                                <div id="away-counter" class="counter-value" hx-put="/away-points/display" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Away</div>
                             </div>
                             <button class="button-increment-away" hx-post="/away-points/update/1" hx-swap="none">+</button>
@@ -105,7 +105,7 @@
                         </div>
                         <div class="stat-item">
                             <label>Uptime:</label>
-                            <span id="uptime-value" hx-ext="sse" sse-connect="/uptime-sse" sse-swap="message" sse-close="shutdown">00:00:00</span>
+                            <span id="uptime-value" hx-put="/uptime-display" hx-trigger="every 100ms">00:00:00</span>
                         </div>
                         <button class="button-lock-interface" id="lockInterfaceBtn"><strong>Lock Interface</strong></button>
                     </div>
@@ -122,7 +122,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-countdown" hx-post="/countdown-clock/update/-1/0" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="countdown-counter-minutes" class="countdown" hx-ext="sse" sse-connect="/countdown-clock/sse/minutes" sse-swap="message" sse-close="shutdown">0</div>
+                                <div id="countdown-counter-minutes" class="countdown" hx-put="/countdown-clock/display/minutes" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Minutes</div>
                             </div>
                             <button class="button-increment-countdown" hx-post="/countdown-clock/update/1/0" hx-swap="none">+</button>
@@ -131,7 +131,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-countdown" hx-post="/countdown-clock/update/0/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="countdown-counter-seconds" class="countdown" hx-ext="sse" sse-connect="/countdown-clock/sse/seconds" sse-swap="message" sse-close="shutdown">0</div>
+                                <div id="countdown-counter-seconds" class="countdown" hx-put="/countdown-clock/display/seconds" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Seconds</div>
                             </div>
                             <button class="button-increment-countdown" hx-post="/countdown-clock/update/0/1" hx-swap="none">+</button>
@@ -159,7 +159,7 @@
                     <div class="counter-container">
                         <button class="button-decrement-quarter" hx-post="/quarter/update/-1" hx-swap="none">-</button>
                         <div class="counter">
-                            <div id="quarter-counter" class="counter-value" hx-ext="sse" sse-connect="/quarter/sse" sse-swap="message" sse-close="shutdown">1</div>
+                            <div id="quarter-counter" class="counter-value" hx-put="/quarter/display" hx-trigger="every 100ms">1</div>
                             <div class="counter-subtext">Quarter</div>
                         </div>
                         <button class="button-increment-quarter" hx-post="/quarter/update/1" hx-swap="none">+</button>
@@ -179,7 +179,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="clock-counter-minutes" class="countdown" hx-ext="sse" sse-connect="/game-clock/sse/minutes" sse-swap="message" sse-close="shutdown">0</div>
+                                <div id="clock-counter-minutes" class="countdown" hx-put="/game-clock/display/minutes" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Minutes</div>
                             </div>
                             <button class="button-increment-clock" hx-post="/game-clock/update/1/0" hx-swap="none">+</button>
@@ -188,7 +188,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="clock-counter-seconds" class="countdown" hx-ext="sse" sse-connect="/game-clock/sse/seconds" sse-swap="message" sse-close="shutdown">0</div>
+                                <div id="clock-counter-seconds" class="countdown" hx-put="/game-clock/display/seconds" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Seconds</div>
                             </div>
                             <button class="button-increment-clock" hx-post="/game-clock/update/0/1" hx-swap="none">+</button>
