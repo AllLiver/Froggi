@@ -662,7 +662,6 @@ async fn game_clock_update_handler(
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
     if verify_auth(jar).await {
-        println!("test");
         let mut game_clock = GAME_CLOCK.lock().await;
         let time_diff = mins * 60 + secs;
 
