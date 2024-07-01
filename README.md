@@ -32,13 +32,11 @@ The compiled binary will be in /target/release
 
 # Roadmap
 Froggi is an indev project so change is very likley.
-Here are some features/updates planned
- - More consistent naming in API and frontend code
- - Web accessible logs
- - Team Colors will change the gradients on index
- - Ui popups for team touchdowns, & scoring
- - Integretion with easyOCR
- - Docker support
+Here are some features/updates planned in no particular order
+ - Jersey colors will reflect the color on the overlay
+ - More sports
+ - Integration with ScoreSight
+ - Web acsessible logs
 
 # Tech Stack
  - Rust with Axum in the backend

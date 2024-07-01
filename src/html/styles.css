@@ -150,7 +150,7 @@ body {
 .sponsors-rectangle {
     background-color: #1d1e22;
     width: 35.73vw;
-    height: 6.02vh;
+    height: 9.02vh;
     border-radius: 0.86vw;
     display: flex;
     justify-content: space-between;
@@ -541,7 +541,6 @@ pointer-events: auto;
     color: #000;
 }
 
-
 .countdown-controls, .quick-time-buttons, .quick-down-buttons {
     width: 100%;
     display: flex;
@@ -571,17 +570,22 @@ pointer-events: auto;
     margin: 0.65vh;
 }
 
-.show-countdown, .show-sponsors {
+.show-countdown, .show-sponsors, .show-scoreboard {
     display: flex;
     flex-direction: column;
+    font-size: 1.85vh;
     align-items: center;
+    border: none;
     justify-content: center;
     width: 100%; 
     height: 4vh;
-    background-color: #fff;
-    color: #000;
+    background-color: #27a644;
+    color: #fff;
     border-radius: 10.5px;
+    margin: 0.3vh;
+    cursor: pointer;
 }
+
 
 #countdown-clock-text {
     align-items: center;
@@ -610,6 +614,13 @@ pointer-events: auto;
    /* text-wrap: nowrap; */
 }
 
+.visibility-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
 .quarter-buttons {
     display: flex;
     justify-content: center; 
@@ -627,6 +638,19 @@ pointer-events: auto;
     text-align: center;
 }
 
+/* Preview iFrame */
+
+iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    overflow: hidden;
+}
+
+.preview-iframe {
+    width: 100%; 
+    height: 100%;
+}
 
 /* Responsive design */
 @media (max-width: 102.22vh) {
@@ -700,12 +724,6 @@ pointer-events: auto;
         margin-left: 8px;
     }
 }
-
-
-
-
-
-
 
 @media (max-width: 480px) {
     .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
@@ -808,7 +826,7 @@ pointer-events: auto;
 .flag-home:hover, .flag-away:hover,
 .show-countdown:hover,
 .button-lock-interface:hover,
-.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover, .submit-button:hover {
+.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover, .submit-button:hover, .show-scoreboard:hover {
     transform: scale(1.01); 
 }
 
@@ -982,7 +1000,80 @@ pointer-events: auto;
 
         /*& Overlay.html styles */
 
-        /* Teaminfo, sponsors, teampresets styles */
+        #overlay {
+            background-color: rgb(0, 177, 64);
+            cursor: none;
+            color: black;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding: 0.93vh;
+            height: 100vh;
+        }
+
+        #chromakey {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: rgb(0, 177, 64);
+        }
+
+        .info-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 41.67vw;
+            margin: 0 auto;
+            padding: 10px;
+            box-sizing: border-box;
+            gap: 0.5rem; 
+        }
+
+        .info-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            height: 4vh;
+            padding: 0 1rem;
+            border-radius: 4.5px;
+            font-size: 1em;
+            margin: 0; 
+            flex: 1; 
+        }
+
+        .logo {
+            height: 2.59vh;
+            width: auto;
+            margin-right: 0.26vw;
+        }
+
+        .team-name {
+            flex: 1;
+            text-align: center;
+        }
+
+        .team-score {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .home-box, .away-box {
+            min-width: 9vw;
+        }
+
+        .score-box h3, .down-togo-box h3 {
+            margin: 0;
+        }
+
+        .score-box h3, .down-togo-box h3 {
+            margin: 0;
+            white-space: nowrap; /* Prevent text from wrapping */
+        }
+
+        /*& Teaminfo, sponsors, teampresets styles */
         .teaminfo-container {
             display: flex;
             flex-wrap: wrap;

@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--* Adapted from froggi 1.0's overlay, adding the support for downs-->
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>Overlay</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
@@ -26,131 +25,33 @@
         updateSponsorImage();
     </script>
     <link rel="icon" href="/favicon.png">
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; 
-             background-color: rgb(0, 177, 64);
-        }
-
-        #overlay {
-            background-color: rgb(0, 177, 64);
-            cursor: none;
-            color: black;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end; 
-            padding: 10px;
-            flex: 1; 
-            height: 100vh;
-        }
-
-        .overlay-rectangle-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end; 
-            width: calc(100% - 20px); 
-            max-width: 800px; 
-            margin: 0 auto; 
-            padding: 10px; 
-            box-sizing: border-box; 
-        }
-
-        .overlay-rectangle-home, .overlay-rectangle-away, .overlay-rectangle-quarter,  overlay-rectangle-score, .overlay-rectangle-down-togo {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #fff;
-            height: 3vh; 
-            width: auto; 
-            padding: 0 10px; 
-            border-radius: 3.5px;
-            font-size: 1em;
-            margin: 0.2vw;
-        }
-
-        .logo {
-            height: 28px;
-            width: auto;
-            margin-right: 5px;
-        }
-
-        .team-name {
-            flex: 1;
-            text-align: center;
-        }
-
-        .team-score {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-
-        .overlay-rectangle-quarter {
-            background-color: #fff;
-            height: 3vh; 
-            min-width: 6vw; 
-            padding: 0 10px; 
-            border-radius: 3.5px;
-            font-size: 1em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .overlay-rectangle-quarter {
-            background-color: #fff;
-            height: 3vh; 
-            width: 3vw; 
-            padding: 0 10px; 
-            border-radius: 3.5px;
-            font-size: 1em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .overlay-rectangle-away, .overlay-rectangle-home {
-            background-color: #fff;
-            height: 3vh; 
-            min-width: 9vw; 
-            padding: 0 10px; 
-            border-radius: 3.5px;
-            font-size: 1em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        
-    </style>
+    <!-- Todo: popups (with superman animations as per T's request ), countdown, sponsor, hide overlay-->
 </head>
 
-<body>
+<body id="chromakey">
     <div id="overlay">
-        <div class=" overlay-rectangle-container">
-            <div class=" overlay-rectangle-home">
-                <img class="logo" src="home_png" alt="Home" height="28px" width="auto">
+        <div class="info-container">
+            <div class="info-box home-box">
+                <img class="logo" src="home_png" alt="Home">
                 <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
             </div>
-            <div class=" overlay-rectangle-away">
-                <img class="logo" src="away_png" alt="Away" height="28px" width="auto">
+            <div class="info-box away-box">
+                <img class="logo" src="away_png" alt="Away">
                 <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
             </div>
-            <div class=" overlay-rectangle-quarter">
+            <div class="info-box quarter-box">
                 <div hx-put="/time_and_quarter" hx-trigger="every 10ms">12:00 - 1st</div>
             </div>
-            <div class=" overlay-rectangle-score">
+            <div class="info-box score-box">
                 <h3>12-12</h3>
             </div>
-            <div class=" overlay-rectangle-down-togo">
+            <div class="info-box down-togo-box">
                <h3>1st & 10</h3>
             </div>
         </div>
     </div>
 
-    <!-- Additional sections outside overlay -->
+
     <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div>
     <div id="countdown" hx-put="/countdown_display" hx-trigger="every 10ms"></div>
     <div class="popup-container" id="popupContainer" hx-put="/popup" hx-trigger="every 10ms">
@@ -158,5 +59,4 @@
     </div>
 
 </body>
-
 </html>
