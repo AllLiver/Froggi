@@ -7,7 +7,7 @@ use argon2::{
 use axum::{
     body::Body,
     debug_handler,
-    extract::{Path, State},
+    extract::{Multipart, Path, State},
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
@@ -22,14 +22,13 @@ use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use lazy_static::lazy_static;
-use rand::Rng;
+use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
-    sync::Arc,
-    time::{Instant, UNIX_EPOCH},
+    io::Read, sync::Arc, time::{Instant, UNIX_EPOCH}
 };
 use tokio::{
-    fs::File,
+    fs::{create_dir, create_dir_all, File},
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
     sync::{Mutex, RwLock},
@@ -138,6 +137,9 @@ async fn main() -> Result<()> {
         .route("/quarter/display", put(quarter_display_handler))
         .route("/quarter/set/:q", post(quarter_set_handler))
         .route("/quarter/update/:a", post(quarter_update_handler))
+        // Teaminfo routes
+        .route("/teaminfo", get(teaminfo_handler))
+        .route("/teaminfo/create", post(teaminfo_preset_create_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -178,6 +180,21 @@ async fn index_handler(jar: CookieJar) -> impl IntoResponse {
         return Response::builder()
             .status(StatusCode::OK)
             .body(String::from(include_str!("./html/index.html")))
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header(LOCATION, HeaderValue::from_static("/login"))
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn teaminfo_handler(jar: CookieJar) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::from(include_str!("./html/teaminfo.html")))
             .unwrap();
     } else {
         return Response::builder()
@@ -859,6 +876,87 @@ async fn quarter_update_handler(
 }
 
 // endregion: quarters
+// region: teaminfo
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Teaminfo {
+    home_name: String,
+    home_color: String,
+    away_name: String,
+    away_color: String
+}
+impl Teaminfo {
+    fn new() -> Teaminfo {
+        Teaminfo {
+            home_name: String::new(),
+            home_color: String::new(),
+            away_name: String::new(),
+            away_color: String::new()
+        }
+    }
+}
+
+async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut teaminfo = Teaminfo::new();
+        let id = id_create(12);
+
+        create_dir_all(format!("team-presets/{}", id)).await.expect("Could not create team preset directory");
+
+        while let Some(mut field) = form.next_field().await.expect("Could not get next field of preset create multipart") {
+            match field.name().unwrap() {
+                "home_name" => {
+                    teaminfo.home_name = field.text().await.unwrap();
+                }
+                "home_img" => {
+                    let mut f = File::create(format!("team-presets/{}/home.{}", id, field.file_name().unwrap().to_string().split(".").collect::<Vec<&str>>()[1])).await.expect("Could not create home img");
+
+                    f.write_all(field.bytes().await.unwrap().as_ref()).await.expect("Could not write to home img");
+                }
+                "home_color" => {
+                    teaminfo.home_color = field.text().await.unwrap();
+                }
+                "away_name" => {
+                    teaminfo.away_name = field.text().await.unwrap();
+                }
+                "away_img" => {
+                    let mut f = File::create(format!("team-presets/{}/away.{}", id, field.file_name().unwrap().to_string().split(".").collect::<Vec<&str>>()[1])).await.expect("Could not create away img");
+
+                    f.write_all(field.bytes().await.unwrap().as_ref()).await.expect("Could not write to away img");
+                }
+                "away_color" => {
+                    teaminfo.away_color = field.text().await.unwrap();
+                }
+                _ => {
+
+                }
+            }
+        }
+        
+        let write_json = serde_json::to_string_pretty(&teaminfo).expect("Could not serialize teaminfo");
+
+        let mut f = File::create(format!("team-presets/{}/teams.json", id)).await.expect("Could not create teams.json");
+
+        f.write_all(write_json.as_bytes()).await.expect("Could not write to teams.json");
+    } else {
+
+    }
+}
+
+// endregion: teaminfo
+
+fn id_create(l: u8) -> String {
+    const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
+
+    let mut id = String::new();
+    let base62: Vec<char> = BASE62.chars().collect();
+
+    for _ in 0..l {
+        id.push(base62[thread_rng().gen_range(0..base62.len())])
+    }
+
+    id
+}
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
 async fn shutdown_signal() {

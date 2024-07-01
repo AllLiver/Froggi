@@ -25,94 +25,27 @@
             <li><a href="/overlay">Overlay</a></li>
         </ul>
     </nav>
-    <div class="teaminfo-container">
-        <div class="teaminfo-rectangle">
-            <h2 class="teaminfo-title">Score</h2>
-            <form id="homeinfo" hx-post="/submit_homeinfo" hx-target=".logo-previews" hx-swap="innerHTML">
-                <label for="home-name">Home Name</label>
-                <input type="text" id="home-name" name="home-name" required maxlength="25">
-                <label for="home-logo">Home Logo</label>
-                <input type="file" id="home-logo" name="home-logo" accept="image/*" required>
-                <label for="home-color">Main Jersey Color</label>
-                <input type="color" id="home-color" name="home-color">
-                <input type="submit" value="Submit" class="submit-button" hx-post="/submit_homeinfo" hx-swap="none">
-            </form>
-            <form id="awayinfo" hx-post="/submit_awayinfo" hx-target=".logo-previews" hx-swap="innerHTML">
-                <label for="away-name">Away Name</label>
-                <input type="text" id="away-name" name="away-name" required maxlength="25">
-                <label for="away-logo">Away Logo</label>
-                <input type="file" id="away-logo" name="away-logo" accept="image/*" required>
-                <label for="away-color">Main Jersey Color</label>
-                <input type="color" id="away-color" name="away-color">
-                <input type="submit" value="Submit" class="submit-button" hx-post="/submit_awayinfo" hx-swap="none">
-            </form>
-            <div class="logo-previews">
-                <img id="home-logo-preview" alt="Home Logo Preview">
-                <img id="away-logo-preview" alt="Away Logo Preview">
-            </div>
-        </div>
-        <div class="sponsor-rectangle">
-            <h1>Sponsors</h1>
-            <form id="sponsor-form" hx-post="/submit_sponsor" hx-target=".sponsor-rectangle" hx-swap="innerHTML">
-                <label for="sponsorname">Sponsor Season & Sport</label>
-                <input type="text" id="sponsorname" name="sponsorname" required>
-                <label for="sponsorlogo">Sponsor's Logo (select multiple)</label>
-                <input type="file" id="sponsorlogo" name="sponsorlogo" accept="image/png, image/jpeg" multiple required>
-                <input type="submit" value="Submit" class="submit-button" hx-post="/submit_sponsor" hx-swap="none">
-            </form>
-        </div>
-        <div class="teaminfo-presets-rectangle">
-            <h2>Team Presets</h2>
-            <div class="team-selector" hx-get="/team_selectors" hx-trigger="load"></div>
-        </div>
-    </div>
+    <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data">
+        <label for="home_name">Home name:</label>
+        <input type="text" id="home_name" name="home_name"><br>
 
-    <script>
-        function toggleMenu() {
-            const navbar = document.querySelector('.sidenavbar');
-            navbar.classList.toggle('active');
-        }
+        <label for="home_img">Home icon:</label>
+        <input type="file" id="home_img" name="home_img" accept="image/*"><br>
 
-        document.getElementById('home-logo').addEventListener('change', function (event) {
-            processImage(event, 'home-logo-preview');
-        });
-        document.getElementById('away-logo').addEventListener('change', function (event) {
-            processImage(event, 'away-logo-preview');
-        });
+        <label for="home_color">Home color:</label>
+        <input type="color" id="home_color" name="home_color"><br><br>
 
-        function processImage(event, previewElementId) {
-            if (event.target.files && event.target.files[0]) {
-                var reader = new FileReader();
-                reader.onload = function (e) {
-                    var img = new Image();
-                    img.onload = function () {
-                        var canvas = document.createElement('canvas');
-                        var ctx = canvas.getContext('2d');
-                        canvas.width = 50;
-                        canvas.height = 50;
-                        ctx.drawImage(img, 0, 0, 50, 50);
+        <label for="away_name">Away name:</label>
+        <input type="text" id="away_name" name="away_name"><br>
 
-                        var previewImg = document.getElementById(previewElementId);
-                        previewImg.src = canvas.toDataURL();
-                        previewImg.style.display = 'block';
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(event.target.files[0]);
-            }
-        }
+        <label for="away_img">Away icon:</label>
+        <input type="file" id="away_img" name="away_img" accept="image/*"><br>
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.sidenavbar a');
+        <label for="away_color">Away color:</label>
+        <input type="color" id="away_color" name="away_color"><br><br>
 
-            navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath) {
-                    link.classList.add('active');
-                }
-            });
-        });
-    </script>
+        <input type="submit">
+    </form>
 </body>
 
 </html>
