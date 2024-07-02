@@ -1070,79 +1070,67 @@ iframe {
 
         .score-box h3, .down-togo-box h3 {
             margin: 0;
-            white-space: nowrap; /* Prevent text from wrapping */
+            white-space: nowrap; /* no text wrapping */
         }
 
         /*& Teaminfo, sponsors, teampresets styles */
-        .teaminfo-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-around;
-            padding: 1.85vh;
-            margin-top: 4.63vh;
-        }
-
-        .teaminfo-rectangle,
-        .sponsor-rectangle,
-        .teaminfo-presets-rectangle {
+        form {
             background-color: #1d1e22;
             border-radius: 10px;
-            padding: 1.04vw;
-            margin: 1.04vw;
-            width: calc(33% - 2.08vw);
-            box-sizing: border-box;
-        }
-
-        .teaminfo-title,
-        .sponsor-rectangle h1,
-        .teaminfo-presets-rectangle h2 {
-            text-align: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            margin-top: 40px;
         }
 
         form label {
+            display: block;
             margin: 10px 0 5px;
         }
 
         form input[type="text"],
-        form input[type="file"],
-        form input[type="color"] {
-            padding: 10px;
-            margin-bottom: 10px;
-            border: none;
+        form input[type="file"]
+        {
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #fff;
-            color: #000;
+            box-sizing: border-box;
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 10px;
         }
 
         form input[type="color"] {
             width: 100%;
-            margin-bottom: 0.93vh;
-            outline: 3px solid white;
+            border-radius: 5px;
+            border: 3px;
+            margin-bottom: 10px;
         }
 
-        .submit-button {
+        form input[type="submit"] {
             background-color: #27a644;
-            padding: 10px;
-            margin-bottom: 10px;
             border: none;
             border-radius: 5px;
             color: #fff;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
         }
 
-        form#homeinfo label[for="home-name"],
-        form#homeinfo label[for="home-logo"],
-        form label[for="home-color"] {
+        form input[type="submit"]:hover {
+            background-color: #218a3d;
+        }
+
+        .home-section label,
+        .home-section input[type="text"],
+        .home-section input[type="color"] {
             color: #007BFF;
         }
 
-        form#awayinfo label[for="away-name"],
-        form#awayinfo label[for="away-logo"],
-        form label[for="away-color"] {
+        .away-section label,
+        .away-section input[type="text"],
+        .away-section input[type="color"] {
             color: #ff8601;
         }
 
@@ -1153,9 +1141,9 @@ iframe {
         }
 
         .logo-previews img {
-            display: none;
-            width: 50px;
-            height: 50px;
             border: 1px solid #fff;
             border-radius: 5px;
+            display: none;
+            height: 50px;
+            width: 50px;
         }
