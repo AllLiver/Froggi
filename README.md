@@ -34,12 +34,11 @@ The compiled binary will be in /target/release
 # Roadmap
 Froggi is an indev project so change is very likely.
 Here are some features/updates planned
- - Docker support for stable channel
- - More consistent naming in API and frontend code
+ - Docker support for the stable channel
+ - Consistent naming in API and frontend code
  - Web-accessible logs
- - Improved html chips for downs & home scoring
- - Front end redesign
- - Integration with OCR https://github.com/RenarsKokins/ScoreboardOCR
+ - Improved HTML chips for downs & home scoring
+ - Integration with OCR (MIT) [https://github.com/RenarsKokins/ScoreboardOCR](https://github.com/occ-ai/scoresight)
 
 # Tech Stack
  - Rust with Axum in the backend
