@@ -308,6 +308,7 @@ dependencies = [
  "axum",
  "axum-extra",
  "base64 0.22.1",
+ "cookie",
  "jsonwebtoken",
  "lazy_static",
  "rand",

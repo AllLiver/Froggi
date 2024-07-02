@@ -9,6 +9,7 @@ argon2 = "0.5.3"
 axum = { version = "0.7.5", features = ["macros", "multipart", "tokio"] }
 axum-extra = { version = "0.9.3", features = ["cookie"] }
 base64 = "0.22.1"
+cookie = "0.18.1"
 jsonwebtoken = "9.3.0"
 lazy_static = "1.4.0"
 rand = "0.8.5"

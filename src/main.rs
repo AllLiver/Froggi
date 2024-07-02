@@ -507,6 +507,7 @@ async fn auth_cookie_builder(username: String) -> String {
         .path("/")
         .secure(config.secure_auth_cookie)
         .http_only(true)
+        .max_age(cookie::time::Duration::days(7))
         .same_site(SameSite::Strict);
 
     cookie.to_string()
@@ -883,7 +884,7 @@ async fn quarter_update_handler(
 // endregion: quarters
 // region: teaminfo
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize)]
 struct Teaminfo {
     home_name: String,
     home_color: String,
