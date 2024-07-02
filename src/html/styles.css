@@ -9,14 +9,15 @@ body {
     margin: 0;
     padding: 0;
     height: 100vh;
-  /*  overflow: hidden; */
+    /*  overflow: hidden; */
     touch-action: manipulation;
     user-select: none;
 }
+
 /* Rectangles */
 .score-rectangle {
     background-color: #1d1e22;
-    width: 35.73vw; 
+    width: 35.73vw;
     height: 33vh;
     border-radius: 0.86vw;
     display: flex;
@@ -28,6 +29,7 @@ body {
     margin-bottom: 0.65vh;
     margin-left: 0.5vw;
 }
+
 .preview-rectangle {
     background-color: rgb(0, 177, 64);
     width: 35.73vw;
@@ -76,11 +78,11 @@ body {
 .countdown-rectangle {
     background-color: #1d1e22;
     width: 35.73vw;
-    height: 33vh; 
+    height: 33vh;
     border-radius: 0.86vw;
     display: flex;
-    flex-direction: column; 
-    overflow-y: auto; 
+    flex-direction: column;
+    overflow-y: auto;
     padding: 5px;
     position: relative;
     margin-bottom: 0.65vh;
@@ -108,8 +110,8 @@ body {
     height: 25vh;
     border-radius: 0.86vw;
     display: flex;
-    flex-direction: column; 
-    align-items: center; 
+    flex-direction: column;
+    align-items: center;
     overflow: hidden;
     padding: 5px;
     position: relative;
@@ -128,7 +130,7 @@ body {
     align-items: center;
     opacity: 0.95;
     width: 100%;
-    max-width: 400px; 
+    max-width: 400px;
     position: relative;
 }
 
@@ -174,7 +176,7 @@ body {
 .net-stats-title {
     font-size: 2vh;
     margin: 0 0.52vw;
-    color: #fff; 
+    color: #fff;
 }
 
 
@@ -196,9 +198,12 @@ body {
 }
 
 /* Increment and decrement buttons */
-.button-increment-home, .button-decrement-home,
-.button-increment-away, .button-decrement-away,
-.button-increment-togo, .button-decrement-togo{
+.button-increment-home,
+.button-decrement-home,
+.button-increment-away,
+.button-decrement-away,
+.button-increment-togo,
+.button-decrement-togo {
     color: white;
     border: none;
     padding: 0.93vh;
@@ -209,15 +214,24 @@ body {
     border-radius: 5px;
 }
 
-.button-increment-home, .button-decrement-home {
+.button-increment-home,
+.button-decrement-home {
     background-color: #007BFF;
 }
 
-.button-increment-away, .button-decrement-away {
+.button-increment-away,
+.button-decrement-away {
     background-color: #ff8601;
 }
 
-.button-decrement-countdown, .button-increment-countdown, .button-increment-quarter, .button-decrement-quarter, .button-increment-clock, .button-decrement-clock, .button-increment-togo, .button-decrement-togo  {
+.button-decrement-countdown,
+.button-increment-countdown,
+.button-increment-quarter,
+.button-decrement-quarter,
+.button-increment-clock,
+.button-decrement-clock,
+.button-increment-togo,
+.button-decrement-togo {
     background-color: #fff;
     color: #000;
     border: none;
@@ -231,7 +245,8 @@ body {
 
 
 /* Counter display */
-.counter, .countdown-counter {
+.counter,
+.countdown-counter {
     font-size: 2.22vh;
     margin: 0 10px;
     min-width: 2.6vw;
@@ -243,7 +258,10 @@ body {
 }
 
 /* Quick score buttons */
-.button-quick-score-home, .button-quick-score-away, .flag-home, .flag-away{
+.button-quick-score-home,
+.button-quick-score-away,
+.flag-home,
+.flag-away {
     background-color: #007BFF;
     color: white;
     border: none;
@@ -255,7 +273,8 @@ body {
     margin: 0.65vh;
 }
 
-.button-quick-score-away, .flag-away {
+.button-quick-score-away,
+.flag-away {
     background-color: #ff8601;
 }
 
@@ -291,28 +310,28 @@ body {
     cursor: pointer;
     padding: 0.52vw 1.85vh;
     border-radius: 5px;
-    margin-right: 2.08vw; 
+    margin-right: 2.08vw;
     margin-left: 0.5w;
     z-index: 20;
-    position: relative; 
+    position: relative;
     pointer-events: auto;
     width: 7vw;
-    height: auto; 
+    height: auto;
 }
 
 
 .net-stats-content {
     display: flex;
-    flex-direction: row; 
+    flex-direction: row;
     align-items: end;
-    justify-content: space-between; 
+    justify-content: space-between;
     margin-left: 5vw;
 }
 
 .stat-item {
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     margin-bottom: 0.93vh;
 }
 
@@ -339,18 +358,18 @@ body {
     pointer-events: none;
     opacity: 0.5;
     filter: grayscale(100%);
-    position: relative; 
+    position: relative;
 }
 
 #lockInterfaceBtn {
-z-index: 999;
-pointer-events: auto;
+    z-index: 999;
+    pointer-events: auto;
 }
 
 .unlock-interface-btn {
-    display: none; 
-    z-index: 30; 
-    position: relative; 
+    display: none;
+    z-index: 30;
+    position: relative;
     pointer-events: auto;
 }
 
@@ -358,21 +377,21 @@ pointer-events: auto;
 
 /* Navbar */
 .off-screen-menu {
-    background-color: #fff; 
-    height: 100vh; 
-    width: 15.63vw; 
-    max-width: 80%; 
+    background-color: #fff;
+    height: 100vh;
+    width: 15.63vw;
+    max-width: 80%;
     position: fixed;
     top: 0;
-    right: -300px; 
-    z-index: 1000; 
+    right: -300px;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     padding: 1.85vh;
-    font-size: 18px; 
-    transition: right 0.3s ease; 
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+    font-size: 18px;
+    transition: right 0.3s ease;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     color: #000000;
 }
 
@@ -417,20 +436,20 @@ pointer-events: auto;
     position: fixed;
     top: 0;
     right: 0;
-    height: auto; 
+    height: auto;
     width: 13.02vw;
     z-index: 1000;
-    background-color: rgba(29, 30, 34, 0.9); 
-    box-shadow: -10px 0 1.85vh rgba(0, 0, 0, 0.2); 
+    background-color: rgba(29, 30, 34, 0.9);
+    box-shadow: -10px 0 1.85vh rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
-    align-items: center; 
+    align-items: center;
     transform: translateX(100%);
     transition: transform 0.3s ease;
     list-style-type: none;
-    border-top-left-radius: 10px; 
-    border-bottom-left-radius: 10px; 
-    padding-top: 1vh; 
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    padding-top: 1vh;
     padding-bottom: 1vh;
     margin-top: 6vh;
 }
@@ -442,7 +461,7 @@ pointer-events: auto;
 
 
 .sidenavbar a {
-    color: #fff; 
+    color: #fff;
     text-decoration: none;
     font-size: 18px;
     padding: 5px;
@@ -455,15 +474,15 @@ pointer-events: auto;
 }
 
 .sidenavbar a:hover {
-    background-color: #252525; 
-    color: #fff; 
+    background-color: #252525;
+    color: #fff;
 }
 
 .close-btn {
     position: absolute;
     top: 1.85vh;
     right: 1.85vh;
-    color: #fff; 
+    color: #fff;
     cursor: pointer;
     font-size: 2.22vh;
 }
@@ -476,7 +495,8 @@ pointer-events: auto;
 }
 
 /* Columns */
-.left-column, .middle-column {
+.left-column,
+.middle-column {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -488,9 +508,9 @@ pointer-events: auto;
 /* Middle column specific styles */
 .middle-column {
     display: flex;
-    flex-direction: column; 
-    align-items: flex-start; 
-    padding: 10px; 
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
 }
 
 /* Main container for layout */
@@ -498,7 +518,8 @@ pointer-events: auto;
     display: flex;
 }
 
-.button-stop-countdown, .button-start-countdown {
+.button-stop-countdown,
+.button-start-countdown {
     background-color: #fc3232;
     color: #fff;
     color: white;
@@ -527,7 +548,7 @@ pointer-events: auto;
 .countdown-title {
     font-size: 2vh;
     margin: 0 0.52vw;
-    color: #fff; 
+    color: #fff;
 }
 
 .counter {
@@ -541,24 +562,28 @@ pointer-events: auto;
     color: #000;
 }
 
-.countdown-controls, .quick-time-buttons, .quick-down-buttons {
+.countdown-controls,
+.quick-time-buttons,
+.quick-down-buttons {
     width: 100%;
     display: flex;
     justify-content: space-around;
     margin-bottom: 10px;
 }
 
-.quick-time-buttons, .quick-down-buttons {
+.quick-time-buttons,
+.quick-down-buttons {
     margin-top: 10px;
 }
 
 #countdown-clock-text::placeholder {
-    color: #999; 
-    font-style: italic; 
+    color: #999;
+    font-style: italic;
     opacity: 0.9;
 }
 
-.button-quick-time, .button-quick-countdown {
+.button-quick-time,
+.button-quick-countdown {
     background-color: #27a644;
     color: white;
     border: none;
@@ -570,14 +595,16 @@ pointer-events: auto;
     margin: 0.65vh;
 }
 
-.show-countdown, .show-sponsors, .show-scoreboard {
+.show-countdown,
+.show-sponsors,
+.show-scoreboard {
     display: flex;
     flex-direction: column;
     font-size: 1.85vh;
     align-items: center;
     border: none;
     justify-content: center;
-    width: 100%; 
+    width: 100%;
     height: 4vh;
     background-color: #27a644;
     color: #fff;
@@ -590,9 +617,9 @@ pointer-events: auto;
 #countdown-clock-text {
     align-items: center;
     border-radius: 10.5px;
-    width: 100%; 
-    box-sizing: border-box; 
-    padding: 10px; 
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
     background-color: #000;
     color: #fff;
     margin-bottom: 0.28vh;
@@ -608,10 +635,10 @@ pointer-events: auto;
     height: 4.07vh;
     border-radius: 5px;
     display: flex;
-    justify-content: center; 
-    align-items: center;    
+    justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
-   /* text-wrap: nowrap; */
+    /* text-wrap: nowrap; */
 }
 
 .visibility-buttons {
@@ -623,14 +650,14 @@ pointer-events: auto;
 
 .quarter-buttons {
     display: flex;
-    justify-content: center; 
-    align-items: center;    
+    justify-content: center;
+    align-items: center;
     flex-wrap: wrap;
     gap: 0.73vw;
     margin-top: 1.39vh;
 }
 
-.quarter-container{
+.quarter-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -648,8 +675,82 @@ iframe {
 }
 
 .preview-iframe {
-    width: 100%; 
+    width: 100%;
     height: 100%;
+}
+
+/* Clock box
+
+/* Clock Box */
+.clock-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.clock-controls-left,
+.clock-controls-right {
+    width: 50%;
+}
+
+.button-start-clock,
+.button-stop-clock {
+    background-color: #fc3232;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    margin: 5px;
+    font-size: 1.85vh;
+    cursor: pointer;
+    width: 100%;
+    border-radius: 5px;
+    white-space: nowrap;
+}
+
+.button-quick-clock {
+    background-color: #27a644;
+    color: white;
+    border: none;
+    font-size: 1.85vh;
+    cursor: pointer;
+    width: 100%;
+    height: 4.07vh;
+    border-radius: 5px;
+    margin: 0.65vh;
+}
+
+.show-clock {
+    background-color: #fff;
+    color: #000;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.clock-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+#clock-text {
+    width: calc(100% - 11.85vh);
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #000;
+    color: #fff;
+    margin-bottom: 3px;
+}
+
+.clock-actions button {
+    flex-shrink: 0;
 }
 
 /* Responsive design */
@@ -658,7 +759,8 @@ iframe {
         flex-direction: column;
     }
 
-    .left-column, .middle-column {
+    .left-column,
+    .middle-column {
         width: 100%;
     }
 
@@ -670,14 +772,33 @@ iframe {
         width: 250px;
     }
 
-    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
+    .score-rectangle,
+    .preview-rectangle,
+    .downs-rectangle,
+    .net-stats-rectangle,
+    .countdown-rectangle,
+    .quarter-rectangle,
+    .clock-rectangle,
+    .sponsors-rectangle,
+    .create-login-rectangle,
+    .login-rectangle {
         width: calc(100% - 10px);
         margin-left: 3px;
     }
 }
 
 @media (max-width: 768px) {
-    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
+
+    .score-rectangle,
+    .preview-rectangle,
+    .downs-rectangle,
+    .net-stats-rectangle,
+    .countdown-rectangle,
+    .quarter-rectangle,
+    .clock-rectangle,
+    .sponsors-rectangle,
+    .create-login-rectangle,
+    .login-rectangle {
         width: calc(100% - 16px);
         margin-left: 8px;
         margin-bottom: 10px;
@@ -706,15 +827,16 @@ iframe {
     }
 
     .downs-rectangle {
-        overflow-x: auto; 
-        white-space: nowrap; 
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     .main-container {
         flex-direction: column;
     }
 
-    .left-column, .middle-column {
+    .left-column,
+    .middle-column {
         width: 100%;
     }
 }
@@ -726,12 +848,25 @@ iframe {
 }
 
 @media (max-width: 480px) {
-    .score-rectangle, .preview-rectangle, .downs-rectangle, .net-stats-rectangle, .countdown-rectangle, .quarter-rectangle, .clock-rectangle, .sponsors-rectangle, .create-login-rectangle, .login-rectangle {
+
+    .score-rectangle,
+    .preview-rectangle,
+    .downs-rectangle,
+    .net-stats-rectangle,
+    .countdown-rectangle,
+    .quarter-rectangle,
+    .clock-rectangle,
+    .sponsors-rectangle,
+    .create-login-rectangle,
+    .login-rectangle {
         width: calc(100% - 1.85vh);
         margin-left: 3px;
     }
 
-    .button-quick-score-home, .button-quick-score-away, .flag-home, .flag-away {
+    .button-quick-score-home,
+    .button-quick-score-away,
+    .flag-home,
+    .flag-away {
         width: 130px;
         font-size: 14px;
     }
@@ -745,7 +880,8 @@ iframe {
         font-size: 18px;
     }
 
-    .button-quick-time, .button-quick-countdown {
+    .button-quick-time,
+    .button-quick-countdown {
         width: 140px;
         font-size: 14px;
     }
@@ -761,6 +897,7 @@ iframe {
     .off-screen-menu {
         width: 10.42vw;
     }
+
     .teaminfo-rectangle,
     .sponsor-rectangle,
     .teaminfo-presets-rectangle {
@@ -768,7 +905,7 @@ iframe {
     }
 }
 
-@media only screen and (min-device-width: 768px) and (max-device-width: 102.22vh) and (orientation: landscape) { 
+@media only screen and (min-device-width: 768px) and (max-device-width: 102.22vh) and (orientation: landscape) {
     .main-container {
         transform: scale(0.75);
         transform-origin: 0 0;
@@ -787,6 +924,7 @@ iframe {
     .button-quick-clock {
         font-size: 16px;
     }
+
     .net-stats-rectangle {
         width: calc(100% - 16px);
         margin-left: 8px;
@@ -807,343 +945,286 @@ iframe {
     #clock-text {
         width: calc(100% - 100px);
     }
+
     .net-stats-rectangle {
         width: calc(100% - 1.85vh);
         margin-left: 3px;
     }
 }
 
-
 /* Hover effect */
-.button-increment-home:hover, .button-decrement-home:hover,
-.button-increment-away:hover, .button-decrement-away:hover,
-.button-increment-togo:hover, .button-decrement-togo:hover, .button-decrement-down:hover,
-.button-decrement-countdown:hover, .button-increment-countdown:hover, .button-decrement-quarter, .button-increment-quarter,
-.button-quick-score-home:hover, .button-quick-score-away:hover,
-.button-quick-down:hover,
-.button-start-countdown:hover, .button-stop-countdown:hover,
-.button-quick-time:hover, .button-quick-countdown:hover,
-.flag-home:hover, .flag-away:hover,
-.show-countdown:hover,
-.button-lock-interface:hover,
-.button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-quick-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover, .submit-button:hover, .show-scoreboard:hover {
-    transform: scale(1.01); 
-}
+.button-increment-home:hover,.button-decrement-home:hover,.button-increment-away:hover,.button-decrement-away:hover,.button-increment-togo:hover,.button-decrement-togo:hover,.button-decrement-down:hover,.button-decrement-countdown:hover,.button-increment-countdown:hover,.button-decrement-quarter,.button-increment-quarter,.button-quick-score-home:hover,.button-quick-score-away:hover,.button-quick-down:hover,.button-start-countdown:hover,.button-stop-countdown:hover,.button-quick-time:hover,.button-quick-countdown:hover,.flag-home:hover,.flag-away:hover,.show-countdown:hover,.button-lock-interface:hover,.button-quick-quarter:hover,.create-login-rectangle input[type="submit"]:hover,.login-rectangle input[type="submit"]:hover,.button-quick-clock:hover,.button-stop-clock:hover,.button-start-clock:hover,.show-sponsors:hover,.submit-button:hover,.show-scoreboard:hover,.submit-button:hover{transform:scale(1.01)}
 
 .watermark {
     position: absolute;
     bottom: 3px;
     left: 5px;
     font-size: 12px;
-    color: #f5f5f580; 
+    color: #f5f5f580;
 }
 
-/* * Login */   
-     canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; 
-            z-index: -1; 
-        }
+/*& Login */
 
-        .create-login-rectangle h1 {
-            margin-bottom: 1.85vh;
-            font-size: 2.22vh;
-            color: #ffffff;
-        }
+#login-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    position: relative;
+}
 
-        .create-login-rectangle label {
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #ffffff;
-            align-self: flex-start; 
-        }
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+}
 
-        .create-login-rectangle input[type="text"],
-        .create-login-rectangle input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+.create-login-rectangle h1 {
+    margin-bottom: 1.85vh;
+    font-size: 2.22vh;
+    color: #ffffff;
+}
 
-        .create-login-rectangle input[type="submit"] {
-            background-color: #27a644;
-            color: white;
-            padding: 14px 1.85vh;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            border-radius: 5px;
-        }
+.create-login-rectangle label {
+    font-size: 0.8em;
+    margin-bottom: 5px;
+    color: #ffffff;
+    align-self: flex-start;
+}
 
-        .login-rectangle h1 {
-            margin-bottom: 1.85vh;
-            font-size: 2.22vh;
-            color: #ffffff;
-        }
+.create-login-rectangle input[type="text"],
+.create-login-rectangle input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 0.8em;
+}
 
-        .login-rectangle label {
-            font-size: 14px;
-            margin-bottom: 5px;
-            color: #ffffff;
-            align-self: flex-start;
-        }
+.create-login-rectangle input[type="submit"] {
+    background-color: #27a644;
+    color: white;
+    padding: 14px 1.85vh;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    border-radius: 5px;
+}
 
-        .login-rectangle input[type="text"],
-        .login-rectangle input[type="password"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+.login-rectangle h1 {
+    margin-bottom: 1.85vh;
+    font-size: 2.22vh;
+    color: #ffffff;
+}
 
-        .login-rectangle input[type="submit"] {
-            background-color: #27a644;
-            color: white;
-            padding: 14px 1.85vh;
-            margin: 8px 0;
-            border: none;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            border-radius: 5px;
-        }
+.login-rectangle label {
+    font-size: 0.8em;
+    margin-bottom: 0.46vh;
+    color: #ffffff;
+    align-self: flex-start;
+}
 
+.login-rectangle input[type="text"],
+.login-rectangle input[type="password"] {
+    width: 100%;
+    padding: 0.93vh;
+    margin-bottom: 1.39vh;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
 
-        /* Clock Box */
-        .clock-controls {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        .clock-controls-left,
-        .clock-controls-right {
-            width: 50%;
-        }
-        
-        .button-start-clock,
-        .button-stop-clock {
-            background-color: #fc3232;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            margin: 5px;
-            font-size: 1.85vh;
-            cursor: pointer;
-            width: 100%; 
-            border-radius: 5px;
-            white-space: nowrap; 
-        }
-        
-        .button-quick-clock {
-            background-color: #27a644;
-            color: white;
-            border: none;
-            font-size: 1.85vh;
-            cursor: pointer;
-            width: 100%; 
-            height: 4.07vh;
-            border-radius: 5px;
-            margin: 0.65vh;
-        }
-        
-        .show-clock {
-            background-color: #fff;
-            color: #000;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        
-        .clock-actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 10px;
-        }
-        
-        #clock-text {
-            width: calc(100% - 11.85vh);
-            border-radius: 5px;
-            padding: 10px;
-            background-color: #000;
-            color: #fff;
-            margin-bottom: 3px;
-        }
-        
-        .clock-actions button {
-            flex-shrink: 0; 
-        }
-        
+.login-rectangle input[type="submit"] {
+    background-color: #27a644;
+    color: white;
+    padding: 14px 1.85vh;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-size: 1em;
+    border-radius: 5px;
+}
 
 
 
 
-        /*& Overlay.html styles */
+/*& Overlay.html styles */
 
-        #overlay {
-            background-color: rgb(0, 177, 64);
-            cursor: none;
-            color: black;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            padding: 0.93vh;
-            height: 100vh;
-        }
+#overlay {
+    background-color: rgb(0, 177, 64);
+    cursor: none;
+    color: black;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 0.93vh;
+    height: 100vh;
+}
 
-        #chromakey {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: rgb(0, 177, 64);
-        }
+#chromakey-body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: rgb(0, 177, 64);
+}
 
-        .info-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            max-width: 41.67vw;
-            margin: 0 auto;
-            padding: 10px;
-            box-sizing: border-box;
-            gap: 0.5rem; 
-        }
+.info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 41.67vw;
+    margin: 0 auto;
+    padding: 10px;
+    box-sizing: border-box;
+    gap: 0.5rem;
+}
 
-        .info-box {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #fff;
-            height: 4vh;
-            padding: 0 1rem;
-            border-radius: 4.5px;
-            font-size: 1em;
-            margin: 0; 
-            flex: 1; 
-        }
+.info-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    height: 4vh;
+    padding: 0 1rem;
+    border-radius: 4.5px;
+    font-size: 1em;
+    margin: 0;
+    flex: 1;
+}
 
-        .logo {
-            height: 2.59vh;
-            width: auto;
-            margin-right: 0.26vw;
-        }
+.logo {
+    height: 2.59vh;
+    width: auto;
+    margin-right: 0.26vw;
+}
 
-        .team-name {
-            flex: 1;
-            text-align: center;
-        }
+.team-name {
+    flex: 1;
+    text-align: center;
+}
 
-        .team-score {
-            font-size: 1.5em;
-            font-weight: bold;
-        }
+.team-score {
+    font-size: 1.5em;
+    font-weight: bold;
+}
 
-        .home-box, .away-box {
-            min-width: 9vw;
-        }
+.home-box,
+.away-box {
+    min-width: 9vw;
+}
 
-        .score-box h3, .down-togo-box h3 {
-            margin: 0;
-        }
+.score-box h3,
+.down-togo-box h3 {
+    margin: 0;
+}
 
-        .score-box h3, .down-togo-box h3 {
-            margin: 0;
-            white-space: nowrap; /* no text wrapping */
-        }
+.score-box h3,
+.down-togo-box h3 {
+    margin: 0;
+    white-space: nowrap;
+}
 
-        /*& Teaminfo, sponsors, teampresets styles */
-        form {
-            background-color: #1d1e22;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 20px auto;
-            max-width: 600px;
-            padding: 20px;
-            margin-top: 40px;
-        }
+/*& Teaminfo, sponsors, teampresets styles */
 
-        form label {
-            display: block;
-            margin: 10px 0 5px;
-        }
+.teaminfo-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    padding: 2vh;
+    margin-top: 5vh;
+}
 
-        form input[type="text"],
-        form input[type="file"]
-        {
-            background-color: #f9f9f9;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-            padding: 10px;
-            width: 100%;
-            margin-bottom: 10px;
-        }
+.teaminfo-rectangle,
+.sponsor-rectangle,
+.teaminfo-presets-rectangle {
+    background-color: #1d1e22;
+    border-radius: 10px;
+    padding: 2vw;
+    margin: 1vw;
+    width: calc(30% - 2vw);
+    box-sizing: border-box;
+    color: white;
+}
 
-        form input[type="color"] {
-            width: 100%;
-            border-radius: 5px;
-            border: 3px;
-            margin-bottom: 10px;
-        }
+.teaminfo-rectangle h1,
+.sponsor-rectangle h1,
+.teaminfo-presets-rectangle h2 {
+    text-align: center;
+}
 
-        form input[type="submit"] {
-            background-color: #27a644;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            padding: 10px;
-            width: 100%;
-        }
+form {
+    display: flex;
+    flex-direction: column;
+}
 
-        form input[type="submit"]:hover {
-            background-color: #218a3d;
-        }
+form label {
+    margin: 0.93vh 0 0.46vh;
+}
 
-        .home-section label,
-        .home-section input[type="text"],
-        .home-section input[type="color"] {
-            color: #007BFF;
-        }
+form input[type="text"],
+form input[type="file"] {
+    padding: 10px;
+    margin-bottom: 1.39vh;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #000;
+    width: 40%;
+}
 
-        .away-section label,
-        .away-section input[type="text"],
-        .away-section input[type="color"] {
-            color: #ff8601;
-        }
+form input[type="color"] {
+    width: 100%;
+}
 
-        .logo-previews {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 10px;
-        }
+form input[type="submit"],
+.submit-button {
+    background-color: #27a644;
+    padding: 0.93vh;
+    margin-bottom: 1.39vh;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 20px;
+    font-weight: 600;
+}
 
-        .logo-previews img {
-            border: 1px solid #fff;
-            border-radius: 5px;
-            display: none;
-            height: 50px;
-            width: 50px;
-        }
+.home-section label[for="home_name"],
+.home-section label[for="home_img"],
+.home-section label[for="home_color"] {
+    color: #007BFF;
+}
+
+.away-section label[for="away_name"],
+.away-section label[for="away_img"],
+.away-section label[for="away_color"] {
+    color: #ff8601;
+}
+
+.logo-previews {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 0.93vh;
+}
+
+.logo-previews img {
+    display: none;
+    width: 2.6vw;
+    height: 4.63vh;
+    border: 1px solid #fff;
+    border-radius: 5px;
+}

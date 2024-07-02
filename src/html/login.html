@@ -5,21 +5,9 @@
     <title>Login</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            position: relative;
-        }
-
-    </style>
     <script src="/htmx.js"></script>
 </head>
-<body>
+<body id="login-body">
     <canvas id="background"></canvas>
 
     <div class="login-rectangle">
@@ -93,5 +81,6 @@
             });
         });
     </script>
+       <script src="/app.js"></script>
 </body>
 </html>

@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
         integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
+        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
@@ -20,39 +24,50 @@
             <span class="line"></span>
         </button>
         <ul class="sidenavbar">
-            <li><a href="/index">Dashboard</a></li>
-            <li><a href="/teaminfo.html" class="nav-active">Sponsors & Teaminfo</a></li>
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/teaminfo" class="nav-active">Sponsors & Teaminfo</a></li>
             <li><a href="/overlay">Overlay</a></li>
         </ul>
     </nav>
-
-    <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data" onsubmit="return sanitize(this);">
-        <div class="home-section">
-            <label for="home_name">Home name:</label>
-            <input type="text" id="home_name" name="home_name" required maxlength="25"><br>
-
-            <label for="home_img">Home icon:</label>
-            <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" multiple required><br>
-
-            <label for="home_color">Home jersey color:</label>
-            <input type="color" id="home_color" name="home_color" value="#007BFF" multiple required><br><br>
+    <div class="teaminfo-container">
+        <div class="teaminfo-rectangle">
+            <h1>Team Creation</h1>
+            <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data" onsubmit="return sanitize(this);">
+                <div class="home-section">
+                    <label for="home_name">Home name:</label> <br>
+                    <input type="text" id="home_name" name="home_name" required maxlength="25"> <br>
+    
+                    <label for="home_img">Home icon:</label> <br>
+                    <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" multiple required><br>
+    
+                    <label for="home_color">Home jersey color:</label><br>
+                    <input type="color" id="home_color" name="home_color" value="#007BFF" multiple required><br>
+                </div>
+    
+                <div class="away-section">
+                    <label for="away_name">Away name:</label> <br>
+                    <input type="text" id="away_name" name="away_name" required maxlength="25"> <br>
+    
+                    <label for="away_img">Away icon:</label> <br>
+                    <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" multiple required><br>
+    
+                    <label for="away_color">Away jersey color:</label> <br>
+                    <input type="color" id="away_color" name="away_color" value="#ff8601" required> <br>
+                </div>
+    
+                <input type="submit" value="Submit">
+            </form>
         </div>
-
-        <div class="away-section">
-            <label for="away_name">Away name:</label>
-            <input type="text" id="away_name" name="away_name" required maxlength="25"><br>
-
-            <label for="away_img">Away icon:</label>
-            <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" multiple required><br>
-
-            <label for="away_color">Away jersey color:</label>
-            <input type="color" id="away_color" name="away_color" value="#ff8601" required><br><br>
+        <div class="sponsor-rectangle">
+            <h1>Sponsors</h1>
+            <!-- Put sponsor content here alliver :0 -->
         </div>
-
-        <input type="submit" value="Submit">
-    </form>
-    <div class="teaminfo-selector-container" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body">
+        <div class="teaminfo-presets-rectangle">
+            <h2>Team Presets</h2>
+            <div class="team-selector" hx-get="/team_selectors" hx-trigger="load"></div>
+        </div>
     </div>
+    <script src="/app.js"></script>
 </body>
 
 </html>

@@ -86,3 +86,4 @@ function sanitize(inputElement) {
 updateVersion();
 testLatency();
 setInterval(testLatency, pingTime);
+
