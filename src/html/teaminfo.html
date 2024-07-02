@@ -51,7 +51,7 @@
 
         <input type="submit" value="Submit">
     </form>
-    <div class="teaminfo-selector-container" hx-put="/teaminfo/selector" hx-trigger="load">
+    <div class="teaminfo-selector-container" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body">
     </div>
 </body>
 

@@ -980,6 +980,7 @@ async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> 
 
         return Response::builder()
             .status(StatusCode::OK)
+            .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("reload-selector"))
             .body(String::new())
             .unwrap();
     } else {
