@@ -1,8 +1,9 @@
-const version = '2.0.0';  // * Change this if you want to change the version that is displayed in the net-stats container.
-const pingTime = '1000';  // * Change this if you want to change how often the ping is updated (in milliseconds), the default is 3000ms (3 seconds).
-const pingUrl = 'http://localhost:3000'; // * Change this to your localhost port, the default port is 3000
-const previewUrl = 'http://localhost:3000/overlay'; // * Change this to your localhost port ./overlay, the default port is 3000
+const version = '2.0.0';
+const pingTime = '1000';
+const pingUrl = 'http://localhost:3000';
+const previewUrl = 'http://localhost:3000/overlay';
 const lockInterfaceBtn = document.getElementById('lockInterfaceBtn');
+
 function updateVersion() {
     const versionElement = document.getElementById('version-value');
     versionElement.textContent = version;
@@ -33,18 +34,6 @@ function measurePing(url, callback) {
         });
 }
 
-function updatePing() {
-    measurePing(pingUrl, ping => {
-        const pingElement = document.getElementById('ping-value');
-        if (typeof ping === 'number') {
-            pingElement.textContent = `${ping} ms`;
-        } else {
-            pingElement.textContent = ping;
-        }
-    });
-}
-
-
 lockInterfaceBtn.addEventListener('click', function(event) {
     if (event.target !== lockInterfaceBtn) {
         document.body.classList.toggle('interface-locked');
@@ -59,7 +48,6 @@ lockInterfaceBtn.addEventListener('click', function(event) {
     }
 });
 
-// When refreshed load the lock state from local storage, if locked add the class to the index
 window.addEventListener('load', function() {
     const lockState = localStorage.getItem('lockState');
     
@@ -71,13 +59,6 @@ window.addEventListener('load', function() {
         lockInterfaceBtn.innerHTML = '<strong>Lock Interface</strong>';
     }
 });
-
-
-
-updateVersion();
-updatePing();
-//* Updates ping every X second (1X*1000ms = 1 second)
-setInterval(updatePing, pingTime);
 
 function testLatency() {
     var startTime = Date.now();
@@ -94,13 +75,14 @@ function testLatency() {
 
 document.addEventListener("DOMContentLoaded", function() {
     var iframe = document.getElementById("previewIframe");
-
     iframe.src = previewUrl;
 });
 
-function updatePing() {
-    testLatency();
-    setTimeout(updatePing, pingTime); 
+function sanitize(inputElement) {
+    var sanitizedValue = inputElement.value.replace(/[&<>"'/]/g, '');
+    inputElement.value = sanitizedValue;
 }
 
-updatePing(); 
+updateVersion();
+testLatency();
+setInterval(testLatency, pingTime);

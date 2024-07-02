@@ -8,7 +8,11 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
         integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
-    <!--Ensure data is not tampered with-->
+        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
@@ -176,7 +180,7 @@
                     </div>
                     <div class="countdown-actions">
                         <input type="text" id="countdown-clock-text" maxlength="25"
-                            placeholder="Countdown Display Text">
+                            placeholder="Countdown Display Text" oninput="sanitize(this)">
                         <button class="show-countdown">Show Countdown</button>
                     </div>
                 </div>

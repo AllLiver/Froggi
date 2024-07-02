@@ -26,7 +26,7 @@
         </ul>
     </nav>
 
-    <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data">
+    <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data" onsubmit="return sanitize(this);">
         <div class="home-section">
             <label for="home_name">Home name:</label>
             <input type="text" id="home_name" name="home_name" required maxlength="25"><br>
@@ -35,8 +35,7 @@
             <input type="file" id="home_img" name="home_img" accept="image/*" required><br>
 
             <label for="home_color">Home jersey color:</label>
-            <input type="color" id="home_color" name="home_color" value="#007BFF" multiple required ><br><br> 
-            
+            <input type="color" id="home_color" name="home_color" value="#007BFF" multiple required><br><br>
         </div>
 
         <div class="away-section">
@@ -47,7 +46,7 @@
             <input type="file" id="away_img" name="away_img" accept="image/*" multiple required><br>
 
             <label for="away_color">Away jersey color:</label>
-            <input type="color" id="away_color" name="away_color" value="#ff8601" required><br><br> 
+            <input type="color" id="away_color" name="away_color" value="#ff8601" required><br><br>
         </div>
 
         <input type="submit" value="Submit">
