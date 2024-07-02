@@ -12,9 +12,7 @@ use axum::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderName, HeaderValue, Response, StatusCode,
     },
-    response::{
-        Html, IntoResponse,
-    },
+    response::{Html, IntoResponse},
     routing::{get, post, put},
     Form, Router,
 };
@@ -25,18 +23,19 @@ use lazy_static::lazy_static;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
-    io::Read, sync::Arc, time::{Instant, UNIX_EPOCH}
+    path::PathBuf,
+    sync::Arc,
+    time::{Instant, UNIX_EPOCH},
 };
 use tokio::{
-    fs::{create_dir, create_dir_all, File},
+    fs::{create_dir_all, read_dir, File},
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
-    sync::{Mutex, RwLock},
+    sync::Mutex,
 };
 use uuid::Uuid;
 
 lazy_static! {
-    static ref SHUTDOWN: Arc<RwLock<bool>> = Arc::new(RwLock::new(false));
     static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref GAME_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
@@ -123,7 +122,10 @@ async fn main() -> Result<()> {
             post(game_clock_update_handler),
         )
         // Countdown clock routes
-        .route("/countdown-clock/display/:o", put(countdown_clock_display_handler))
+        .route(
+            "/countdown-clock/display/:o",
+            put(countdown_clock_display_handler),
+        )
         .route("/countdown-clock/ctl/:o", post(countdown_clock_ctl_handler))
         .route(
             "/countdown-clock/set/:mins",
@@ -140,6 +142,7 @@ async fn main() -> Result<()> {
         // Teaminfo routes
         .route("/teaminfo", get(teaminfo_handler))
         .route("/teaminfo/create", post(teaminfo_preset_create_handler))
+        .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -618,7 +621,12 @@ async fn uptime_ticker() {
 async fn uptime_display_handler() -> impl IntoResponse {
     let uptime = UPTIME_SECS.lock().await;
 
-    Html::from(format!("{}:{}:{}", *uptime / 3600, (*uptime % 3600) / 60, *uptime % 60))
+    Html::from(format!(
+        "{}:{}:{}",
+        *uptime / 3600,
+        (*uptime % 3600) / 60,
+        *uptime % 60
+    ))
 }
 
 async fn game_clock_ticker() {
@@ -682,7 +690,6 @@ async fn game_clock_update_handler(
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
     if verify_auth(jar).await {
-
         let mut game_clock = GAME_CLOCK.lock().await;
         let time_diff = mins * 60 + secs;
 
@@ -797,9 +804,7 @@ async fn countdown_clock_update_handler(
     }
 }
 
-
-
-async fn countdown_clock_display_handler(Path(o): Path<String>,) -> impl IntoResponse {
+async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse {
     let countdown_clock = COUNTDOWN_CLOCK.lock().await;
     let mut time_display = String::new();
 
@@ -811,7 +816,7 @@ async fn countdown_clock_display_handler(Path(o): Path<String>,) -> impl IntoRes
         time_display = format!("{}:{}", *countdown_clock / 60, *countdown_clock % 60);
     }
 
-    return Html::from(time_display)
+    return Html::from(time_display);
 }
 
 // endregion: time
@@ -883,7 +888,7 @@ struct Teaminfo {
     home_name: String,
     home_color: String,
     away_name: String,
-    away_color: String
+    away_color: String,
 }
 impl Teaminfo {
     fn new() -> Teaminfo {
@@ -891,7 +896,7 @@ impl Teaminfo {
             home_name: String::new(),
             home_color: String::new(),
             away_name: String::new(),
-            away_color: String::new()
+            away_color: String::new(),
         }
     }
 }
@@ -901,17 +906,36 @@ async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> 
         let mut teaminfo = Teaminfo::new();
         let id = id_create(12);
 
-        create_dir_all(format!("team-presets/{}", id)).await.expect("Could not create team preset directory");
+        create_dir_all(format!("team-presets/{}", id))
+            .await
+            .expect("Could not create team preset directory");
 
-        while let Some(mut field) = form.next_field().await.expect("Could not get next field of preset create multipart") {
+        while let Some(field) = form
+            .next_field()
+            .await
+            .expect("Could not get next field of preset create multipart")
+        {
             match field.name().unwrap() {
                 "home_name" => {
                     teaminfo.home_name = field.text().await.unwrap();
                 }
                 "home_img" => {
-                    let mut f = File::create(format!("team-presets/{}/home.{}", id, field.file_name().unwrap().to_string().split(".").collect::<Vec<&str>>()[1])).await.expect("Could not create home img");
+                    let mut f = File::create(format!(
+                        "team-presets/{}/home.{}",
+                        id,
+                        field
+                            .file_name()
+                            .unwrap()
+                            .to_string()
+                            .split(".")
+                            .collect::<Vec<&str>>()[1]
+                    ))
+                    .await
+                    .expect("Could not create home img");
 
-                    f.write_all(field.bytes().await.unwrap().as_ref()).await.expect("Could not write to home img");
+                    f.write_all(field.bytes().await.unwrap().as_ref())
+                        .await
+                        .expect("Could not write to home img");
                 }
                 "home_color" => {
                     teaminfo.home_color = field.text().await.unwrap();
@@ -920,27 +944,133 @@ async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> 
                     teaminfo.away_name = field.text().await.unwrap();
                 }
                 "away_img" => {
-                    let mut f = File::create(format!("team-presets/{}/away.{}", id, field.file_name().unwrap().to_string().split(".").collect::<Vec<&str>>()[1])).await.expect("Could not create away img");
+                    let mut f = File::create(format!(
+                        "team-presets/{}/away.{}",
+                        id,
+                        field
+                            .file_name()
+                            .unwrap()
+                            .to_string()
+                            .split(".")
+                            .collect::<Vec<&str>>()[1]
+                    ))
+                    .await
+                    .expect("Could not create away img");
 
-                    f.write_all(field.bytes().await.unwrap().as_ref()).await.expect("Could not write to away img");
+                    f.write_all(field.bytes().await.unwrap().as_ref())
+                        .await
+                        .expect("Could not write to away img");
                 }
                 "away_color" => {
                     teaminfo.away_color = field.text().await.unwrap();
                 }
-                _ => {
-
-                }
+                _ => {}
             }
         }
-        
-        let write_json = serde_json::to_string_pretty(&teaminfo).expect("Could not serialize teaminfo");
 
-        let mut f = File::create(format!("team-presets/{}/teams.json", id)).await.expect("Could not create teams.json");
+        let write_json =
+            serde_json::to_string_pretty(&teaminfo).expect("Could not serialize teaminfo");
 
-        f.write_all(write_json.as_bytes()).await.expect("Could not write to teams.json");
+        let mut f = File::create(format!("team-presets/{}/teams.json", id))
+            .await
+            .expect("Could not create teams.json");
+        f.write_all(write_json.as_bytes())
+            .await
+            .expect("Could not write to teams.json");
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
     } else {
-
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
     }
+}
+
+async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
+    let mut html = String::new();
+    let mut a = read_dir("./team-presets").await.unwrap();
+
+    while let Ok(Some(d)) = a.next_entry().await
+    {
+        if d.file_type()
+            .await
+            .expect("Could not get preset file type")
+            .is_dir()
+        {
+            let mut home_img_path = PathBuf::new();
+            let mut away_img_path = PathBuf::new();
+
+            let mut home_tag_type = String::new();
+            let mut away_tag_type = String::new();
+
+            let mut teaminfo = Teaminfo::new();
+
+            let mut b = read_dir(d.path()).await.unwrap();
+
+            while let Ok(Some(d0)) = b
+                .next_entry()
+                .await
+            {
+                let file_name = d0.file_name().to_string_lossy().to_string();
+
+                if file_name.starts_with("home.") {
+                    home_img_path = d0.path();
+
+                    home_tag_type = match file_name.split(".").collect::<Vec<&str>>()[1] {
+                        "png" => String::from("png"),
+                        "jpg" => String::from("jpeg"),
+                        "jpeg" => String::from("jpeg"),
+                        _ => String::new()
+                    }
+                } else if file_name.starts_with("away.") {
+                    away_img_path = d0.path();
+
+                    away_tag_type = match file_name.split(".").collect::<Vec<&str>>()[1] {
+                        "png" => String::from("png"),
+                        "jpg" => String::from("jpeg"),
+                        "jpeg" => String::from("jpeg"),
+                        _ => String::new(),
+                    }
+                } else if file_name == "teams.json" {
+                    let f = File::open(d0.path())
+                        .await
+                        .expect("Could not open teams.json");
+                    let mut buf_reader = BufReader::new(f);
+
+                    let mut temp_str = String::new();
+
+                    buf_reader
+                        .read_to_string(&mut temp_str)
+                        .await
+                        .expect("Could not read teams.json");
+
+                    teaminfo =
+                        serde_json::from_str(&temp_str).expect("Could not deserialize teams.json");
+                }
+            }
+            let home_img_bytes = tokio::fs::read(home_img_path).await.expect("Could not read home img");
+            let away_img_bytes = tokio::fs::read(away_img_path).await.expect("Could not read away img");
+            html += &format!(
+                "<div class=\"match-selector\">
+                <img src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
+                <p>{} vs {}</p>
+                <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
+            </div>",
+                home_tag_type,
+                BASE64_STANDARD.encode(home_img_bytes),
+                teaminfo.home_name,
+                teaminfo.away_name,
+                away_tag_type,
+                BASE64_STANDARD.encode(away_img_bytes)
+            );
+        }
+    }
+
+    return Html::from(html);
 }
 
 // endregion: teaminfo
@@ -964,9 +1094,6 @@ async fn shutdown_signal() {
         signal::ctrl_c()
             .await
             .expect("failed to install Ctrl+C handler");
-
-        let mut shutdown = SHUTDOWN.write().await;
-        *shutdown = true;
     };
 
     #[cfg(unix)]
@@ -975,16 +1102,11 @@ async fn shutdown_signal() {
             .expect("failed to install signal handler")
             .recv()
             .await;
-
-        let mut shutdown = SHUTDOWN.write().await;
-        *shutdown = true;
     };
 
     #[cfg(not(unix))]
     let terminate = async {
         let _ = std::future::pending::<()>().await;
-        let mut shutdown = SHUTDOWN.write().await;
-        *shutdown = true;
     };
 
     tokio::select! {
