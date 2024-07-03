@@ -60,7 +60,7 @@
         </div>
         <div class="teaminfo-presets-rectangle">
             <h2>Team Presets</h2>
-            <div class="team-selector" hx-get="/team_selectors" hx-trigger="load"></div>
+            <div class="team-selector" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body"></div>
         </div>
         <div class="sponsor-rectangle">
             <h1>Sponsors</h1>

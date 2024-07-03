@@ -6,7 +6,6 @@ use argon2::{
 };
 use axum::{
     body::Body,
-    debug_handler,
     extract::{Multipart, Path, State},
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
@@ -28,7 +27,7 @@ use std::{
     time::{Instant, UNIX_EPOCH},
 };
 use tokio::{
-    fs::{create_dir_all, read_dir, File},
+    fs::{create_dir_all, read_dir, remove_dir_all, File},
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
     sync::Mutex,
@@ -48,7 +47,7 @@ struct AppState {
     home_points: Arc<Mutex<u32>>,
     away_points: Arc<Mutex<u32>>,
     quarter: Arc<Mutex<u8>>,
-    preset_id: Arc<Mutex<String>>
+    preset_id: Arc<Mutex<String>>,
 }
 
 #[tokio::main]
@@ -58,7 +57,7 @@ async fn main() -> Result<()> {
         home_points: Arc::new(Mutex::new(0)),
         away_points: Arc::new(Mutex::new(0)),
         quarter: Arc::new(Mutex::new(1)),
-        preset_id: Arc::new(Mutex::new(String::new()))
+        preset_id: Arc::new(Mutex::new(String::new())),
     };
 
     // Validate required files and directories
@@ -146,6 +145,9 @@ async fn main() -> Result<()> {
         .route("/teaminfo/create", post(teaminfo_preset_create_handler))
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
         .route("/teaminfo/set/:id", post(teaminfo_preset_set_handler))
+        .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
+        // Sponsor routes
+        .route("/sponsors/upload", post(upload_sponsors_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -984,7 +986,10 @@ async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> 
 
         return Response::builder()
             .status(StatusCode::OK)
-            .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("reload-selector"))
+            .header(
+                HeaderName::from_static("hx-trigger"),
+                HeaderValue::from_static("reload-selector"),
+            )
             .body(String::new())
             .unwrap();
     } else {
@@ -999,8 +1004,7 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
     let mut html = String::new();
     let mut a = read_dir("./team-presets").await.unwrap();
 
-    while let Ok(Some(d)) = a.next_entry().await
-    {
+    while let Ok(Some(d)) = a.next_entry().await {
         if d.file_type()
             .await
             .expect("Could not get preset file type")
@@ -1016,10 +1020,7 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
 
             let mut b = read_dir(d.path()).await.unwrap();
 
-            while let Ok(Some(d0)) = b
-                .next_entry()
-                .await
-            {
+            while let Ok(Some(d0)) = b.next_entry().await {
                 let file_name = d0.file_name().to_string_lossy().to_string();
 
                 if file_name.starts_with("home.") {
@@ -1029,7 +1030,7 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
                         "png" => String::from("png"),
                         "jpg" => String::from("jpeg"),
                         "jpeg" => String::from("jpeg"),
-                        _ => String::new()
+                        _ => String::new(),
                     }
                 } else if file_name.starts_with("away.") {
                     away_img_path = d0.path();
@@ -1057,14 +1058,22 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
                         serde_json::from_str(&temp_str).expect("Could not deserialize teams.json");
                 }
             }
-            let home_img_bytes = tokio::fs::read(home_img_path).await.expect("Could not read home img");
-            let away_img_bytes = tokio::fs::read(away_img_path).await.expect("Could not read away img");
+            let home_img_bytes = tokio::fs::read(home_img_path)
+                .await
+                .expect("Could not read home img");
+            let away_img_bytes = tokio::fs::read(away_img_path)
+                .await
+                .expect("Could not read away img");
+
+            let id = d.file_name().to_string_lossy().to_string();
+
             html += &format!(
                 "<div class=\"match-selector\">
                 <img src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
                 <p>{} vs {}</p>
                 <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
                 <button hx-post=\"/teaminfo/set/{}\" hx-swap=\"none\">Set</button>
+                <button hx-post=\"/teaminfo/remove/{}\" hx-swap=\"none\">Remove</button>
             </div>",
                 home_tag_type,
                 BASE64_STANDARD.encode(home_img_bytes),
@@ -1072,7 +1081,8 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
                 teaminfo.away_name,
                 away_tag_type,
                 BASE64_STANDARD.encode(away_img_bytes),
-                d.file_name().to_string_lossy().to_string()
+                id,
+                id
             );
         }
     }
@@ -1080,12 +1090,20 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
     return Html::from(html);
 }
 
-async fn teaminfo_preset_set_handler(jar: CookieJar, State(state): State<AppState>, Path(id): Path<String>) -> impl IntoResponse {
+async fn teaminfo_preset_set_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut dir = read_dir("./team-presets").await.unwrap();
 
         while let Ok(Some(a)) = dir.next_entry().await {
-            if a.file_type().await.expect("Could not get file type of dir entry").is_dir() {
+            if a.file_type()
+                .await
+                .expect("Could not get file type of dir entry")
+                .is_dir()
+            {
                 if a.file_name().to_string_lossy().to_string() == id {
                     *state.preset_id.lock().await = id.clone();
                     break;
@@ -1105,7 +1123,72 @@ async fn teaminfo_preset_set_handler(jar: CookieJar, State(state): State<AppStat
     }
 }
 
+async fn teaminfo_preset_remove_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(id): Path<String>,
+) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        if let Ok(_) = remove_dir_all(format!("./team-presets/{}", id)).await {
+            *state.preset_id.lock().await = String::new();
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .header(
+                HeaderName::from_static("hx-trigger"),
+                HeaderValue::from_static("reload-selector"),
+            )
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
 // endregion: teaminfo
+// region: sponsors
+
+async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        create_dir_all(format!("./sponsors"))
+            .await
+            .expect("Could not create team preset directory");
+
+        while let Some(field) = form
+            .next_field()
+            .await
+            .expect("Could not get next field of sponsor multipart")
+        {
+            let mut f = File::create(format!(
+                "./sponsors/{}.{}",
+                id_create(12),
+                field.file_name().unwrap().split(".").collect::<Vec<&str>>()[1]
+            ))
+            .await
+            .expect("Could not create sponsor file");
+
+            f.write_all(field.bytes().await.unwrap().as_ref())
+                .await
+                .expect("Could not write to sponsor file");
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+// endregion: sponsors
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
