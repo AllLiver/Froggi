@@ -1180,7 +1180,10 @@ async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl In
 
         return Response::builder()
             .status(StatusCode::OK)
-            .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("reload-sponsor"))
+            .header(
+                HeaderName::from_static("hx-trigger"),
+                HeaderValue::from_static("reload-sponsor"),
+            )
             .body(String::new())
             .unwrap();
     } else {
@@ -1206,13 +1209,19 @@ async fn sponsors_management_handler() -> impl IntoResponse {
             _ => "",
         };
 
-        let f_bytes = tokio::fs::read(a.path()).await.expect("Could not read sponsor image");
+        let f_bytes = tokio::fs::read(a.path())
+            .await
+            .expect("Could not read sponsor image");
 
         html += &format!(
-        "<div>
+            "<div>
             <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
             <button hx-post=\"/sponsors/remove/{}\" hx-swap=\"none\">Remove</button>
-        </div>", mime, BASE64_STANDARD.encode(f_bytes), fname_vec[0]);
+        </div>",
+            mime,
+            BASE64_STANDARD.encode(f_bytes),
+            fname_vec[0]
+        );
     }
 
     return Html::from(html);
@@ -1224,7 +1233,13 @@ async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl 
         let mut p = PathBuf::new();
 
         while let Ok(Some(a)) = d.next_entry().await {
-            if a.file_name().to_string_lossy().to_string().split(".").collect::<Vec<&str>>()[0] == id {
+            if a.file_name()
+                .to_string_lossy()
+                .to_string()
+                .split(".")
+                .collect::<Vec<&str>>()[0]
+                == id
+            {
                 p = a.path();
                 break;
             }
@@ -1234,7 +1249,10 @@ async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl 
 
         return Response::builder()
             .status(StatusCode::OK)
-            .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("reload-sponsor"))
+            .header(
+                HeaderName::from_static("hx-trigger"),
+                HeaderValue::from_static("reload-sponsor"),
+            )
             .body(String::new())
             .unwrap();
     } else {
