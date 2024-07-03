@@ -1183,7 +1183,7 @@ form input[type="file"] {
     border-radius: 5px;
     background-color: #fff;
     color: #000;
-    width: 40%;
+    width: 95%;
 }
 
 form input[type="color"] {
@@ -1201,6 +1201,7 @@ form input[type="submit"],
     cursor: pointer;
     margin-top: 20px;
     font-weight: 600;
+    width: 100%;
 }
 
 .home-section label[for="home_name"],
