@@ -18,7 +18,7 @@ body {
 .score-rectangle {
     background-color: #1d1e22;
     width: 35.73vw;
-    height: 33vh;
+    height: 29vh;
     border-radius: 0.86vw;
     display: flex;
     justify-content: space-between;

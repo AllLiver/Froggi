@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <!--TODO: style iframe, sponsor on overlay & fix gaps on overlay after alliver puts in teaminfo, simplify overlay naming scheme, add default color to home and away-->
+    <!--TODO: style iframe (hide scroll bar), sponsor on overlay & fix gaps on overlay after alliver puts in teaminfo, simplify overlay naming scheme, add default color to home and away-->
     <nav>
         <button class="hamburger-menu" onclick="toggleMenu()">
             <span class="line"></span>
@@ -91,12 +91,12 @@
                 <div class="downs-rectangle">
                     <div class="downs-container">
                         <div class="counter-container">
-                            <button class="button-decrement-togo" hx-post="/decrement/togo">-</button>
+                            <button class="button-decrement-downs" hx-post="/decrement/togo">-</button>
                             <div class="counter">
-                                <div id="togo-counter" class="counter-value">0</div>
-                                <div class="counter-subtext">TO-GO</div>
+                                <div id="downs-counter" class="counter-value">0</div>
+                                <div class="counter-subtext">Downs</div>
                             </div>
-                            <button class="button-increment-togo" hx-post="/increment/togo">+</button>
+                            <button class="button-increment-downs" hx-post="/increment/togo">+</button>
                         </div>
                         <div class="quick-down-buttons">
                             <button class="button-quick-down" hx-post="/quickscore/down/1">1st down</button>
@@ -104,6 +104,22 @@
                             <button class="button-quick-down" hx-post="/quickscore/down/3">3rd down</button>
                             <button class="button-quick-down" hx-post="/quickscore/down/4">4th down</button>
                         </div>
+                        <div class="counter-container">
+                        <button class="button-decrement-togo" hx-post="/decrement/togo">-</button>
+                        <div class="counter">
+                            <div id="togo-counter" class="counter-value">0</div>
+                            <div class="counter-subtext">TO-GO</div>
+                        </div>
+                        <button class="button-increment-togo" hx-post="/increment/togo">+</button>
+                    </div>
+                    <div class="quick-togo-buttons">
+                        <button class="button-togo-down" hx-post="">0</button>
+                        <button class="button-togo-down" hx-post="">10</button>
+                        <button class="button-togo-down" hx-post="">20</button>
+                        <button class="button-togo-down" hx-post="">30</button>
+                        <button class="button-togo-down" hx-post="">40</button>
+                        <button class="button-togo-down" hx-post="">50</button>
+                    </div>
                     </div>
                 </div>
             </div>
