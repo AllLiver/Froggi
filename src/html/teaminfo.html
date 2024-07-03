@@ -72,6 +72,8 @@
                 <input type="submit" value="Submit">
                 <img class="htmx-indicator" src="/spinner.svg">
             </form>
+            <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body">
+            </div>
         </div>
     </div>
     <script src="/app.js"></script>

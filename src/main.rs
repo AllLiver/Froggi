@@ -27,7 +27,7 @@ use std::{
     time::{Instant, UNIX_EPOCH},
 };
 use tokio::{
-    fs::{create_dir_all, read_dir, remove_dir_all, File},
+    fs::{create_dir_all, read_dir, remove_dir_all, remove_file, File},
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
     sync::Mutex,
@@ -148,6 +148,8 @@ async fn main() -> Result<()> {
         .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
         // Sponsor routes
         .route("/sponsors/upload", post(upload_sponsors_handler))
+        .route("/sponsors/manage", put(sponsors_management_handler))
+        .route("/sponsors/remove/:id", post(sponsor_remove_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -1013,8 +1015,8 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
             let mut home_img_path = PathBuf::new();
             let mut away_img_path = PathBuf::new();
 
-            let mut home_tag_type = String::new();
-            let mut away_tag_type = String::new();
+            let mut home_tag_type = "";
+            let mut away_tag_type = "";
 
             let mut teaminfo = Teaminfo::new();
 
@@ -1027,19 +1029,19 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
                     home_img_path = d0.path();
 
                     home_tag_type = match file_name.split(".").collect::<Vec<&str>>()[1] {
-                        "png" => String::from("png"),
-                        "jpg" => String::from("jpeg"),
-                        "jpeg" => String::from("jpeg"),
-                        _ => String::new(),
+                        "png" => "png",
+                        "jpg" => "jpeg",
+                        "jpeg" => "jpeg",
+                        _ => "",
                     }
                 } else if file_name.starts_with("away.") {
                     away_img_path = d0.path();
 
                     away_tag_type = match file_name.split(".").collect::<Vec<&str>>()[1] {
-                        "png" => String::from("png"),
-                        "jpg" => String::from("jpeg"),
-                        "jpeg" => String::from("jpeg"),
-                        _ => String::new(),
+                        "png" => "png",
+                        "jpg" => "jpeg",
+                        "jpeg" => "jpeg",
+                        _ => "",
                     }
                 } else if file_name == "teams.json" {
                     let f = File::open(d0.path())
@@ -1068,7 +1070,7 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
             let id = d.file_name().to_string_lossy().to_string();
 
             html += &format!(
-                "<div class=\"match-selector\">
+            "<div class=\"match-selector\">
                 <img src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
                 <p>{} vs {}</p>
                 <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
@@ -1178,6 +1180,61 @@ async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl In
 
         return Response::builder()
             .status(StatusCode::OK)
+            .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("reload-sponsor"))
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn sponsors_management_handler() -> impl IntoResponse {
+    let mut d = read_dir("./sponsors").await.unwrap();
+    let mut html = String::new();
+
+    while let Ok(Some(a)) = d.next_entry().await {
+        let fname = a.file_name().to_string_lossy().to_string();
+        let fname_vec = fname.split(".").collect::<Vec<&str>>();
+
+        let mime = match fname_vec[1] {
+            "png" => "png",
+            "jpg" => "jpeg",
+            "jpeg" => "jpeg",
+            _ => "",
+        };
+
+        let f_bytes = tokio::fs::read(a.path()).await.expect("Could not read sponsor image");
+
+        html += &format!(
+        "<div>
+            <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
+            <button hx-post=\"/sponsors/remove/{}\" hx-swap=\"none\">Remove</button>
+        </div>", mime, BASE64_STANDARD.encode(f_bytes), fname_vec[0]);
+    }
+
+    return Html::from(html);
+}
+
+async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut d = read_dir("./sponsors").await.unwrap();
+        let mut p = PathBuf::new();
+
+        while let Ok(Some(a)) = d.next_entry().await {
+            if a.file_name().to_string_lossy().to_string().split(".").collect::<Vec<&str>>()[0] == id {
+                p = a.path();
+                break;
+            }
+        }
+
+        remove_file(p).await.expect("Could not remove sponsor file");
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("reload-sponsor"))
             .body(String::new())
             .unwrap();
     } else {
