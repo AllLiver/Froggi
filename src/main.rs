@@ -48,6 +48,7 @@ struct AppState {
     home_points: Arc<Mutex<u32>>,
     away_points: Arc<Mutex<u32>>,
     quarter: Arc<Mutex<u8>>,
+    preset_id: Arc<Mutex<String>>
 }
 
 #[tokio::main]
@@ -57,6 +58,7 @@ async fn main() -> Result<()> {
         home_points: Arc::new(Mutex::new(0)),
         away_points: Arc::new(Mutex::new(0)),
         quarter: Arc::new(Mutex::new(1)),
+        preset_id: Arc::new(Mutex::new(String::new()))
     };
 
     // Validate required files and directories
@@ -143,6 +145,7 @@ async fn main() -> Result<()> {
         .route("/teaminfo", get(teaminfo_handler))
         .route("/teaminfo/create", post(teaminfo_preset_create_handler))
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
+        .route("/teaminfo/set/:id", post(teaminfo_preset_set_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -1061,18 +1064,45 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
                 <img src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
                 <p>{} vs {}</p>
                 <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
+                <button hx-post=\"/teaminfo/set/{}\" hx-swap=\"none\">Set</button>
             </div>",
                 home_tag_type,
                 BASE64_STANDARD.encode(home_img_bytes),
                 teaminfo.home_name,
                 teaminfo.away_name,
                 away_tag_type,
-                BASE64_STANDARD.encode(away_img_bytes)
+                BASE64_STANDARD.encode(away_img_bytes),
+                d.file_name().to_string_lossy().to_string()
             );
         }
     }
 
     return Html::from(html);
+}
+
+async fn teaminfo_preset_set_handler(jar: CookieJar, State(state): State<AppState>, Path(id): Path<String>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut dir = read_dir("./team-presets").await.unwrap();
+
+        while let Ok(Some(a)) = dir.next_entry().await {
+            if a.file_type().await.expect("Could not get file type of dir entry").is_dir() {
+                if a.file_name().to_string_lossy().to_string() == id {
+                    *state.preset_id.lock().await = id.clone();
+                    break;
+                }
+            }
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
 }
 
 // endregion: teaminfo
