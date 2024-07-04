@@ -1,7 +1,7 @@
 const version = '2.0.0';
-const pingTime = '1000';
-const pingUrl = 'http://localhost:3000';
-const previewUrl = 'http://localhost:3000/overlay';
+const pingTime = '1000'; // Change to update ping at a different interval, default is 1000ms
+const pingUrl = 'http://localhost:3000'; // Change when to the local ip when acsessing from a different device, default is localhost:3000/
+const previewUrl = 'http://localhost:3000/overlay'; // Change when to the local ip when acsessing from a different device, default is localhost:3000/overlay
 const lockInterfaceBtn = document.getElementById('lockInterfaceBtn');
 
 function updateVersion() {
