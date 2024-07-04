@@ -2,7 +2,7 @@
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
-Is a self-hosted scoreboard overlay software that aims to provide an easy-to-use overlay for sports broadcasting!
+Is a portable self-hosted scoreboard overlay software that aims to provide an easy-to-use overlay for sports broadcasting!
 
 # Usage
 When you run the binary for the first time it should generate all the files and folders it needs  
