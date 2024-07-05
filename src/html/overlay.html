@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>Overlay</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
+        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
+        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
+    <link rel="icon" href="/favicon.png">
     <script>
         // Auto Fullscreen
         document.addEventListener('DOMContentLoaded', function () {
@@ -27,36 +33,40 @@
     <link rel="icon" href="/favicon.png">
     <!-- Todo: popups (with superman animations as per T's request ), countdown, sponsor, hide overlay-->
 </head>
-
-<body id="chromakey-body">
-    <div id="overlay">
-        <div class="info-container">
-            <div class="info-box home-box">
-                <img class="logo" src="home_png" alt="Home">
-                <div class="team-name" hx-put="/hname_score" hx-trigger="every 100ms"></div>
+ <!--* Ol for overlay, you can change any div class as you want, delete everything, or modify the prefixes just lmk-->
+ <body id="overlay-body">
+    <div id="ol-overlay">
+        <div class="ol-info-container">
+            <div class="ol-info-box ol-home-box">
+                <img class="ol-team-logo" src="home_png" alt="Home">
+                <div class="ol-team-name-info" hx-put="/hname_score" hx-trigger="every 100ms"></div>
             </div>
-            <div class="info-box away-box">
-                <img class="logo" src="away_png" alt="Away">
-                <div class="team-name" hx-put="/aname_score" hx-trigger="every 100ms"></div>
+            <div class="ol-info-box ol-away-box">
+                <img class="ol-team-logo" src="away_png" alt="Away">
+                <div class="ol-team-name-info" hx-put="/aname_score" hx-trigger="every 100ms"></div>
             </div>
-            <div class="info-box quarter-box">
-                <div hx-put="/time_and_quarter" hx-trigger="every 10ms">12:00 - 1st</div>
+            <div class="ol-info-box ol-quarter-box">
+                <div class="ol-time-quarter-info" hx-put="/time_and_quarter" hx-trigger="every 10ms">12:00 - 1st</div>
             </div>
-            <div class="info-box score-box">
+            <div class="ol-info-box ol-score-box">
                 <h3>12-12</h3>
             </div>
-            <div class="info-box down-togo-box">
-               <h3>1st & 10</h3>
+            <div class="ol-info-box ol-down-togo-box">
+                <h3>1st & 10</h3>
             </div>
         </div>
     </div>
 
-
-    <div class="sponsor-container" id="sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div>
-    <div id="countdown" hx-put="/countdown_display" hx-trigger="every 10ms"></div>
-    <div class="popup-container" id="popupContainer" hx-put="/popup" hx-trigger="every 10ms">
-        <p id="popupText"></p>
+    <div class="ol-sponsor-container" id="ol-sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div>
+    <div id="ol-countdown" hx-put="/countdown_display" hx-trigger="every 10ms"></div>
+    <div class="ol-popup-container" id="ol-popupContainer" hx-put="/popup" hx-trigger="every 10ms">
+        <p id="ol-popupText"></p>
     </div>
-
+    <script>
+        var overlayColor = localStorage.getItem('overlay_color');
+        if (overlayColor) {
+            document.body.style.backgroundColor = overlayColor;
+        }
+    </script>
 </body>
 </html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+    <title>Settings</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
+        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
+    <script src="/htmx.js"></script>
+    <link rel="icon" href="/favicon.png">
+</head>
+<body id="settings-body">
+    <!--TODO:-->
+    <nav>
+        <button class="hamburger-menu" onclick="toggleMenu()">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </button>
+        <ul class="sidenavbar">
+            <li><a href="/">Dashboard</a></li>
+            <li><a href="/teaminfo">Sponsors & Teaminfo</a></li>
+            <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
+            <li><a href="/settings" class="nav-active">Settings</a></li>
+        </ul>
+    </nav>
+    <div class="settings-container">
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Overlay background color</h2>
+                <div class="subtext-settings">
+                    <h6>Optionally, you can change the chromakey color on the overlay page.</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <input type="color" value="#00b140">
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Host IP</h2>
+                <div class="subtext-settings">
+                    <h6>When acsessing from a seperate device, this will need to be set to calculate ping and show the preview.</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <input type="text" name="host-ip" placeholder="X.X.X.X:3000" oninput="sanitize(this)">
+            </div>
+        </div>
+        <div class="settings-box-indev">
+            <div class="settings-title">
+                <h2>Scoresight OCR</h2>
+                <div class="subtext-settings">
+                    <h6>Scoresight is an open source OCR built for scoreboards developed by royshil liscenced with MIT, it is not included with the download of froggi. It can be used to automate the scoreboard overlay, but requires to be setup individually.</h6><br>
+                    <h6>The scoresight liveserver needs to be saved to ../../.../ocr, and is not customizable.</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <p>Ocr</p> 
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="settings-box-indev">
+            <div class="settings-title">
+                <h2>Keybinds</h2>
+                <div class="subtext-settings">
+                    <h6>Customizable keybinds makes it a breeze to keep score without a touchscreen.</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <input type="text" id="keybind-input" name="keybind" placeholder="Press a key" readonly>
+            </div>
+        </div>
+    </div>
+    <script src="/app.js"></script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+// TODO: Change consts to just 1, so it will add /overlay its self
 const version = '2.0.0';
 const pingTime = '1000'; // Change to update ping at a different interval, default is 1000ms
 const pingUrl = 'http://localhost:3000'; // Change when to the local ip when acsessing from a different device, default is localhost:3000/
@@ -43,7 +44,7 @@ lockInterfaceBtn.addEventListener('click', function(event) {
             localStorage.setItem('lockState', 'locked');
         } else {
             lockInterfaceBtn.innerHTML = '<strong>Lock Interface</strong>';
-            localStorage.setItem('lockState', 'unlocked');
+             localStorage.setItem('lockState', 'unlocked');
         }
     }
 });

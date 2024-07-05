@@ -28,6 +28,7 @@ body {
     position: relative;
     margin-bottom: 0.65vh;
     margin-left: 0.5vw;
+    overflow: hidden;
 }
 
 .score-rectangle {
@@ -693,6 +694,7 @@ iframe {
 .preview-iframe {
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 /* Clock box
@@ -973,7 +975,7 @@ iframe {
 }
 
 /* Hover effect */
-.button-increment-home:hover,.button-decrement-home:hover,.button-increment-away:hover,.button-decrement-away:hover,.button-increment-togo:hover,.button-decrement-togo:hover,.button-decrement-down:hover,.button-decrement-countdown:hover,.button-increment-countdown:hover,.button-decrement-quarter,.button-increment-quarter,.button-quick-score-home:hover,.button-quick-score-away:hover,.button-quick-down:hover,.button-start-countdown:hover,.button-stop-countdown:hover,.button-quick-time:hover,.button-quick-countdown:hover,.flag-home:hover,.flag-away:hover,.show-countdown:hover,.button-lock-interface:hover,.button-quick-quarter:hover,.create-login-rectangle input[type="submit"]:hover,.login-rectangle input[type="submit"]:hover,.button-quick-clock:hover,.button-stop-clock:hover,.button-start-clock:hover,.show-sponsors:hover,.submit-button:hover,.show-scoreboard:hover,.submit-button:hover{transform:scale(1.01)}
+.button-increment-home:hover,.button-decrement-home:hover,.button-increment-away:hover,.button-decrement-away:hover,.button-increment-togo:hover,.button-decrement-togo:hover,.button-decrement-down:hover,.button-decrement-countdown:hover,.button-increment-countdown:hover,.button-decrement-quarter,.button-increment-quarter,.button-quick-score-home:hover,.button-quick-score-away:hover,.button-quick-down:hover,.button-start-countdown:hover,.button-stop-countdown:hover,.button-quick-time:hover,.button-quick-countdown:hover,.flag-home:hover,.flag-away:hover,.show-countdown:hover,.button-lock-interface:hover,.button-quick-quarter:hover,.create-login-rectangle input[type="submit"]:hover,.login-rectangle input[type="submit"]:hover,.button-quick-clock:hover,.button-stop-clock:hover,.button-start-clock:hover,.show-sponsors:hover,.submit-button:hover,.show-scoreboard:hover,.submit-button:hover,.show-downs:hover{transform:scale(1.01)}
 
 .watermark {
     position: absolute;
@@ -1077,12 +1079,9 @@ canvas {
     border-radius: 5px;
 }
 
-
-
-
 /*& Overlay.html styles */
 
-#overlay {
+#ol-overlay {
     background-color: rgb(0, 177, 64);
     cursor: none;
     color: black;
@@ -1093,7 +1092,7 @@ canvas {
     height: 100vh;
 }
 
-#chromakey-body {
+#overlay-body {
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -1101,7 +1100,7 @@ canvas {
     background-color: rgb(0, 177, 64);
 }
 
-.info-container {
+.ol-info-container {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1113,7 +1112,7 @@ canvas {
     gap: 0.5rem;
 }
 
-.info-box {
+.ol-info-box {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1126,34 +1125,34 @@ canvas {
     flex: 1;
 }
 
-.logo {
+.ol-team-logo {
     height: 2.59vh;
     width: auto;
     margin-right: 0.26vw;
 }
 
-.team-name {
+.ol-team-name-info {
     flex: 1;
     text-align: center;
 }
 
-.team-score {
+.ol-team-score {
     font-size: 1.5em;
     font-weight: bold;
 }
 
-.home-box,
-.away-box {
+.ol-home-box,
+.ol-away-box {
     min-width: 9vw;
 }
 
-.score-box h3,
-.down-togo-box h3 {
+.ol-score-box h3,
+.ol-down-togo-box h3 {
     margin: 0;
 }
 
-.score-box h3,
-.down-togo-box h3 {
+.ol-score-box h3,
+.ol-down-togo-box h3 {
     margin: 0;
     white-space: nowrap;
 }
@@ -1175,7 +1174,7 @@ canvas {
     border-radius: 10px;
     padding: 2vw;
     margin: 1vw;
-    width: calc(30% - 2vw);
+    width: calc(32% - 2vw);
     box-sizing: border-box;
     color: white;
 }
@@ -1193,6 +1192,26 @@ form {
 
 form label {
     margin: 0.93vh 0 0.46vh;
+}
+
+#subtext-multiple {
+    display: inline; 
+    color: #ff0000; 
+    font-style: italic; 
+    font-size: 0.75em;
+    font-weight: bold;
+    font-family: "open-sans", sans-serif;
+}
+
+.label-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5vh;
+}
+
+.label-container label {
+    margin: 0;
+    margin-right: 0.5em;
 }
 
 form input[type="text"],
@@ -1236,6 +1255,10 @@ form input[type="submit"],
     color: #ff8601;
 }
 
+.ti-away-section {
+    margin-top: 4vh;
+}
+
 .logo-previews {
     display: flex;
     justify-content: space-around;
@@ -1248,4 +1271,90 @@ form input[type="submit"],
     height: 4.63vh;
     border: 1px solid #fff;
     border-radius: 5px;
+}
+
+/*& Settings */
+
+.settings-container {
+    max-width: 41.67vw;
+    margin: 0 auto;
+    margin-top: 5vh;
+}
+.settings-box {
+    background-color: #1d1e22;
+    border-radius: 8px;
+    padding: 2.22vh;
+    margin-bottom: 2.22vh;
+}
+.settings-box-indev {
+    background-color: #1d1e22;
+    border-radius: 8px;
+    padding: 2.22vh;
+    margin-bottom: 2.22vh;
+    filter: blur(0.1vh);
+    cursor: not-allowed;
+}
+.settings-title h2 {
+    margin: 0;
+    font-size: 2vh;
+    font-weight: bold;
+}
+.subtext-settings h6 {
+    margin: 0.56vh 0 1.67vh;
+    font-size: 1.56vh;
+    font-weight: normal;
+    color: #e0e0e0;
+    font-style: italic;
+}
+.setting {
+    display: flex;
+    align-items: center;
+}
+.setting input {
+    margin-right: 0.52vw;
+}
+.switch-container {
+    margin-left: 1vw;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 3.13vw;
+    height: 3.78vh;
+}
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 3.78vh;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 2.89vh;
+    width: 1.35vw;
+    left: 0.21vw;
+    bottom: 0.44vh;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+input:checked + .slider {
+    background-color: #2196F3;
+}
+input:focus + .slider {
+    box-shadow: 0 0 0.05vw #2196F3;
+}
+input:checked + .slider:before {
+    transform: translateX(1.35vw);
 }
