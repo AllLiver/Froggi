@@ -22,9 +22,7 @@ use lazy_static::lazy_static;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
-    path::PathBuf,
-    sync::Arc,
-    time::{Instant, UNIX_EPOCH},
+    path::PathBuf, sync::Arc, time::{Instant, UNIX_EPOCH}
 };
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, remove_file, File},
@@ -45,7 +43,9 @@ lazy_static! {
 #[derive(Clone)]
 struct AppState {
     home_points: Arc<Mutex<u32>>,
+    home_name: Arc<Mutex<String>>,
     away_points: Arc<Mutex<u32>>,
+    away_name: Arc<Mutex<String>>,
     quarter: Arc<Mutex<u8>>,
     preset_id: Arc<Mutex<String>>,
 }
@@ -55,7 +55,9 @@ async fn main() -> Result<()> {
     // Initialize the application state
     let state = AppState {
         home_points: Arc::new(Mutex::new(0)),
+        home_name: Arc::new(Mutex::new(String::from("Home"))),
         away_points: Arc::new(Mutex::new(0)),
+        away_name: Arc::new(Mutex::new(String::from("Away"))),
         quarter: Arc::new(Mutex::new(1)),
         preset_id: Arc::new(Mutex::new(String::new())),
     };
@@ -146,10 +148,15 @@ async fn main() -> Result<()> {
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
         .route("/teaminfo/set/:id", post(teaminfo_preset_set_handler))
         .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
+        .route("/teaminfo/name/:t", put(team_name_display_handler))
         // Sponsor routes
         .route("/sponsors/upload", post(upload_sponsors_handler))
         .route("/sponsors/manage", put(sponsors_management_handler))
         .route("/sponsors/remove/:id", post(sponsor_remove_handler))
+        // Overlay display routes
+        .route("/points/overview", put(points_overview_handler))
+        .route("/icon/:t", put(icon_handler))
+        .route("/overlay/clock", put(overlay_clock_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -1108,6 +1115,25 @@ async fn teaminfo_preset_set_handler(
             {
                 if a.file_name().to_string_lossy().to_string() == id {
                     *state.preset_id.lock().await = id.clone();
+
+                    let mut a_json = String::new();
+
+                    let a_json_f = File::open(format!("{}/teams.json", a.path().to_string_lossy().to_string()))
+                        .await
+                        .expect("Could not open preset file");
+                    let mut buf_reader = BufReader::new(a_json_f);
+
+                    buf_reader
+                        .read_to_string(&mut a_json)
+                        .await
+                        .expect("Could not read preset file");
+
+                    let team_info: Teaminfo =
+                        serde_json::from_str(&a_json).expect("Could not deserialize preset file");
+
+                    *state.home_name.lock().await = team_info.home_name;
+                    *state.away_name.lock().await = team_info.away_name;
+
                     break;
                 }
             }
@@ -1148,6 +1174,19 @@ async fn teaminfo_preset_remove_handler(
             .status(StatusCode::UNAUTHORIZED)
             .body(String::new())
             .unwrap();
+    }
+}
+
+async fn team_name_display_handler(
+    Path(t): Path<String>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    if t == "home" {
+        return Html::from(state.home_name.lock().await.clone());
+    } else if t == "away" {
+        return Html::from(state.away_name.lock().await.clone());
+    } else {
+        return Html::from(String::new());
     }
 }
 
@@ -1264,6 +1303,67 @@ async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl 
 }
 
 // endregion: sponsors
+// region: overlay
+
+async fn points_overview_handler(State(state): State<AppState>) -> impl IntoResponse {
+    Html::from(format!("<h3>{}-{}</h3>", state.home_points.lock().await, state.away_points.lock().await))
+}
+
+// "<img class=\"ol-team-logo\" src=\"data:image/{};base64,{}\" height=\"30px\" width=\"auto\" alt=\"team-icon\">"
+
+async fn icon_handler(Path(t): Path<String>, State(state): State<AppState>) -> impl IntoResponse {
+    let mut d = read_dir(format!("./team-presets/{}", state.preset_id.lock().await)).await.expect("Could not read preset dir");
+
+    while let Ok(Some(f)) = d.next_entry().await {
+        if !f.file_type().await.unwrap().is_dir() {
+            let fname = f.file_name().to_string_lossy().to_string();
+
+            if t == "home" && fname.starts_with("home.") {
+                let img_bytes = tokio::fs::read(f.path()).await.expect("Could not read img bytes");
+
+                let mime_type = match fname.split(".").collect::<Vec<&str>>()[1] {
+                    "png" => "png",
+                    "jpg" => "jpeg",
+                    "jpeg" => "jpeg",
+                    _ => "",
+                };
+
+                return Html::from(format!("<img class=\"ol-team-logo\" src=\"data:image/{};base64,{}\" height=\"30px\" width=\"auto\" alt=\"home-icon\">", mime_type, BASE64_STANDARD.encode(img_bytes)));
+            } else if t == "away" && fname.starts_with("away.") {
+                let img_bytes = tokio::fs::read(f.path()).await.expect("Could not read img bytes");
+
+                let mime_type = match fname.split(".").collect::<Vec<&str>>()[1] {
+                    "png" => "png",
+                    "jpg" => "jpeg",
+                    "jpeg" => "jpeg",
+                    _ => "",
+                };
+
+                return Html::from(format!("<img class=\"ol-team-logo\" src=\"data:image/{};base64,{}\" height=\"30px\" width=\"auto\" alt=\"away-icon\">", mime_type, BASE64_STANDARD.encode(img_bytes)));
+            }
+        }
+    }
+
+    return Html::from(String::new());
+}
+
+async fn overlay_clock_handler(State(state): State<AppState>) -> impl IntoResponse {
+    let game_clock = GAME_CLOCK.lock().await;
+
+    let quarter = state.quarter.lock().await;
+
+    let quarter_display = match *quarter {
+        1 => "1st",
+        2 => "2nd",
+        3 => "3rd",
+        4 => "4th",
+        _ => "OT",
+    };
+
+    Html::from(format!("{}:{} - {}", *game_clock / 60, *game_clock % 60, quarter_display))
+}
+
+// endregion: overlay
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";

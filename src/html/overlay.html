@@ -38,18 +38,17 @@
     <div id="ol-overlay">
         <div class="ol-info-container">
             <div class="ol-info-box ol-home-box">
-                <img class="ol-team-logo" src="home_png" alt="Home">
-                <div class="ol-team-name-info" hx-put="/hname_score" hx-trigger="every 100ms"></div>
+                <div hx-put="/icon/home" hx-trigger="load"></div>
+                <div class="ol-team-name-info" hx-put="/teaminfo/name/home" hx-trigger="load"></div>
+            </div>
+            <div class="ol-info-box ol-score-box" hx-put="/points/overview" hx-trigger="every 10ms">
             </div>
             <div class="ol-info-box ol-away-box">
-                <img class="ol-team-logo" src="away_png" alt="Away">
-                <div class="ol-team-name-info" hx-put="/aname_score" hx-trigger="every 100ms"></div>
+                <div class="ol-team-name-info" hx-put="/teaminfo/name/away" hx-trigger="load"></div>
+                <div hx-put="/icon/away" hx-trigger="load"></div>
             </div>
             <div class="ol-info-box ol-quarter-box">
-                <div class="ol-time-quarter-info" hx-put="/time_and_quarter" hx-trigger="every 10ms">12:00 - 1st</div>
-            </div>
-            <div class="ol-info-box ol-score-box">
-                <h3>12-12</h3>
+                <div class="ol-time-quarter-info" hx-put="/overlay/clock" hx-trigger="every 10ms">0:0 - 1st</div>
             </div>
             <div class="ol-info-box ol-down-togo-box">
                 <h3>1st & 10</h3>
