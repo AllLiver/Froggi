@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
     <title>Overlay</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
-        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
-        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="no-referrer">
@@ -26,31 +28,30 @@
                 document.documentElement.msRequestFullscreen();
             }
         });
+
         function updateSponsorImage() {
         }
+        
         updateSponsorImage();
     </script>
-    <link rel="icon" href="/favicon.png">
-    <!-- Todo: popups (with superman animations as per T's request ), countdown, sponsor, hide overlay-->
+    <!-- Todo: Updated div names hopefully for the last time, popups (with superman animations as per T's request ), countdown, sponsor, hide overlay-->
 </head>
- <!--* Ol for overlay, you can change any div class as you want, delete everything, or modify the prefixes just lmk-->
- <body id="overlay-body">
-    <div id="ol-overlay">
-        <div class="ol-info-container">
-            <div class="ol-info-box ol-home-box">
+<body id="overlay-body">
+    <div class="ol-parent-container">
+        <div class="ol-container">
+            <div class="ol-home-box">
                 <div hx-put="/icon/home" hx-trigger="load"></div>
-                <div class="ol-team-name-info" hx-put="/teaminfo/name/home" hx-trigger="load"></div>
+                <div class="ol-team-name" hx-put="/teaminfo/name/home" hx-trigger="load"></div>
             </div>
-            <div class="ol-info-box ol-score-box" hx-put="/points/overview" hx-trigger="every 10ms">
-            </div>
-            <div class="ol-info-box ol-away-box">
-                <div class="ol-team-name-info" hx-put="/teaminfo/name/away" hx-trigger="load"></div>
+            <div class="ol-score-box" hx-put="/points/overview" hx-trigger="every 10ms"></div>
+            <div class="ol-away-box">
+                <div class="ol-team-name" hx-put="/teaminfo/name/away" hx-trigger="load"></div>
                 <div hx-put="/icon/away" hx-trigger="load"></div>
             </div>
-            <div class="ol-info-box ol-quarter-box">
-                <div class="ol-time-quarter-info" hx-put="/overlay/clock" hx-trigger="every 10ms">0:0 - 1st</div>
+            <div class="ol-quarter-box">
+                <div class="ol-time-quarter" hx-put="/overlay/clock" hx-trigger="every 10ms">0:0 - 1st</div>
             </div>
-            <div class="ol-info-box ol-down-togo-box">
+            <div class="ol-down-box">
                 <h3>1st & 10</h3>
             </div>
         </div>
@@ -61,11 +62,33 @@
     <div class="ol-popup-container" id="ol-popupContainer" hx-put="/popup" hx-trigger="every 10ms">
         <p id="ol-popupText"></p>
     </div>
+
+    <div id="flag-home" class="ol-popup-home">Flag home</div>
+    <div id="timeout-home" class="ol-popup-home">Timeout home</div>
+    <div id="touchdown-home" class="ol-popup-home">Touchdown home</div>
+    <div id="foul-home" class="ol-popup-home">Foul home</div>
+    
+    <div id="flag-away" class="ol-popup-away">Flag away</div>
+    <div id="timeout-away" class="ol-popup-away">Timeout away</div>
+    <div id="touchdown-away" class="ol-popup-away">Touchdown away</div>
+    <div id="foul-away" class="ol-popup-away">Foul away</div>
+
     <script>
-        var overlayColor = localStorage.getItem('overlay_color');
-        if (overlayColor) {
-            document.body.style.backgroundColor = overlayColor;
-        }
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'F' || event.key === 'f') {
+                    var popup = document.getElementById('foul-home');
+                    popup.classList.add('show');
+                    setTimeout(function() {
+                        popup.classList.remove('show');
+                    }, 7500);
+                } else if (event.key === 'J' || event.key === 'j') {
+                    var popup = document.getElementById('foul-away');
+                    popup.classList.add('show');
+                    setTimeout(function() {
+                        popup.classList.remove('show');
+                    }, 7500); 
+                }
+            });
     </script>
 </body>
 </html>

@@ -2,27 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Create Login</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
-        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
+    <title>Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
     <script src="/htmx.js"></script>
+    <script src="/app.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
 <body id="login-body">
     <canvas id="background"></canvas>
-
     <div class="create-login-rectangle">
         <h1>Create Login</h1>
-        <form hx-post="/login/create" hx-swap="innerHTML" hx-target="#message_create_login" onsubmit="return validateForm()">
+        <form id="create-login-form" hx-post="/login/create" hx-swap="innerHTML" hx-target="#message_create_login" onsubmit="return validateForm()">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
+            <input type="text" id="username" name="username" oninput="this.value = sanitizeInput(this.value)">
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
+            <input type="password" id="password" name="password" oninput="this.value = sanitizeInput(this.value)">
 
             <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password">
+            <input type="password" id="confirm_password" name="confirm_password" oninput="this.value = sanitizeInput(this.value)">
             <div id="password_error" class="error"></div>
 
             <input type="submit" value="Create">
@@ -44,7 +43,7 @@
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
                 radius: Math.random() * 20 + 10,
-                color: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`, // Reduced opacity
+                color: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`, 
                 vx: Math.random() * 4 - 2,
                 vy: Math.random() * 4 - 2
             });

@@ -6,10 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>Teaminfo & Sponsors</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
-        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css=" crossorigin="anonymous"
-        integrity="sha256-e1f50d68532d39499609e56dafc9ba99624404217f00decaa51c56332df0986c=">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"crossorigin="anonymous">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -18,9 +15,9 @@
     <link rel="icon" href="/favicon.png">
 </head>
 
-<body>
+<body id="teaminfo-body">
     <nav>
-        <button class="hamburger-menu" onclick="toggleMenu()">
+        <button class="hamburger-menu" onclick="toggle_menu()">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
@@ -38,7 +35,7 @@
             <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data" onsubmit="return sanitize(this);">
                 <div class="ti-home-section">
                     <label for="home_name">Home name:</label> <br>
-                    <input type="text" id="home_name" name="home_name" required maxlength="25"> <br>
+                    <input type="text" id="home_name" name="home_name" required maxlength="25"><br>
     
                     <label for="home_img">Home icon:</label> <br>
                     <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" required><br>
@@ -48,13 +45,13 @@
                 </div>
                 <div class="ti-away-section">
                     <label for="away_name">Away name:</label> <br>
-                    <input type="text" id="away_name" name="away_name" required maxlength="25"> <br>
+                    <input type="text" id="away_name" name="away_name" required maxlength="25"><br>
     
                     <label for="away_img">Away icon:</label> <br>
                     <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" required><br>
     
                     <label for="away_color">Away jersey color:</label> <br>
-                    <input type="color" id="away_color" name="away_color" value="#ff8601" required> <br>
+                    <input type="color" id="away_color" name="away_color" value="#ff8601" required><br>
                 </div>
                 
                 <input type="submit" value="Submit">

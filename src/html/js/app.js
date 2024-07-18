@@ -1,30 +1,36 @@
-// TODO: Change consts to just 1, so it will add /overlay its self
-const version = '2.0.0';
-const pingTime = '1000'; // Change to update ping at a different interval, default is 1000ms
-const pingUrl = 'http://localhost:3000'; // Change when to the local ip when acsessing from a different device, default is localhost:3000/
-const previewUrl = 'http://localhost:3000/overlay'; // Change when to the local ip when acsessing from a different device, default is localhost:3000/overlay
-const lockInterfaceBtn = document.getElementById('lockInterfaceBtn');
+const version = '2.0.0'; // Deprecated. Current version of the app, change when updating the app, using semantic versions.
+const ping_time = '1000'; // Change to update ping at a different interval, default is 1000ms.
+const ping_url = 'http://localhost:3000'; // Change when to the local ip when accessing from a different device, default is localhost:3000/
+const preview_url = 'http://localhost:3000/overlay'; // Change when to the local ip when accessing from a different device, default is localhost:3000/overlay
+const default_theme = 'theme-dark'; // Default theme, change to 'theme-light' or 'theme-colorblind' if you want to change the default theme (clear local storage), default is theme-dark.
+const lock_interface_btn = document.getElementById('lockInterfaceBtn'); // Change to the id of the button that will lock the interface, if null, the button will be disabled, default is 'lockInterfaceBtn'.
+const popup_duration = "7500"; // Change to update the duration of the popup, default is 7500ms.
 
-function updateVersion() {
-    const versionElement = document.getElementById('version-value');
-    versionElement.textContent = version;
+
+function update_version() {
+    const version_element = document.getElementById('version-value');
+    if (version_element) {
+        version_element.textContent = version;
+    } else {
+        console.error('Version value not found');
+    }
 }
 
-function toggleMenu() {
-    const menuButton = document.querySelector('.hamburger-menu');
-    const sideNav = document.querySelector('.sidenavbar');
-    menuButton.classList.toggle('active');
-    sideNav.classList.toggle('active');
+function toggle_menu() {
+    const menu_button = document.querySelector('.hamburger-menu');
+    const side_nav = document.querySelector('.sidenavbar');
+    menu_button.classList.toggle('active');
+    side_nav.classList.toggle('active');
 }
 
-function measurePing(url, callback) {
-    const startTime = performance.now();
+function measure_ping(url, callback) {
+    const start_time = performance.now();
 
     fetch(url, { method: 'HEAD', cache: 'no-store' })
         .then(response => {
             if (response.ok) {
-                const endTime = performance.now();
-                const time = Math.round(endTime - startTime);
+                const end_time = performance.now();
+                const time = Math.round(end_time - start_time);
                 callback(time);
             } else {
                 callback('Ping Error: ' + response.status);
@@ -35,38 +41,38 @@ function measurePing(url, callback) {
         });
 }
 
-lockInterfaceBtn.addEventListener('click', function(event) {
-    if (event.target !== lockInterfaceBtn) {
+lock_interface_btn.addEventListener('click', function(event) {
+    if (event.target !== lock_interface_btn) {
         document.body.classList.toggle('interface-locked');
         
         if (document.body.classList.contains('interface-locked')) {
-            lockInterfaceBtn.innerHTML = '<strong>Unlock Interface</strong>';
+            lock_interface_btn.innerHTML = '<strong>Unlock Interface</strong>';
             localStorage.setItem('lockState', 'locked');
         } else {
-            lockInterfaceBtn.innerHTML = '<strong>Lock Interface</strong>';
-             localStorage.setItem('lockState', 'unlocked');
+            lock_interface_btn.innerHTML = '<strong>Lock Interface</strong>';
+            localStorage.setItem('lockState', 'unlocked');
         }
     }
 });
 
 window.addEventListener('load', function() {
-    const lockState = localStorage.getItem('lockState');
+    const lock_state = localStorage.getItem('lockState');
     
-    if (lockState === 'locked') {
+    if (lock_state === 'locked') {
         document.body.classList.add('interface-locked');
-        lockInterfaceBtn.innerHTML = '<strong>Unlock Interface</strong>';
+        lock_interface_btn.innerHTML = '<strong>Unlock Interface</strong>';
     } else {
         document.body.classList.remove('interface-locked');
-        lockInterfaceBtn.innerHTML = '<strong>Lock Interface</strong>';
+        lock_interface_btn.innerHTML = '<strong>Lock Interface</strong>';
     }
 });
 
-function testLatency() {
-    var startTime = Date.now();
+function test_latency() {
+    const start_time = Date.now();
     fetch(window.location.href) 
         .then(function(response) {
-            var endTime = Date.now();
-            var latency = endTime - startTime;
+            const end_time = Date.now();
+            const latency = end_time - start_time;
             document.getElementById('ping-value').textContent = latency + ' ms';
         })
         .catch(function(err) {
@@ -75,16 +81,98 @@ function testLatency() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    var iframe = document.getElementById("previewIframe");
-    iframe.src = previewUrl;
+    const iframe = document.getElementById("previewIframe");
+    iframe.src = preview_url;
 });
 
-function sanitize(inputElement) {
-    var sanitizedValue = inputElement.value.replace(/[&<>"'/]/g, '');
-    inputElement.value = sanitizedValue;
+function sanitize(input_element) {
+    const sanitized_value = input_element.value.replace(/[&<>"'\\/?*]/g, '');
+    input_element.value = sanitized_value;
 }
 
-updateVersion();
-testLatency();
-setInterval(testLatency, pingTime);
+function toggle_theme(theme) {
+    document.body.classList.remove('theme-light', 'theme-dark', 'theme-colorblind');
+    document.body.classList.add(theme);
+    localStorage.setItem('currentTheme', theme); 
+}
 
+function load_theme() {
+    const saved_theme = localStorage.getItem('currentTheme');
+    console.log('Saved Theme:', saved_theme);
+
+    if (saved_theme) {
+        toggle_theme(saved_theme);
+    } else {
+        console.log('No theme set, applying default:', default_theme);
+        toggle_theme(default_theme); 
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('light-theme').addEventListener('click', function() {
+        toggle_theme('theme-light');
+    });
+
+    document.getElementById('dark-theme').addEventListener('click', function() {
+        toggle_theme('theme-dark');
+    });
+
+    document.getElementById('colorblind-theme').addEventListener('click', function() {
+        toggle_theme('theme-colorblind');
+    });
+
+    load_theme();
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    function initialize_buttons(start_button_id, stop_button_id, storage_key) {
+        const start_button = document.getElementById(start_button_id);
+        const stop_button = document.getElementById(stop_button_id);
+
+        start_button.addEventListener("click", function () {
+            start_button.classList.add("selector-active");
+            stop_button.classList.remove("selector-active");
+            localStorage.setItem(storage_key, "start");
+        });
+
+        stop_button.addEventListener("click", function () {
+            stop_button.classList.add("selector-active");
+            start_button.classList.remove("selector-active");
+            localStorage.setItem(storage_key, "stop");
+        });
+
+        const saved_state = localStorage.getItem(storage_key);
+        if (saved_state === "start") {
+            start_button.classList.add("selector-active");
+            stop_button.classList.remove("selector-active");
+        } else if (saved_state === "stop") {
+            stop_button.classList.add("selector-active");
+            start_button.classList.remove("selector-active");
+        }
+    }
+
+    initialize_buttons("countdownStartButton", "countdownStopButton", "countdownState");
+    initialize_buttons("clockStartButton", "clockStopButton", "clockState");
+    initialize_buttons("showAnimationStartButton", "showAnimationStopButton", "showAnimationState");
+    initialize_buttons("showCountdownStartButton", "showCountdownStopButton", "showCountdownState");
+    initialize_buttons("showDownsStartButton", "showDownsStopButton", "showDownsState");
+    initialize_buttons("showScoreboardStartButton", "showScoreboardStopButton", "showScoreboardState");
+    initialize_buttons("showPopupStartButton", "showPopupStopButton", "showPopupState");
+    initialize_buttons("showSponsorsStartButton", "showSponsorsStopButton", "showSponsorsState");
+});
+
+document.querySelectorAll('.cooldown').forEach(button => {
+    button.addEventListener('click', function() {
+        this.disabled = true;
+        this.classList.add('popup-cooldown');
+        
+        setTimeout(() => {
+            this.disabled = false;
+            this.classList.remove('popup-cooldown');
+        }, popup_duration);
+    });
+});
+
+update_version();
+test_latency();
+setInterval(test_latency, ping_time);

@@ -17,9 +17,9 @@
 </head>
 
 <body>
-    <!--TODO: sponsor on overlay, fix start and stop countdown and clock inconstiency (just merge the classes)-->
+    <!--TODO: iframe on ipad & indicators on ipad-->
     <nav>
-        <button class="hamburger-menu" onclick="toggleMenu()">
+        <button class="hamburger-menu" onclick="toggle_menu()">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
@@ -27,7 +27,7 @@
         <ul class="sidenavbar">
             <li><a href="/" class="nav-active">Dashboard</a></li>
             <li><a href="/teaminfo">Sponsors & Teaminfo</a></li>
-            <li><a href="/overlay"  target="_blank"  rel="noopener noreferrer">Overlay</a></li>
+            <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
             <li><a href="/settings">Settings</a></li>
         </ul>
     </nav>
@@ -37,7 +37,7 @@
             <div class="preview">
                 <a href="/overlay">
                     <div class="preview-rectangle">
-                        <iframe id="previewIframe" class="preview-iframe" frameborder="0"  scrolling="no"></iframe>
+                        <iframe id="previewIframe" class="preview-iframe" frameborder="0" scrolling="no"  height="1080" width="1920" title="Overlay Preview"></iframe>
                     </div>
                 </a>
             </div>
@@ -57,13 +57,11 @@
                             <button class="button-increment-home" hx-post="/home-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-home" hx-post="/home-points/update/1" hx-swap="none">Add 1
-                            point</button>
+                        <button class="button-quick-score-home" hx-post="/home-points/update/1" hx-swap="none"><strong>Add 1 point</strong></button>
                         <button class="button-quick-score-home" hx-post="/home-points/update/2" hx-swap="none">Add 2
                             points</button>
                         <button class="button-quick-score-home" hx-post="/home-points/update/3" hx-swap="none">Add 3
                             points</button>
-                        <button class="flag-home">Flag Home</button>
                     </div>
                     <div class="section away-section">
                         <div class="counter-container">
@@ -77,13 +75,11 @@
                             <button class="button-increment-away" hx-post="/away-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-away" hx-post="/away-points/update/1" hx-swap="none">Add 1
-                            point</button>
+                        <button class="button-quick-score-away" hx-post="/away-points/update/1" hx-swap="none"><strong>Add 1 point</strong></button>
                         <button class="button-quick-score-away" hx-post="/away-points/update/2" hx-swap="none">Add 2
                             points</button>
                         <button class="button-quick-score-away" hx-post="/away-points/update/3" hx-swap="none">Add 3
                             points</button>
-                        <button class="flag-away">Flag Away</button>
                     </div>
                 </div>
             </div>
@@ -126,9 +122,9 @@
             </div>
 
             <div class="net-stats">
-                <div class="net-stats-rectangle">
-                    <h2 class="net-stats-title">Statistics</h2>
-                    <div class="net-stats-content">
+                <div class="netstats-rectangle">
+                    <h2 class="netstats-title">Statistics</h2>
+                    <div class="netstats-content">
                         <div class="stat-item">
                             <label>Ping:</label>
                             <span id="ping-value">-- ms</span>
@@ -152,55 +148,48 @@
 
         <div class="middle-column">
             <div class="countdown">
-                <div class="countdown-rectangle">
-                    <div class="counter-section">
-                        <div class="counter-container">
-                            <button class="button-decrement-countdown" hx-post="/countdown-clock/update/-1/0"
-                                hx-swap="none">-</button>
-                            <div class="counter">
-                                <div id="countdown-counter-minutes" class="countdown"
-                                    hx-put="/countdown-clock/display/minutes" hx-trigger="every 100ms">0</div>
-                                <div class="counter-subtext">Minutes</div>
+                <div class="clock">
+                    <div class="clock-rectangle">
+                        <div class="counter-section">
+                            <div class="counter-container">
+                                <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0"
+                                    hx-swap="none">-</button>
+                                <div class="counter">
+                                    <div id="clock-counter-minutes" class="countdown" hx-put="/game-clock/display/minutes"
+                                        hx-trigger="every 100ms">0</div>
+                                    <div class="counter-subtext">Minutes</div>
+                                </div>
+                                <button class="button-increment-clock" hx-post="/game-clock/update/1/0"
+                                    hx-swap="none">+</button>
                             </div>
-                            <button class="button-increment-countdown" hx-post="/countdown-clock/update/1/0"
-                                hx-swap="none">+</button>
-                        </div>
-                        <h2 class="countdown-title">Countdown</h2>
-                        <div class="counter-container">
-                            <button class="button-decrement-countdown" hx-post="/countdown-clock/update/0/-1"
-                                hx-swap="none">-</button>
-                            <div class="counter">
-                                <div id="countdown-counter-seconds" class="countdown"
-                                    hx-put="/countdown-clock/display/seconds" hx-trigger="every 100ms">0</div>
-                                <div class="counter-subtext">Seconds</div>
+                            <h2 class="clock-title">Clock</h2>
+                            <div class="counter-container">
+                                <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1"
+                                    hx-swap="none">-</button>
+                                <div class="counter">
+                                    <div id="clock-counter-seconds" class="countdown" hx-put="/game-clock/display/seconds"
+                                        hx-trigger="every 100ms">0</div>
+                                    <div class="counter-subtext">Seconds</div>
+                                </div>
+                                <button class="button-increment-clock" hx-post="/game-clock/update/0/1"
+                                    hx-swap="none">+</button>
                             </div>
-                            <button class="button-increment-countdown" hx-post="/countdown-clock/update/0/1"
-                                hx-swap="none">+</button>
                         </div>
-                    </div>
-                    <div class="countdown-controls">
-                        <button class="button-start-countdown" hx-post="/countdown-clock/ctl/start" hx-swap="none">Start
-                            Countdown</button>
-                        <button class="button-stop-countdown" hx-post="/countdown-clock/ctl/stop" hx-swap="none">Stop
-                            Countdown</button>
-                    </div>
-                    <div class="quick-time-buttons">
-                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/20"
-                            hx-swap="none">20:00</button>
-                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/15"
-                            hx-swap="none">15:00</button>
-                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/10"
-                            hx-swap="none">10:00</button>
-                        <button class="button-quick-countdown" hx-post="/countdown-clock/set/5"
-                            hx-swap="none">5:00</button>
-                    </div>
-                    <div class="countdown-actions">
-                        <input type="text" id="countdown-clock-text" maxlength="25"
-                            placeholder="Countdown Display Text" oninput="sanitize(this)">
-                        <button class="show-countdown">Show Countdown</button>
+                        <div class="clock-controls">
+                            <button class="button-start-clock" id="clockStartButton" hx-post="/game-clock/ctl/start" hx-swap="none">Start
+                                Clock</button>
+                            <button class="button-stop-clock" id="clockStopButton"  hx-post="/game-clock/ctl/stop" hx-swap="none">Stop
+                                Clock</button>
+                        </div>
+                        <div class="quick-time-buttons">
+                            <button class="button-quick-clock" hx-post="/game-clock/set/12" hx-swap="none">12:00</button>
+                            <button class="button-quick-clock" hx-post="/game-clock/set/9" hx-swap="none">9:00</button>
+                            <button class="button-quick-clock" hx-post="/game-clock/set/6" hx-swap="none">6:00</button>
+                            <button class="button-quick-clock" hx-post="/game-clock/set/3" hx-swap="none">3:00</button>
+                        </div>
                     </div>
                 </div>
-            </div>
+    
             <div class="quarter-rectangle">
                 <div class="quarter-container">
                     <div class="counter-container">
@@ -225,57 +214,89 @@
                     </div>
                 </div>
             </div>
-            <div class="clock">
-                <div class="clock-rectangle">
-                    <div class="counter-section">
-                        <div class="counter-container">
-                            <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0"
-                                hx-swap="none">-</button>
-                            <div class="counter">
-                                <div id="clock-counter-minutes" class="countdown" hx-put="/game-clock/display/minutes"
-                                    hx-trigger="every 100ms">0</div>
-                                <div class="counter-subtext">Minutes</div>
-                            </div>
-                            <button class="button-increment-clock" hx-post="/game-clock/update/1/0"
-                                hx-swap="none">+</button>
+            <div class="countdown-rectangle">
+                <div class="counter-section">
+                    <div class="counter-container">
+                        <button class="button-decrement-countdown" hx-post="/countdown-clock/update/-1/0"
+                            hx-swap="none">-</button>
+                        <div class="counter">
+                            <div id="countdown-counter-minutes" class="countdown"
+                                hx-put="/countdown-clock/display/minutes" hx-trigger="every 100ms">0</div>
+                            <div class="counter-subtext">Minutes</div>
                         </div>
-                        <h2 class="countdown-title">Clock</h2>
-                        <div class="counter-container">
-                            <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1"
-                                hx-swap="none">-</button>
-                            <div class="counter">
-                                <div id="clock-counter-seconds" class="countdown" hx-put="/game-clock/display/seconds"
-                                    hx-trigger="every 100ms">0</div>
-                                <div class="counter-subtext">Seconds</div>
-                            </div>
-                            <button class="button-increment-clock" hx-post="/game-clock/update/0/1"
-                                hx-swap="none">+</button>
+                        <button class="button-increment-countdown" hx-post="/countdown-clock/update/1/0"
+                            hx-swap="none">+</button>
+                    </div>
+                    <h2 class="countdown-title">Countdown</h2>
+                    <div class="counter-container">
+                        <button class="button-decrement-countdown" hx-post="/countdown-clock/update/0/-1"
+                            hx-swap="none">-</button>
+                        <div class="counter">
+                            <div id="countdown-counter-seconds" class="countdown"
+                                hx-put="/countdown-clock/display/seconds" hx-trigger="every 100ms">0</div>
+                            <div class="counter-subtext">Seconds</div>
                         </div>
-                    </div>
-                    <div class="countdown-controls">
-                        <button class="button-start-clock" hx-post="/game-clock/ctl/start" hx-swap="none">Start
-                            Clock</button>
-                        <button class="button-stop-clock" hx-post="/game-clock/ctl/stop" hx-swap="none">Stop
-                            Clock</button>
-                    </div>
-                    <div class="quick-time-buttons">
-                        <button class="button-quick-clock" hx-post="/game-clock/set/12" hx-swap="none">12:00</button>
-                        <button class="button-quick-clock" hx-post="/game-clock/set/9" hx-swap="none">9:00</button>
-                        <button class="button-quick-clock" hx-post="/game-clock/set/6" hx-swap="none">6:00</button>
-                        <button class="button-quick-clock" hx-post="/game-clock/set/3" hx-swap="none">3:00</button>
+                        <button class="button-increment-countdown" hx-post="/countdown-clock/update/0/1"
+                            hx-swap="none">+</button>
                     </div>
                 </div>
+                <div class="countdown-controls">
+                    <button class="button-start-countdown" id="countdownStartButton" hx-post="/countdown-clock/ctl/start" hx-swap="none">Start Countdown</button>
+                    <button class="button-stop-countdown" id="countdownStopButton" hx-post="/countdown-clock/ctl/stop" hx-swap="none">Stop Countdown</button>
+                </div>
+                <div class="quick-time-buttons">
+                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/20"
+                        hx-swap="none">20:00</button>
+                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/15"
+                        hx-swap="none">15:00</button>
+                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/10"
+                        hx-swap="none">10:00</button>
+                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/5"
+                        hx-swap="none">5:00</button>
+                </div>
+                <div class="countdown-actions">
+                    <input type="text" id="countdown-clock-text" maxlength="25"
+                        placeholder="Countdown Display Text" oninput="sanitize(this)">
+                </div>
             </div>
+        </div>
+
             <div class="visibility">
                 <div class="visibility-rectangle">
                     <div class="visibility-buttons">
-                        <button class="show-sponsors">Show Sponsors</button>
+                        <button class="show-animation">Show Animations for popups</button> <!--really just a placeholder button-->
+                        <button class="show-countdown">Show Countdown</button>
+                        <button class="show-downs">Show Downs & To Go</button> 
                         <button class="show-scoreboard">Show Scoreboard</button>
-                        <button class="show-downs">Show Downs & To Go</button>
+                        <button class="show-popup">Show Pop Ups</button>
+                        <button class="show-sponsors">Show Sponsors</button>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="right-column">
+            <div class="popups-rectangle">
+                <h2 class="score-title"><strong>Popups</strong></h2>
+                <div class="section home-buttons">
+                    <h2 class="popup-subtitle">Home</h2>
+                    <button class="button home-popup cooldown" hx-put="/flag-home">Flag Home</button>
+                    <button class="button home-popup cooldown" hx-put="/timeout-home">Timeout</button>
+                    <button class="button home-popup cooldown" hx-put="/touchdown-home">Touchdown</button>
+                    <button class="button home-popup cooldown" hx-put="/foul-home">Foul Home</button>
+                </div>
+                <div class="section away-buttons">
+                    <h2 class="popup-subtitle">Away</h2>
+                    <button class="button away-popup cooldown" hx-put="/flag-away">Flag Away</button>
+                    <button class="button away-popup cooldown" hx-put="/timeout-away">Timeout</button>
+                    <button class="button away-popup cooldown" hx-put="/touchdown-away">Touchdown</button>
+                    <button class="button away-popup cooldown" hx-put="/foul-away">Foul Away</button>
+                </div>
+            </div>
+        </div>     
             <script src="/app.js"></script>
+            <script>
+            </script>
     </div>
 </body>
 

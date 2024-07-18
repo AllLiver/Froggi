@@ -17,7 +17,7 @@
 <body id="settings-body">
     <!--TODO:-->
     <nav>
-        <button class="hamburger-menu" onclick="toggleMenu()">
+        <button class="hamburger-menu" onclick="toggle_menu()">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
@@ -50,6 +50,20 @@
             </div>
             <div class="setting">
                 <input type="text" name="host-ip" placeholder="X.X.X.X:3000" oninput="sanitize(this)">
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Theme</h2>
+                <div class="subtext-settings">
+                    <h6>Changing themes can be helpful in different scenarios, and for those who bennefit WGAC AAA</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <div class="setting">
+                    <button id="light-theme">Light Theme</button>
+                    <button id="dark-theme">Dark Theme</button>
+                    <button id="colorblind-theme">Colorblind Theme</button>
             </div>
         </div>
         <div class="settings-box-indev">

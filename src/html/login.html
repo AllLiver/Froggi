@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
     <script src="/htmx.js"></script>
+    <script src="/app.js"></script>
+    <link rel="icon" href="/favicon.png">
 </head>
 <body id="login-body">
     <canvas id="background"></canvas>
@@ -14,10 +16,10 @@
         <h1>Login</h1>
         <form hx-post="/login" hx-swap="innerHTML" hx-target="#message_create_login">
             <label for="username">Username:</label>
-            <input type="text" name="username" id="username">
+            <input type="text" name="username" id="username" oninput="sanitize(this)">
 
             <label for="password">Password:</label>
-            <input type="password" name="password" id="password">
+            <input type="password" name="password" id="password" oninput="sanitize(this)">
 
             <input type="submit" value="Login">
             <img class="htmx-indicator" src="/spinner.svg">
@@ -80,7 +82,7 @@
                 }
             });
         });
+
     </script>
-       <script src="/app.js"></script>
 </body>
 </html>
