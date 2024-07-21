@@ -1432,7 +1432,7 @@ async fn downs_togo_set_handler(jar: CookieJar, State(state): State<AppState>, P
 async fn downs_togo_update_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<i8>) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut downs_togo = state.downs_togo.lock().await;
-        if (1..=255).contains(&((*downs_togo as i8 + y) as u16)) {
+        if (1..=99).contains(&(*downs_togo as i8 + y)) {
             *downs_togo = (*downs_togo as i8 + y) as u8;
         }
 
