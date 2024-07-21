@@ -48,6 +48,8 @@ struct AppState {
     away_name: Arc<Mutex<String>>,
     quarter: Arc<Mutex<u8>>,
     preset_id: Arc<Mutex<String>>,
+    down: Arc<Mutex<u8>>,
+    downs_togo: Arc<Mutex<u8>>
 }
 
 #[tokio::main]
@@ -60,6 +62,8 @@ async fn main() -> Result<()> {
         away_name: Arc::new(Mutex::new(String::from("Away"))),
         quarter: Arc::new(Mutex::new(1)),
         preset_id: Arc::new(Mutex::new(String::new())),
+        down: Arc::new(Mutex::new(1)),
+        downs_togo: Arc::new(Mutex::new(0))
     };
 
     // Validate required files and directories
@@ -157,6 +161,12 @@ async fn main() -> Result<()> {
         .route("/points/overview", put(points_overview_handler))
         .route("/icon/:t", put(icon_handler))
         .route("/overlay/clock", put(overlay_clock_handler))
+        // Downs routes
+        .route("/downs/set/:d", post(downs_set_handler))
+        .route("/downs/update/:d", post(downs_update_handler))
+        .route("/downs/togo/set/:y", post(downs_togo_set_handler))
+        .route("/downs/togo/update/:y", post(downs_togo_update_handler))
+        .route("/downs/display/:t", put(downs_display_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -1364,6 +1374,113 @@ async fn overlay_clock_handler(State(state): State<AppState>) -> impl IntoRespon
 }
 
 // endregion: overlay
+// region: downs
+
+async fn downs_set_handler(jar: CookieJar, State(state): State<AppState>, Path(d): Path<u8>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        if (1..=4).contains(&d) {
+            *state.down.lock().await = d;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn downs_update_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<i8>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut down = state.down.lock().await;
+        if (1..=4).contains(&(*down as i8 + y)) {
+            *down = (*down as i8 + y) as u8;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn downs_togo_set_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<u8>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        *state.downs_togo.lock().await = y;
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn downs_togo_update_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<i8>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut downs_togo = state.downs_togo.lock().await;
+        if (1..=255).contains(&((*downs_togo as i8 + y) as u16)) {
+            *downs_togo = (*downs_togo as i8 + y) as u8;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn downs_display_handler(State(state): State<AppState>, Path(t): Path<String>) -> impl IntoResponse {
+    if t == "down" {
+        let down = state.down.lock().await;
+
+        return match *down {
+            1 => Html::from(String::from("1st")),
+            2 => Html::from(String::from("2nd")),
+            3 => Html::from(String::from("3rd")),
+            4 => Html::from(String::from("4th")),
+            _ => Html::from(String::new()),
+        }
+    } else if t == "togo" {
+        return Html::from(state.downs_togo.lock().await.to_string())
+    } else if t == "both" {
+        let down = state.down.lock().await;
+
+        let down_display = match *down {
+            1 => String::from("1st"),
+            2 => String::from("2nd"),
+            3 => String::from("3rd"),
+            4 => String::from("4th"),
+            _ => String::new(),
+        };
+
+        drop(down);
+
+        return Html::from(format!("{} & {}", down_display, *state.downs_togo.lock().await))
+    } else {
+        return Html::from(String::new());
+    }
+}
+
+// endregion: downs
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";

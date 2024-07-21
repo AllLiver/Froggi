@@ -88,34 +88,34 @@
                 <div class="downs-rectangle">
                     <div class="downs-container">
                         <div class="counter-container">
-                            <button class="button-decrement-downs" hx-post="/decrement/togo">-</button>
+                            <button class="button-decrement-downs" hx-post="/downs/update/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="downs-counter" class="counter-value">0</div>
+                                <div id="downs-counter" hx-put="/downs/display/down" hx-trigger="every 100ms">0</div>
                                 <div class="counter-subtext">Downs</div>
                             </div>
-                            <button class="button-increment-downs" hx-post="/increment/togo">+</button>
+                            <button class="button-increment-downs" hx-post="/downs/update/1" hx-swap="none">+</button>
                         </div>
                         <div class="quick-down-buttons">
-                            <button class="button-quick-down" hx-post="/quickscore/down/1">1st down</button>
-                            <button class="button-quick-down" hx-post="/quickscore/down/2">2nd down</button>
-                            <button class="button-quick-down" hx-post="/quickscore/down/3">3rd down</button>
-                            <button class="button-quick-down" hx-post="/quickscore/down/4">4th down</button>
+                            <button class="button-quick-down" hx-post="/downs/set/1" hx-swap="none">1st down</button>
+                            <button class="button-quick-down" hx-post="/downs/set/2" hx-swap="none">2nd down</button>
+                            <button class="button-quick-down" hx-post="/downs/set/3" hx-swap="none">3rd down</button>
+                            <button class="button-quick-down" hx-post="/downs/set/4" hx-swap="none">4th down</button>
                         </div>
                         <div class="counter-container">
-                        <button class="button-decrement-togo" hx-post="/decrement/togo">-</button>
+                        <button class="button-decrement-togo" hx-post="/downs/togo/update/-1" hx-swap="none">-</button>
                         <div class="counter">
-                            <div id="togo-counter" class="counter-value">0</div>
+                            <div id="togo-counter" class="counter-value" hx-put="/downs/display/togo" hx-trigger="every 100ms">0</div>
                             <div class="counter-subtext">TO-GO</div>
                         </div>
-                        <button class="button-increment-togo" hx-post="/increment/togo">+</button>
+                        <button class="button-increment-togo" hx-post="/downs/togo/update/1" hx-swap="none">+</button>
                     </div>
                     <div class="quick-togo-buttons">
-                        <button class="button-quick-togo" hx-post="">0</button>
-                        <button class="button-quick-togo" hx-post="">10</button>
-                        <button class="button-quick-togo" hx-post="">20</button>
-                        <button class="button-quick-togo" hx-post="">30</button>
-                        <button class="button-quick-togo" hx-post="">40</button>
-                        <button class="button-quick-togo" hx-post="">50</button>
+                        <button class="button-quick-togo" hx-post="/downs/togo/set/0" hx-swap="none">0</button>
+                        <button class="button-quick-togo" hx-post="/downs/togo/set/10" hx-swap="none">10</button>
+                        <button class="button-quick-togo" hx-post="/downs/togo/set/20" hx-swap="none">20</button>
+                        <button class="button-quick-togo" hx-post="/downs/togo/set/30" hx-swap="none">30</button>
+                        <button class="button-quick-togo" hx-post="/downs/togo/set/40" hx-swap="none">40</button>
+                        <button class="button-quick-togo" hx-post="/downs/togo/set/50" hx-swap="none">50</button>
                     </div>
                     </div>
                 </div>
