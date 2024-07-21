@@ -743,7 +743,7 @@ async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse 
     } else if o == "seconds" {
         time_display = (*game_clock % 60).to_string();
     } else if o == "both" {
-        time_display = format!("{}:{}", *game_clock / 60, *game_clock % 60);
+        time_display = format!("{}:{:02}", *game_clock / 60, *game_clock % 60);
     }
 
     Html::from(time_display)
@@ -838,7 +838,7 @@ async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl IntoResp
     } else if o == "seconds" {
         time_display = (*countdown_clock % 60).to_string();
     } else if o == "both" {
-        time_display = format!("{}:{}", *countdown_clock / 60, *countdown_clock % 60);
+        time_display = format!("{}:{:02}", *countdown_clock / 60, *countdown_clock % 60);
     }
 
     return Html::from(time_display);
@@ -1370,7 +1370,7 @@ async fn overlay_clock_handler(State(state): State<AppState>) -> impl IntoRespon
         _ => "OT",
     };
 
-    Html::from(format!("{}:{} - {}", *game_clock / 60, *game_clock % 60, quarter_display))
+    Html::from(format!("{}:{:02} - {}", *game_clock / 60, *game_clock % 60, quarter_display))
 }
 
 // endregion: overlay
