@@ -6,9 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"
-        integrity="sha256-YMTXWpyoCVCn1xAOzL7zotWxPMmVYvdtVgwKCSfSYdA=" crossorigin="anonymous">
-        <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="no-referrer">
@@ -17,7 +16,7 @@
 </head>
 
 <body>
-    <!--TODO: iframe on ipad & indicators on ipad-->
+    <!--TODO: iframe on ipad & indicators on ipad, change overlay to em not rem-->
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
             <span class="line"></span>
@@ -37,7 +36,8 @@
             <div class="preview">
                 <a href="/overlay">
                     <div class="preview-rectangle">
-                        <iframe id="previewIframe" class="preview-iframe" frameborder="0" scrolling="no"  height="1080" width="1920" title="Overlay Preview"></iframe>
+                        <iframe id="previewIframe" class="preview-iframe" frameborder="0" scrolling="no" height="1080"
+                            width="1920" title="Overlay Preview"></iframe>
                     </div>
                 </a>
             </div>
@@ -57,7 +57,8 @@
                             <button class="button-increment-home" hx-post="/home-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-home" hx-post="/home-points/update/1" hx-swap="none"><strong>Add 1 point</strong></button>
+                        <button class="button-quick-score-home" hx-post="/home-points/update/1"
+                            hx-swap="none"><strong>Add 1 point</strong></button>
                         <button class="button-quick-score-home" hx-post="/home-points/update/2" hx-swap="none">Add 2
                             points</button>
                         <button class="button-quick-score-home" hx-post="/home-points/update/3" hx-swap="none">Add 3
@@ -75,7 +76,8 @@
                             <button class="button-increment-away" hx-post="/away-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-away" hx-post="/away-points/update/1" hx-swap="none"><strong>Add 1 point</strong></button>
+                        <button class="button-quick-score-away" hx-post="/away-points/update/1"
+                            hx-swap="none"><strong>Add 1 point</strong></button>
                         <button class="button-quick-score-away" hx-post="/away-points/update/2" hx-swap="none">Add 2
                             points</button>
                         <button class="button-quick-score-away" hx-post="/away-points/update/3" hx-swap="none">Add 3
@@ -91,32 +93,35 @@
                             <button class="button-decrement-downs" hx-post="/downs/update/-1" hx-swap="none">-</button>
                             <div class="counter">
                                 <div id="downs-counter" hx-put="/downs/display/down" hx-trigger="every 100ms">0</div>
-                                <div class="counter-subtext">Downs</div>
+                                <div class="counter-subtext">Down</div>
                             </div>
                             <button class="button-increment-downs" hx-post="/downs/update/1" hx-swap="none">+</button>
                         </div>
-                        <div class="quick-down-buttons">
-                            <button class="button-quick-down" hx-post="/downs/set/1" hx-swap="none">1st down</button>
-                            <button class="button-quick-down" hx-post="/downs/set/2" hx-swap="none">2nd down</button>
-                            <button class="button-quick-down" hx-post="/downs/set/3" hx-swap="none">3rd down</button>
-                            <button class="button-quick-down" hx-post="/downs/set/4" hx-swap="none">4th down</button>
+                        <div class="preset-down-buttons">
+                            <button class="button-preset-down" hx-post="/downs/set/1" hx-swap="none">1st down</button>
+                            <button class="button-preset-down" hx-post="/downs/set/2" hx-swap="none">2nd down</button>
+                            <button class="button-preset-down" hx-post="/downs/set/3" hx-swap="none">3rd down</button>
+                            <button class="button-preset-down" hx-post="/downs/set/4" hx-swap="none">4th down</button>
                         </div>
                         <div class="counter-container">
-                        <button class="button-decrement-togo" hx-post="/downs/togo/update/-1" hx-swap="none">-</button>
-                        <div class="counter">
-                            <div id="togo-counter" class="counter-value" hx-put="/downs/display/togo" hx-trigger="every 100ms">0</div>
-                            <div class="counter-subtext">TO-GO</div>
+                            <button class="button-decrement-togo" hx-post="/downs/togo/update/-1"
+                                hx-swap="none">-</button>
+                            <div class="counter">
+                                <div id="togo-counter" class="counter-value" hx-put="/downs/display/togo"
+                                    hx-trigger="every 100ms">0</div>
+                                <div class="counter-subtext">TO-GO</div>
+                            </div>
+                            <button class="button-increment-togo" hx-post="/downs/togo/update/1"
+                                hx-swap="none">+</button>
                         </div>
-                        <button class="button-increment-togo" hx-post="/downs/togo/update/1" hx-swap="none">+</button>
-                    </div>
-                    <div class="quick-togo-buttons">
-                        <button class="button-quick-togo" hx-post="/downs/togo/set/0" hx-swap="none">0</button>
-                        <button class="button-quick-togo" hx-post="/downs/togo/set/10" hx-swap="none">10</button>
-                        <button class="button-quick-togo" hx-post="/downs/togo/set/20" hx-swap="none">20</button>
-                        <button class="button-quick-togo" hx-post="/downs/togo/set/30" hx-swap="none">30</button>
-                        <button class="button-quick-togo" hx-post="/downs/togo/set/40" hx-swap="none">40</button>
-                        <button class="button-quick-togo" hx-post="/downs/togo/set/50" hx-swap="none">50</button>
-                    </div>
+                        <div class="preset-togo-buttons">
+                            <button class="button-preset-togo" hx-post="/downs/togo/set/0" hx-swap="none">0</button>
+                            <button class="button-preset-togo" hx-post="/downs/togo/set/10" hx-swap="none">10</button>
+                            <button class="button-preset-togo" hx-post="/downs/togo/set/20" hx-swap="none">20</button>
+                            <button class="button-preset-togo" hx-post="/downs/togo/set/30" hx-swap="none">30</button>
+                            <button class="button-preset-togo" hx-post="/downs/togo/set/40" hx-swap="none">40</button>
+                            <button class="button-preset-togo" hx-post="/downs/togo/set/50" hx-swap="none">50</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -147,49 +152,110 @@
         </div>
 
         <div class="middle-column">
-            <div class="countdown">
-                <div class="clock">
-                    <div class="clock-rectangle">
-                        <div class="counter-section">
-                            <div class="counter-container">
-                                <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0"
-                                    hx-swap="none">-</button>
-                                <div class="counter">
-                                    <div id="clock-counter-minutes" class="countdown" hx-put="/game-clock/display/minutes"
-                                        hx-trigger="every 100ms">0</div>
-                                    <div class="counter-subtext">Minutes</div>
+            <div class="tab-container" data-group="clock">
+                <button class="tab-button" onclick="openTab('clock-tabular', 'clock')">Clock</button>
+                <button class="tab-button" onclick="openTab('countdown-tabular', 'clock')">Countdown</button>
+    
+
+                <div id="clock-tabular" class="tab-content">
+                    <div class="clock">
+                        <div class="clock-rectangle">
+                            <div class="counter-section">
+                                <div class="counter-container">
+                                    <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0"
+                                        hx-swap="none">-</button>
+                                    <div class="counter">
+                                        <div id="clock-counter-minutes" class="countdown"
+                                            hx-put="/game-clock/display/minutes" hx-trigger="every 100ms">0</div>
+                                        <div class="counter-subtext">Minutes</div>
+                                    </div>
+                                    <button class="button-increment-clock" hx-post="/game-clock/update/1/0"
+                                        hx-swap="none">+</button>
                                 </div>
-                                <button class="button-increment-clock" hx-post="/game-clock/update/1/0"
-                                    hx-swap="none">+</button>
-                            </div>
-                            <h2 class="clock-title">Clock</h2>
-                            <div class="counter-container">
-                                <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1"
-                                    hx-swap="none">-</button>
-                                <div class="counter">
-                                    <div id="clock-counter-seconds" class="countdown" hx-put="/game-clock/display/seconds"
-                                        hx-trigger="every 100ms">0</div>
-                                    <div class="counter-subtext">Seconds</div>
+                                <h2 class="clock-title">Clock</h2>
+                                <div class="counter-container">
+                                    <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1"
+                                        hx-swap="none">-</button>
+                                    <div class="counter">
+                                        <div id="clock-counter-seconds" class="countdown"
+                                            hx-put="/game-clock/display/seconds" hx-trigger="every 100ms">0</div>
+                                        <div class="counter-subtext">Seconds</div>
+                                    </div>
+                                    <button class="button-increment-clock" hx-post="/game-clock/update/0/1"
+                                        hx-swap="none">+</button>
                                 </div>
-                                <button class="button-increment-clock" hx-post="/game-clock/update/0/1"
-                                    hx-swap="none">+</button>
                             </div>
-                        </div>
-                        <div class="clock-controls">
-                            <button class="button-start-clock" id="clockStartButton" hx-post="/game-clock/ctl/start" hx-swap="none">Start
-                                Clock</button>
-                            <button class="button-stop-clock" id="clockStopButton"  hx-post="/game-clock/ctl/stop" hx-swap="none">Stop
-                                Clock</button>
-                        </div>
-                        <div class="quick-time-buttons">
-                            <button class="button-quick-clock" hx-post="/game-clock/set/12" hx-swap="none">12:00</button>
-                            <button class="button-quick-clock" hx-post="/game-clock/set/9" hx-swap="none">9:00</button>
-                            <button class="button-quick-clock" hx-post="/game-clock/set/6" hx-swap="none">6:00</button>
-                            <button class="button-quick-clock" hx-post="/game-clock/set/3" hx-swap="none">3:00</button>
+                            <div class="clock-controls">
+                                <button class="button-start-clock" id="clockStartButton" hx-post="/game-clock/ctl/start"
+                                    hx-swap="none">Start Clock</button>
+                                <button class="button-stop-clock" id="clockStopButton" hx-post="/game-clock/ctl/stop"
+                                    hx-swap="none">Stop Clock</button>
+                            </div>
+                            <div class="preset-clock-buttons">
+                                <button class="button-preset-clock" hx-post="/game-clock/set/12"
+                                    hx-swap="none">12:00</button>
+                                <button class="button-preset-clock" hx-post="/game-clock/set/9"
+                                    hx-swap="none">9:00</button>
+                                <button class="button-preset-clock" hx-post="/game-clock/set/6"
+                                    hx-swap="none">6:00</button>
+                                <button class="button-preset-clock" hx-post="/game-clock/set/3"
+                                    hx-swap="none">3:00</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-    
+
+                <div id="countdown-tabular" class="tab-content">
+                    <div class="countdown-rectangle">
+                        <div class="counter-section">
+                            <div class="counter-container">
+                                <button class="button-decrement-countdown" hx-post="/countdown-clock/update/-1/0"
+                                    hx-swap="none">-</button>
+                                <div class="counter">
+                                    <div id="countdown-counter-minutes" class="countdown"
+                                        hx-put="/countdown-clock/display/minutes" hx-trigger="every 100ms">0</div>
+                                    <div class="counter-subtext">Minutes</div>
+                                </div>
+                                <button class="button-increment-countdown" hx-post="/countdown-clock/update/1/0"
+                                    hx-swap="none">+</button>
+                            </div>
+                            <h2 class="countdown-title">Countdown</h2>
+                            <div class="counter-container">
+                                <button class="button-decrement-countdown" hx-post="/countdown-clock/update/0/-1"
+                                    hx-swap="none">-</button>
+                                <div class="counter">
+                                    <div id="countdown-counter-seconds" class="countdown"
+                                        hx-put="/countdown-clock/display/seconds" hx-trigger="every 100ms">0</div>
+                                    <div class="counter-subtext">Seconds</div>
+                                </div>
+                                <button class="button-increment-countdown" hx-post="/countdown-clock/update/0/1"
+                                    hx-swap="none">+</button>
+                            </div>
+                        </div>
+                        <div class="countdown-controls">
+                            <button class="button-start-countdown" id="countdownStartButton"
+                                hx-post="/countdown-clock/ctl/start" hx-swap="none">Start Countdown</button>
+                            <button class="button-stop-countdown" id="countdownStopButton"
+                                hx-post="/countdown-clock/ctl/stop" hx-swap="none">Stop Countdown</button>
+                        </div>
+                        <div class="preset-countdown-buttons">
+                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/20"
+                                hx-swap="none">20:00</button>
+                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/15"
+                                hx-swap="none">15:00</button>
+                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/10"
+                                hx-swap="none">10:00</button>
+                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/5"
+                                hx-swap="none">5:00</button>
+                        </div>
+                        <div class="countdown-actions-container">
+                            <input type="text" id="countdown-clock-text" maxlength="25"
+                                placeholder="Countdown Display Text" oninput="sanitize(this)">
+                            <button id="countdown-submit">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="quarter-rectangle">
                 <div class="quarter-container">
                     <div class="counter-container">
@@ -214,90 +280,100 @@
                     </div>
                 </div>
             </div>
-            <div class="countdown-rectangle">
-                <div class="counter-section">
-                    <div class="counter-container">
-                        <button class="button-decrement-countdown" hx-post="/countdown-clock/update/-1/0"
-                            hx-swap="none">-</button>
-                        <div class="counter">
-                            <div id="countdown-counter-minutes" class="countdown"
-                                hx-put="/countdown-clock/display/minutes" hx-trigger="every 100ms">0</div>
-                            <div class="counter-subtext">Minutes</div>
-                        </div>
-                        <button class="button-increment-countdown" hx-post="/countdown-clock/update/1/0"
-                            hx-swap="none">+</button>
-                    </div>
-                    <h2 class="countdown-title">Countdown</h2>
-                    <div class="counter-container">
-                        <button class="button-decrement-countdown" hx-post="/countdown-clock/update/0/-1"
-                            hx-swap="none">-</button>
-                        <div class="counter">
-                            <div id="countdown-counter-seconds" class="countdown"
-                                hx-put="/countdown-clock/display/seconds" hx-trigger="every 100ms">0</div>
-                            <div class="counter-subtext">Seconds</div>
-                        </div>
-                        <button class="button-increment-countdown" hx-post="/countdown-clock/update/0/1"
-                            hx-swap="none">+</button>
-                    </div>
-                </div>
-                <div class="countdown-controls">
-                    <button class="button-start-countdown" id="countdownStartButton" hx-post="/countdown-clock/ctl/start" hx-swap="none">Start Countdown</button>
-                    <button class="button-stop-countdown" id="countdownStopButton" hx-post="/countdown-clock/ctl/stop" hx-swap="none">Stop Countdown</button>
-                </div>
-                <div class="quick-time-buttons">
-                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/20"
-                        hx-swap="none">20:00</button>
-                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/15"
-                        hx-swap="none">15:00</button>
-                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/10"
-                        hx-swap="none">10:00</button>
-                    <button class="button-quick-countdown" hx-post="/countdown-clock/set/5"
-                        hx-swap="none">5:00</button>
-                </div>
-                <div class="countdown-actions">
-                    <input type="text" id="countdown-clock-text" maxlength="25"
-                        placeholder="Countdown Display Text" oninput="sanitize(this)">
-                </div>
-            </div>
-        </div>
 
-            <div class="visibility">
-                <div class="visibility-rectangle">
-                    <div class="visibility-buttons">
-                        <button class="show-animation">Show Animations for popups</button> <!--really just a placeholder button-->
-                        <button class="show-countdown">Show Countdown</button>
-                        <button class="show-downs">Show Downs & To Go</button> 
-                        <button class="show-scoreboard">Show Scoreboard</button>
-                        <button class="show-popup">Show Pop Ups</button>
-                        <button class="show-sponsors">Show Sponsors</button>
+            <!-- Inside your existing <body> section -->
+            <div class="tab-container" data-group="visibility">
+                <button class="tab-button" onclick="openTab('visibility-tabular', 'visibility')">Visibility</button>
+                <button class="tab-button" onclick="openTab('popups-tabular', 'visibility')">Popups</button>
+
+                <div id="visibility-tabular" class="tab-content">
+                    <div class="visibility">
+                        <div class="visibility-rectangle">
+                            <div class="visibility-buttons">
+                                <button class="show-countdown">Show Countdown</button>
+                                <button class="show-downs">Show Downs & To Go</button>
+                                <button class="show-scoreboard">Show Scoreboard</button>
+                                <button class="show-sponsors">Show Sponsors</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="popups-tabular" class="tab-content">
+                    <div class="popups-rectangle">
+                        <table class="popup-table">
+                            <tr>
+                                <th>Popups</th>
+                                <th>HOME</th>
+                                <th>AWAY</th>
+                            </tr>
+                            <tr>
+                                <td>FLAG</td>
+                                <td><button class="button home-popup cooldown" hx-put="/flag-home">HOME</button></td>
+                                <td><button class="button away-popup cooldown" hx-put="/flag-away">AWAY</button></td>
+                            </tr>
+                            <tr>
+                                <td>TIMEOUT</td>
+                                <td><button class="button home-popup cooldown" hx-put="/timeout-home">HOME</button></td>
+                                <td><button class="button away-popup cooldown" hx-put="/timeout-away">AWAY</button></td>
+                            </tr>
+                            <tr>
+                                <td>TOUCHDOWN</td>
+                                <td><button class="button home-popup cooldown" hx-put="/touchdown-home">HOME</button>
+                                </td>
+                                <td><button class="button away-popup cooldown" hx-put="/touchdown-away">AWAY</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>FOUL</td>
+                                <td><button class="button home-popup cooldown" hx-put="/foul-home">Home</button></td>
+                                <td><button class="button away-popup cooldown" hx-put="/foul-away">AWAY</button></td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="right-column">
-            <div class="popups-rectangle">
-                <h2 class="score-title"><strong>Popups</strong></h2>
-                <div class="section home-buttons">
-                    <h2 class="popup-subtitle">Home</h2>
-                    <button class="button home-popup cooldown" hx-put="/flag-home">Flag Home</button>
-                    <button class="button home-popup cooldown" hx-put="/timeout-home">Timeout</button>
-                    <button class="button home-popup cooldown" hx-put="/touchdown-home">Touchdown</button>
-                    <button class="button home-popup cooldown" hx-put="/foul-home">Foul Home</button>
-                </div>
-                <div class="section away-buttons">
-                    <h2 class="popup-subtitle">Away</h2>
-                    <button class="button away-popup cooldown" hx-put="/flag-away">Flag Away</button>
-                    <button class="button away-popup cooldown" hx-put="/timeout-away">Timeout</button>
-                    <button class="button away-popup cooldown" hx-put="/touchdown-away">Touchdown</button>
-                    <button class="button away-popup cooldown" hx-put="/foul-away">Foul Away</button>
-                </div>
+            <div class="right-column">
+
             </div>
-        </div>     
             <script src="/app.js"></script>
             <script>
+        function openTab(tabName, group) {
+            // Hide all tab contents in the specified group
+            var tabContents = document.querySelectorAll(`.tab-container[data-group="${group}"] .tab-content`);
+            tabContents.forEach(tab => tab.classList.remove("active"));
+
+            // Show the selected tab content
+            var element = document.getElementById(tabName);
+            if (element) {
+                element.classList.add("active");
+            }
+
+            // Save the active tab name in local storage for the specified group
+            localStorage.setItem(`tabState${group}`, tabName);
+        }
+
+        function loadSavedTab(group) {
+            // Get the saved tab name from local storage
+            var savedTabName = localStorage.getItem(`tabState${group}`);
+
+            // If there is a saved tab, open it
+            if (savedTabName) {
+                openTab(savedTabName, group);
+            } else {
+                // Optionally, open a default tab if none is saved
+                var defaultTab = group === 'clock' ? 'clock-tabular' : 'visibility-tabular';
+                openTab(defaultTab, group);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadSavedTab('clock');
+            loadSavedTab('visibility');
+        });
             </script>
-    </div>
+        </div>
 </body>
 
 </html>

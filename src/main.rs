@@ -49,7 +49,8 @@ struct AppState {
     quarter: Arc<Mutex<u8>>,
     preset_id: Arc<Mutex<String>>,
     down: Arc<Mutex<u8>>,
-    downs_togo: Arc<Mutex<u8>>
+    downs_togo: Arc<Mutex<u8>>,
+    countdown_text: Arc<Mutex<String>>
 }
 
 #[tokio::main]
@@ -63,7 +64,8 @@ async fn main() -> Result<()> {
         quarter: Arc::new(Mutex::new(1)),
         preset_id: Arc::new(Mutex::new(String::new())),
         down: Arc::new(Mutex::new(1)),
-        downs_togo: Arc::new(Mutex::new(0))
+        downs_togo: Arc::new(Mutex::new(0)),
+        countdown_text: Arc::new(Mutex::new(String::new()))
     };
 
     // Validate required files and directories
@@ -142,6 +144,7 @@ async fn main() -> Result<()> {
             "/countdown-clock/update/:mins/:secs",
             post(countdown_clock_update_handler),
         )
+        .route("/countdown/text/set/:n", post(countdown_text_set_handler))
         // Quarter routes
         .route("/quarter/display", put(quarter_display_handler))
         .route("/quarter/set/:q", post(quarter_set_handler))
@@ -842,6 +845,22 @@ async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl IntoResp
     }
 
     return Html::from(time_display);
+}
+
+async fn countdown_text_set_handler(jar: CookieJar, State(state): State<AppState>, Path(n): Path<String>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        *state.countdown_text.lock().await = n;
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::new())
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
 }
 
 // endregion: time

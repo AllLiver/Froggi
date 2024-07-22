@@ -2,18 +2,17 @@
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
-Is a self-hosted scoreboard overlay software that aims to provide an easy-to-use overlay for sports broadcasting!
-
+Is a self-hosted portable scoreboard solution that aims to provide an free an intuitive sports broadcasting overlay, liscenced under MIT.
 # Usage
-When you run the binary for the first time it should generate all the files and folders it needs  
+When the binary is first run, it will create all needed files.  
 Here is what each of those files/folders do.
- - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard or countdown page, note it will only load these on app startup
+ - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard, you can also add these through the "sponsors & teaminfo" page. A restart of the application is required to take effect.
  - teams (folder): this folder contains the images, names, and jersey color of all team presets you set
  - login (folder): this folder is not for manual editing and contains login information
  - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format  
 
-When logging into the web interface for the first time you will be prompted to create a login for the web interface.  
-After creating a login simply sign in, upload team presets, and start streaming!
+When logging into the web interface for the first time you will be prompted to create a login for the web interface, remember it.  
+After creating a login simply sign in, upload team-info, and start streaming!
 
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
