@@ -22,7 +22,9 @@ use lazy_static::lazy_static;
 use rand::{thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
-    path::PathBuf, sync::Arc, time::{Instant, UNIX_EPOCH}
+    path::PathBuf,
+    sync::Arc,
+    time::{Instant, UNIX_EPOCH},
 };
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, remove_file, File},
@@ -38,6 +40,7 @@ lazy_static! {
     static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref COUNTDOWN_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref COUNTDOWN_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref LOGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
 }
 
 #[derive(Clone)]
@@ -50,7 +53,8 @@ struct AppState {
     preset_id: Arc<Mutex<String>>,
     down: Arc<Mutex<u8>>,
     downs_togo: Arc<Mutex<u8>>,
-    countdown_text: Arc<Mutex<String>>
+    countdown_text: Arc<Mutex<String>>,
+    show_countdown: Arc<Mutex<bool>>,
 }
 
 #[tokio::main]
@@ -65,7 +69,8 @@ async fn main() -> Result<()> {
         preset_id: Arc::new(Mutex::new(String::new())),
         down: Arc::new(Mutex::new(1)),
         downs_togo: Arc::new(Mutex::new(0)),
-        countdown_text: Arc::new(Mutex::new(String::new()))
+        countdown_text: Arc::new(Mutex::new(String::from("Countdown"))),
+        show_countdown: Arc::new(Mutex::new(true)),
     };
 
     // Validate required files and directories
@@ -101,6 +106,10 @@ async fn main() -> Result<()> {
         .await
         .expect("Could not initialize config.json")
     }
+
+    create_dir_all(format!("./sponsors"))
+        .await
+        .expect("Could not create sponsors directory");
 
     let app = Router::new()
         // Basic routes
@@ -144,7 +153,7 @@ async fn main() -> Result<()> {
             "/countdown-clock/update/:mins/:secs",
             post(countdown_clock_update_handler),
         )
-        .route("/countdown/text/set/:n", post(countdown_text_set_handler))
+        .route("/countdown/text/set", post(countdown_text_set_handler))
         // Quarter routes
         .route("/quarter/display", put(quarter_display_handler))
         .route("/quarter/set/:q", post(quarter_set_handler))
@@ -153,7 +162,7 @@ async fn main() -> Result<()> {
         .route("/teaminfo", get(teaminfo_handler))
         .route("/teaminfo/create", post(teaminfo_preset_create_handler))
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
-        .route("/teaminfo/set/:id", post(teaminfo_preset_set_handler))
+        .route("/teaminfo/select/:id", post(teaminfo_preset_select_handler))
         .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
         .route("/teaminfo/name/:t", put(team_name_display_handler))
         // Sponsor routes
@@ -164,6 +173,7 @@ async fn main() -> Result<()> {
         .route("/points/overview", put(points_overview_handler))
         .route("/icon/:t", put(icon_handler))
         .route("/overlay/clock", put(overlay_clock_handler))
+        .route("/countdown/display", put(countdown_display_handler))
         // Downs routes
         .route("/downs/set/:d", post(downs_set_handler))
         .route("/downs/update/:d", post(downs_update_handler))
@@ -847,9 +857,18 @@ async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl IntoResp
     return Html::from(time_display);
 }
 
-async fn countdown_text_set_handler(jar: CookieJar, State(state): State<AppState>, Path(n): Path<String>) -> impl IntoResponse {
+#[derive(Deserialize)]
+struct TextPayload {
+    text: String,
+}
+
+async fn countdown_text_set_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Form(payload): Form<TextPayload>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
-        *state.countdown_text.lock().await = n;
+        *state.countdown_text.lock().await = payload.text;
 
         return Response::builder()
             .status(StatusCode::OK)
@@ -1107,11 +1126,11 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
 
             html += &format!(
             "<div class=\"match-selector\">
-                <img src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
-                <p>{} vs {}</p>
-                <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
-                <button hx-post=\"/teaminfo/set/{}\" hx-swap=\"none\">Set</button>
-                <button hx-post=\"/teaminfo/remove/{}\" hx-swap=\"none\">Remove</button>
+                <img class=\"home-logo\" src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
+                <p class=\"teampreset-title\">{} vs {}</p>
+                <img class=\"away-logo\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
+                <button class=\"select-button\" hx-post=\"/teaminfo/select/{}\" hx-swap=\"none\">Select</button>
+                <button class=\"remove-button\" hx-post=\"/teaminfo/remove/{}\" hx-swap=\"none\">Remove</button>
             </div>",
                 home_tag_type,
                 BASE64_STANDARD.encode(home_img_bytes),
@@ -1128,7 +1147,7 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
     return Html::from(html);
 }
 
-async fn teaminfo_preset_set_handler(
+async fn teaminfo_preset_select_handler(
     jar: CookieJar,
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -1147,9 +1166,12 @@ async fn teaminfo_preset_set_handler(
 
                     let mut a_json = String::new();
 
-                    let a_json_f = File::open(format!("{}/teams.json", a.path().to_string_lossy().to_string()))
-                        .await
-                        .expect("Could not open preset file");
+                    let a_json_f = File::open(format!(
+                        "{}/teams.json",
+                        a.path().to_string_lossy().to_string()
+                    ))
+                    .await
+                    .expect("Could not open preset file");
                     let mut buf_reader = BufReader::new(a_json_f);
 
                     buf_reader
@@ -1226,7 +1248,7 @@ async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl In
     if verify_auth(jar).await {
         create_dir_all(format!("./sponsors"))
             .await
-            .expect("Could not create team preset directory");
+            .expect("Could not create sponsors directory");
 
         while let Some(field) = form
             .next_field()
@@ -1335,20 +1357,28 @@ async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl 
 // region: overlay
 
 async fn points_overview_handler(State(state): State<AppState>) -> impl IntoResponse {
-    Html::from(format!("<h3>{}-{}</h3>", state.home_points.lock().await, state.away_points.lock().await))
+    Html::from(format!(
+        "<h3>{}-{}</h3>",
+        state.home_points.lock().await,
+        state.away_points.lock().await
+    ))
 }
 
 // "<img class=\"ol-team-logo\" src=\"data:image/{};base64,{}\" height=\"30px\" width=\"auto\" alt=\"team-icon\">"
 
 async fn icon_handler(Path(t): Path<String>, State(state): State<AppState>) -> impl IntoResponse {
-    let mut d = read_dir(format!("./team-presets/{}", state.preset_id.lock().await)).await.expect("Could not read preset dir");
+    let mut d = read_dir(format!("./team-presets/{}", state.preset_id.lock().await))
+        .await
+        .expect("Could not read preset dir");
 
     while let Ok(Some(f)) = d.next_entry().await {
         if !f.file_type().await.unwrap().is_dir() {
             let fname = f.file_name().to_string_lossy().to_string();
 
             if t == "home" && fname.starts_with("home.") {
-                let img_bytes = tokio::fs::read(f.path()).await.expect("Could not read img bytes");
+                let img_bytes = tokio::fs::read(f.path())
+                    .await
+                    .expect("Could not read img bytes");
 
                 let mime_type = match fname.split(".").collect::<Vec<&str>>()[1] {
                     "png" => "png",
@@ -1359,7 +1389,9 @@ async fn icon_handler(Path(t): Path<String>, State(state): State<AppState>) -> i
 
                 return Html::from(format!("<img class=\"ol-team-logo\" src=\"data:image/{};base64,{}\" height=\"30px\" width=\"auto\" alt=\"home-icon\">", mime_type, BASE64_STANDARD.encode(img_bytes)));
             } else if t == "away" && fname.starts_with("away.") {
-                let img_bytes = tokio::fs::read(f.path()).await.expect("Could not read img bytes");
+                let img_bytes = tokio::fs::read(f.path())
+                    .await
+                    .expect("Could not read img bytes");
 
                 let mime_type = match fname.split(".").collect::<Vec<&str>>()[1] {
                     "png" => "png",
@@ -1389,13 +1421,36 @@ async fn overlay_clock_handler(State(state): State<AppState>) -> impl IntoRespon
         _ => "OT",
     };
 
-    Html::from(format!("{}:{:02} - {}", *game_clock / 60, *game_clock % 60, quarter_display))
+    Html::from(format!(
+        "{}:{:02} - {}",
+        *game_clock / 60,
+        *game_clock % 60,
+        quarter_display
+    ))
+}
+
+async fn countdown_display_handler(State(state): State<AppState>) -> impl IntoResponse {
+    if *state.show_countdown.lock().await {
+        let countdown_clock = COUNTDOWN_CLOCK.lock().await;
+        return Html::from(format!(
+            "<div id=\"ol-countdown\" class=\"countdown-container\"><h2 class=\"countdown-title\">{}:</h2>{}:{:02}</div>",
+            state.countdown_text.lock().await,
+            *countdown_clock / 60,
+            *countdown_clock % 60
+        ));
+    } else {
+        return Html::from(String::new());
+    }
 }
 
 // endregion: overlay
 // region: downs
 
-async fn downs_set_handler(jar: CookieJar, State(state): State<AppState>, Path(d): Path<u8>) -> impl IntoResponse {
+async fn downs_set_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(d): Path<u8>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         if (1..=4).contains(&d) {
             *state.down.lock().await = d;
@@ -1413,7 +1468,11 @@ async fn downs_set_handler(jar: CookieJar, State(state): State<AppState>, Path(d
     }
 }
 
-async fn downs_update_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<i8>) -> impl IntoResponse {
+async fn downs_update_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(y): Path<i8>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut down = state.down.lock().await;
         if (1..=4).contains(&(*down as i8 + y)) {
@@ -1432,7 +1491,11 @@ async fn downs_update_handler(jar: CookieJar, State(state): State<AppState>, Pat
     }
 }
 
-async fn downs_togo_set_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<u8>) -> impl IntoResponse {
+async fn downs_togo_set_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(y): Path<u8>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         *state.downs_togo.lock().await = y;
 
@@ -1448,7 +1511,11 @@ async fn downs_togo_set_handler(jar: CookieJar, State(state): State<AppState>, P
     }
 }
 
-async fn downs_togo_update_handler(jar: CookieJar, State(state): State<AppState>, Path(y): Path<i8>) -> impl IntoResponse {
+async fn downs_togo_update_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(y): Path<i8>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut downs_togo = state.downs_togo.lock().await;
         if (1..=99).contains(&(*downs_togo as i8 + y)) {
@@ -1467,7 +1534,10 @@ async fn downs_togo_update_handler(jar: CookieJar, State(state): State<AppState>
     }
 }
 
-async fn downs_display_handler(State(state): State<AppState>, Path(t): Path<String>) -> impl IntoResponse {
+async fn downs_display_handler(
+    State(state): State<AppState>,
+    Path(t): Path<String>,
+) -> impl IntoResponse {
     if t == "down" {
         let down = state.down.lock().await;
 
@@ -1477,9 +1547,9 @@ async fn downs_display_handler(State(state): State<AppState>, Path(t): Path<Stri
             3 => Html::from(String::from("3rd")),
             4 => Html::from(String::from("4th")),
             _ => Html::from(String::new()),
-        }
+        };
     } else if t == "togo" {
-        return Html::from(state.downs_togo.lock().await.to_string())
+        return Html::from(state.downs_togo.lock().await.to_string());
     } else if t == "both" {
         let down = state.down.lock().await;
 
@@ -1493,7 +1563,11 @@ async fn downs_display_handler(State(state): State<AppState>, Path(t): Path<Stri
 
         drop(down);
 
-        return Html::from(format!("{} & {}", down_display, *state.downs_togo.lock().await))
+        return Html::from(format!(
+            "{} & {}",
+            down_display,
+            *state.downs_togo.lock().await
+        ));
     } else {
         return Html::from(String::new());
     }

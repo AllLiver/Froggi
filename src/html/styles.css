@@ -83,7 +83,7 @@ body {
 .countdown-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
     width: 37vw;
-    height: 28vh;
+    height: 29vh;
     border-radius: 0.86vw;
     display: flex;
     flex-direction: column;
@@ -97,6 +97,21 @@ body {
     text-align: center;
 }
 
+.clock-rectangle {
+    background-color: var(--color-background-contrast, #1d1e22);
+    width: 37vw;
+    height: 29vh;
+    border-radius: 0.86vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 0.5vh;
+    position: relative;
+    margin-bottom: var(--margin-bottom, 0.65vh);
+    margin-left: var(--margin-left, 0.5vw);
+}
+
 .quarter-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
     width: 37vw;
@@ -107,21 +122,6 @@ body {
     align-items: flex-start;
     overflow: hidden;
     padding: 0.46vh;
-    position: relative;
-    margin-bottom: var(--margin-bottom, 0.65vh);
-    margin-left: var(--margin-left, 0.5vw);
-}
-
-.clock-rectangle {
-    background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
-    height: 28vh;
-    border-radius: 0.86vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
-    padding: 0.5vh;
     position: relative;
     margin-bottom: var(--margin-bottom, 0.65vh);
     margin-left: var(--margin-left, 0.5vw);
@@ -290,6 +290,7 @@ body {
     * {
         animation: none;
         transition: none;
+
         canvas {
             display: none;
         }
@@ -694,7 +695,8 @@ body {
     align-items: center;
 }
 
-.countdown-title, .clock-title {
+.countdown-title,
+.clock-title {
     font-size: 2vh;
     margin: 0 0.52vw;
     color: var(--font-color, #000000);
@@ -769,7 +771,8 @@ body {
     cursor: pointer;
 }
 
-.show-countdown, .show-sponsors {
+.show-countdown,
+.show-sponsors {
     font-weight: 600;
 }
 
@@ -793,8 +796,8 @@ body {
     padding: 10px;
     background-color: var(--font-color-contrast);
     color: var(--font-color, #000000);
-    margin-bottom: 0.28vh;
     height: 3vh;
+    margin-left: 0.3vw;
 }
 
 #countdown-submit {
@@ -802,11 +805,13 @@ body {
     color: var(--font-color, #000000);
     border: none;
     cursor: pointer;
-    width: 75%;
-    height: 3vh;
-    width: 18%;
+    height: 4vh;
+    width: 10vw;
     border-radius: 5px;
-    margin: 0.65vh;
+    margin-left: 0.65vh;
+    text-align: center;
+    margin-top: 0;;
+
 }
 
 .countdown-actions-container {
@@ -814,6 +819,11 @@ body {
     align-items: center;
     width: 100%;
     margin-bottom: 0.28vh;
+}
+
+#countdown-form {
+    display: flex;
+    align-items: center;
 }
 
 #countdown-clock-text {
@@ -874,6 +884,19 @@ body {
     border: none;
     border-radius: 5px;
     color: var(--font-color);
+    font-weight: 600;
+    height: 4vh;
+    margin-left: var(--margin-left);
+    margin-bottom: var(--margin-bottom);
+    width: 6vw;
+    cursor: pointer;
+}
+
+.tab-button.active {
+    filter: drop-shadow(0 0 1vh #27a644);
+    border: 2px solid var(--color-selected);
+    animation: glow 1s infinite alternate;
+    border: none;
 }
 
 /* Preview iFrame */
@@ -1099,11 +1122,15 @@ iframe {
         width: 100%;
     }
 
+
 }
 
 @media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
     .netstats-rectangle {
         margin-left: 8px;
+    }
+    .tab-button {
+        width: 8vw;
     }
 }
 
@@ -1217,7 +1244,43 @@ iframe {
 }
 
 /* Hover effect */
-.button:hover, .button-increment-home:hover, .button-decrement-home:hover, .button-increment-away:hover, .button-decrement-away:hover, .button-increment-togo:hover, .button-decrement-togo:hover, .button-decrement-down:hover, .button-decrement-countdown:hover, .button-increment-countdown:hover, .button-decrement-quarter, .button-increment-quarter, .button-quick-score-home:hover, .button-quick-score-away:hover, .button-preset-down:hover, .button-start-countdown:hover, .button-stop-countdown:hover, .button-quick-time:hover, .button-quick-countdown:hover, .flag-home:hover, .flag-away:hover, .show-countdown:hover, .button-lock-interface:hover, .button-quick-quarter:hover, .create-login-rectangle input[type="submit"]:hover, .login-rectangle input[type="submit"]:hover, .button-preset-clock:hover, .button-stop-clock:hover, .button-start-clock:hover, .show-sponsors:hover, .submit-button:hover, .show-scoreboard:hover, .submit-button:hover, .show-downs:hover, .button-preset-togo:hover, .show-popup:hover, .show-animation:hover {
+.button:hover,
+.button-increment-home:hover,
+.button-decrement-home:hover,
+.button-increment-away:hover,
+.button-decrement-away:hover,
+.button-increment-togo:hover,
+.button-decrement-togo:hover,
+.button-decrement-down:hover,
+.button-decrement-countdown:hover,
+.button-increment-countdown:hover,
+.button-decrement-quarter,
+.button-increment-quarter,
+.button-quick-score-home:hover,
+.button-quick-score-away:hover,
+.button-preset-down:hover,
+.button-start-countdown:hover,
+.button-stop-countdown:hover,
+.button-quick-time:hover,
+.button-quick-countdown:hover,
+.flag-home:hover,
+.flag-away:hover,
+.show-countdown:hover,
+.button-lock-interface:hover,
+.button-quick-quarter:hover,
+.create-login-rectangle input[type="submit"]:hover,
+.login-rectangle input[type="submit"]:hover,
+.button-preset-clock:hover,
+.button-stop-clock:hover,
+.button-start-clock:hover,
+.show-sponsors:hover,
+.submit-button:hover,
+.show-scoreboard:hover,
+.submit-button:hover,
+.show-downs:hover,
+.button-preset-togo:hover,
+.show-popup:hover,
+.show-animation:hover {
     transform: scale(1.01)
 }
 
@@ -1370,7 +1433,11 @@ canvas {
     gap: 0.5rem;
 }
 
-.ol-home-box, .ol-away-box, .ol-score-box, .ol-quarter-box, .ol-down-box {
+.ol-home-box,
+.ol-away-box,
+.ol-score-box,
+.ol-quarter-box,
+.ol-down-box {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1413,6 +1480,53 @@ canvas {
 .ol-down-togo-box h3 {
     margin: 0;
     white-space: nowrap;
+}
+
+.countdown-container {
+    position: absolute;
+    margin-left: auto;
+    margin-right: 0;
+    width: 12vw;
+    height: 6vw;
+    background-color: #111111;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    border-radius: 5px;
+    bottom: 0;
+    right: 0;
+    opacity: 0.5;
+    margin: 0.2%;
+    overflow: hidden;
+}
+
+.countdown-title {
+    font-size: 1em;
+    margin: 0;
+    padding: 5px 0;
+    text-align: center;
+}
+
+.countdown-form-grid {
+    width: 100vw;
+}
+
+#countdown-clock-text {
+    width: 25vw;
+}
+
+#ol-countdown {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 5px 0 0 0;
+    padding: 5px 0;
+    text-align: center;
+    border-radius: 3px;
+    margin: 0.2%;
+    border-radius: 5px;
 }
 
 /* Styles for ol-popup */
@@ -1476,10 +1590,12 @@ canvas {
         border-color: transparent;
         box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
     }
+
     50% {
         border-color: #3498db;
         box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
     }
+
     100% {
         border-color: transparent;
         box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
@@ -1518,10 +1634,12 @@ canvas {
         border-color: transparent;
         box-shadow: 0 0 0 0 rgba(219, 165, 17, 0.7);
     }
+
     50% {
         border-color: #e67e22;
         box-shadow: 0 0 0 10px rgba(230, 126, 34, 0);
     }
+
     100% {
         border-color: transparent;
         box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7);
@@ -1646,18 +1764,51 @@ form input[type="submit"],
     margin-top: 4vh;
 }
 
-.logo-previews {
+/* Container for each match selector */
+.match-selector {
     display: flex;
-    justify-content: space-around;
-    margin-top: 0.93vh;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 0.5rem;
+    overflow: hidden;
 }
 
-.logo-previews img {
-    display: none;
-    width: 2.6vw;
-    height: 4.63vh;
-    border: 1px solid #fff;
+.match-selector .home-logo,
+.match-selector .away-logo {
+    width: 1.5vw;
+    height: 1.5vw;
+    object-fit: cover;
+}
+
+.teampreset-title {
+    flex: 1;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 1rem;
+}
+
+/* Style for buttons */
+.select-button,
+.remove-button {
+    background-color: var(--color-green);
+    color: #fff;
+    border: none;
     border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-left: 0.5rem;
+}
+
+.remove-button {
+    background-color: var(--color-selected);
 }
 
 /*& Settings */
@@ -1665,17 +1816,20 @@ form input[type="submit"],
 #settings-body {
     background-color: var(--color-background, #000);
 }
+
 .settings-container {
     max-width: 41.67vw;
     margin: 0 auto;
     margin-top: 5vh;
 }
+
 .settings-box {
     background-color: var(--color-background-contrast, #1d1e22);
     border-radius: 8px;
     padding: 2.22vh;
     margin-bottom: 2.22vh;
 }
+
 .settings-box-indev {
     background-color: var(--color-background-contrast, #1d1e22);
     border-radius: 8px;
@@ -1684,11 +1838,13 @@ form input[type="submit"],
     filter: blur(0.1vh);
     cursor: not-allowed;
 }
+
 .settings-title h2 {
     margin: 0;
     font-size: 2vh;
     font-weight: bold;
 }
+
 .subtext-settings h6 {
     margin: 0.56vh 0 1.67vh;
     font-size: 1.56vh;
@@ -1696,27 +1852,33 @@ form input[type="submit"],
     color: #e0e0e0;
     font-style: italic;
 }
+
 .setting {
     display: flex;
     align-items: center;
 }
+
 .setting input {
     margin-right: 0.52vw;
 }
+
 .switch-container {
     margin-left: 1vw;
 }
+
 .switch {
     position: relative;
     display: inline-block;
     width: 3.13vw;
     height: 3.78vh;
 }
+
 .switch input {
     opacity: 0;
     width: 0;
     height: 0;
 }
+
 .slider {
     position: absolute;
     cursor: pointer;
@@ -1728,6 +1890,7 @@ form input[type="submit"],
     transition: .4s;
     border-radius: 3.78vh;
 }
+
 .slider:before {
     position: absolute;
     content: "";
@@ -1739,17 +1902,22 @@ form input[type="submit"],
     transition: .4s;
     border-radius: 50%;
 }
+
 input:checked+.slider {
     background-color: #2196F3;
 }
+
 input:focus+.slider {
     box-shadow: 0 0 0.05vw #2196F3;
 }
+
 input:checked+.slider:before {
     transform: translateX(1.35vw);
 }
 
-#light-theme, #dark-theme, #colorblind-theme {
+#light-theme,
+#dark-theme,
+#colorblind-theme {
     background-color: var(--font-color, #000000);
     color: var(--font-color-contrast);
     border: none;
