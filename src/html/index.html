@@ -13,6 +13,11 @@
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
+    <style>
+        .ol-parent-container {
+            margin-right: 2vw;
+        }
+    </style>
 </head>
 
 <body>
@@ -57,11 +62,11 @@
                             <button class="button-increment-home" hx-post="/home-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-home" hx-post="/home-points/update/1"
+                        <button class="button-preset-score-home" hx-post="/home-points/update/1"
                             hx-swap="none"><strong>Add 1 point</strong></button>
-                        <button class="button-quick-score-home" hx-post="/home-points/update/2" hx-swap="none">Add 2
+                        <button class="button-preset-score-home" hx-post="/home-points/update/2" hx-swap="none">Add 2
                             points</button>
-                        <button class="button-quick-score-home" hx-post="/home-points/update/3" hx-swap="none">Add 3
+                        <button class="button-preset-score-home" hx-post="/home-points/update/3" hx-swap="none">Add 3
                             points</button>
                     </div>
                     <div class="section away-section">
@@ -76,11 +81,11 @@
                             <button class="button-increment-away" hx-post="/away-points/update/1"
                                 hx-swap="none">+</button>
                         </div>
-                        <button class="button-quick-score-away" hx-post="/away-points/update/1"
+                        <button class="button-preset-score-away" hx-post="/away-points/update/1"
                             hx-swap="none"><strong>Add 1 point</strong></button>
-                        <button class="button-quick-score-away" hx-post="/away-points/update/2" hx-swap="none">Add 2
+                        <button class="button-preset-score-away" hx-post="/away-points/update/2" hx-swap="none">Add 2
                             points</button>
-                        <button class="button-quick-score-away" hx-post="/away-points/update/3" hx-swap="none">Add 3
+                        <button class="button-preset-score-away" hx-post="/away-points/update/3" hx-swap="none">Add 3
                             points</button>
                     </div>
                 </div>
@@ -240,13 +245,13 @@
                                 hx-post="/countdown-clock/ctl/stop" hx-swap="none">Stop Countdown</button>
                         </div>
                         <div class="preset-countdown-buttons">
-                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/20"
+                            <button class="button-preset-countdown" hx-post="/countdown-clock/set/20"
                                 hx-swap="none">20:00</button>
-                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/15"
+                            <button class="button-preset-countdown" hx-post="/countdown-clock/set/15"
                                 hx-swap="none">15:00</button>
-                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/10"
+                            <button class="button-preset-countdown" hx-post="/countdown-clock/set/10"
                                 hx-swap="none">10:00</button>
-                            <button class="button-quick-countdown" hx-post="/countdown-clock/set/5"
+                            <button class="button-preset-countdown" hx-post="/countdown-clock/set/5"
                                 hx-swap="none">5:00</button>
                         </div>
                         <div class="countdown-actions-container">
@@ -274,15 +279,15 @@
                                 hx-swap="none">+</button>
                         </div>
                         <div class="quarter-buttons">
-                            <button class="button-quick-quarter" hx-post="/quarter/set/1" hx-swap="none">1st
+                            <button class="button-preset-quarter" hx-post="/quarter/set/1" hx-swap="none">1st
                                 Quarter</button>
-                            <button class="button-quick-quarter" hx-post="/quarter/set/2" hx-swap="none">2nd
+                            <button class="button-preset-quarter" hx-post="/quarter/set/2" hx-swap="none">2nd
                                 Quarter</button>
-                            <button class="button-quick-quarter" hx-post="/quarter/set/3" hx-swap="none">3rd
+                            <button class="button-preset-quarter" hx-post="/quarter/set/3" hx-swap="none">3rd
                                 Quarter</button>
-                            <button class="button-quick-quarter" hx-post="/quarter/set/4" hx-swap="none">4th
+                            <button class="button-preset-quarter" hx-post="/quarter/set/4" hx-swap="none">4th
                                 Quarter</button>
-                            <button class="button-quick-quarter" hx-post="/quarter/set/5"
+                            <button class="button-preset-quarter" hx-post="/quarter/set/5"
                                 hx-swap="none">Overtime</button>
                         </div>
                     </div>
@@ -292,7 +297,7 @@
                 <div class="tab-container" data-group="visibility">
 
                     <button id="visibility-tab-button" class="tab-button"
-                        onclick="openTab('visibility-tabular', 'visibility'); toggleVisibilityPopup('visibility-tab-button')">Visibility</button>
+                        onclick="openTab('visibility-tabular', 'visibility'); toggleVisibilityPopup('visibility-tab-button')">Display</button>
                     <button id="popups-tab-button" class="tab-button"
                         onclick="openTab('popups-tabular', 'visibility'); toggleVisibilityPopup('popups-tab-button')">Popups</button>
 
@@ -301,10 +306,10 @@
                         <div class="visibility">
                             <div class="visibility-rectangle">
                                 <div class="visibility-buttons">
-                                    <button class="show-countdown">Show Countdown</button>
-                                    <button class="show-downs">Show Downs & To Go</button>
-                                    <button class="show-scoreboard">Show Scoreboard</button>
-                                    <button class="show-sponsors">Show Sponsors</button>
+                                    <button class="show-countdown">Display Countdown</button>
+                                    <button class="show-downs">Display Downs & To Go</button>
+                                    <button class="show-scoreboard">Display Scoreboard</button>
+                                    <button class="show-sponsors">Display Sponsors</button>
                                 </div>
                             </div>
                         </div>

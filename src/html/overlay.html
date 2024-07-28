@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0">
@@ -8,7 +9,9 @@
     <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+        rel="stylesheet">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -31,11 +34,12 @@
 
         function updateSponsorImage() {
         }
-        
+
         updateSponsorImage();
     </script>
     <!-- Todo: Updated div names hopefully for the last time, popups (with superman animations as per T's request ), countdown, sponsor, hide overlay-->
 </head>
+
 <body id="overlay-body">
     <div class="ol-parent-container">
         <div class="ol-container">
@@ -45,8 +49,8 @@
             </div>
             <div class="ol-score-box" hx-put="/points/overview" hx-trigger="every 10ms">0-0</div>
             <div class="ol-away-box">
-                <div class="ol-team-name" hx-put="/teaminfo/name/away" hx-trigger="load"></div>
                 <div hx-put="/icon/away" hx-trigger="load"></div>
+                <div class="ol-team-name" hx-put="/teaminfo/name/away" hx-trigger="load"></div>
             </div>
             <div class="ol-quarter-box">
                 <div class="ol-time-quarter" hx-put="/overlay/clock" hx-trigger="every 10ms">0:00 - 1st</div>
@@ -67,28 +71,29 @@
     <div id="timeout-home" class="ol-popup-home">Timeout home</div>
     <div id="touchdown-home" class="ol-popup-home">Touchdown home</div>
     <div id="foul-home" class="ol-popup-home">Foul home</div>
-    
+
     <div id="flag-away" class="ol-popup-away">Flag away</div>
     <div id="timeout-away" class="ol-popup-away">Timeout away</div>
     <div id="touchdown-away" class="ol-popup-away">Touchdown away</div>
     <div id="foul-away" class="ol-popup-away">Foul away</div>
 
     <script>
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'F' || event.key === 'f') {
-                    var popup = document.getElementById('foul-home');
-                    popup.classList.add('show');
-                    setTimeout(function() {
-                        popup.classList.remove('show');
-                    }, 7500);
-                } else if (event.key === 'J' || event.key === 'j') {
-                    var popup = document.getElementById('foul-away');
-                    popup.classList.add('show');
-                    setTimeout(function() {
-                        popup.classList.remove('show');
-                    }, 7500); 
-                }
-            });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'F' || event.key === 'f') {
+                var popup = document.getElementById('foul-home');
+                popup.classList.add('show');
+                setTimeout(function () {
+                    popup.classList.remove('show');
+                }, 7500);
+            } else if (event.key === 'J' || event.key === 'j') {
+                var popup = document.getElementById('foul-away');
+                popup.classList.add('show');
+                setTimeout(function () {
+                    popup.classList.remove('show');
+                }, 7500);
+            }
+        });
     </script>
 </body>
+
 </html>
