@@ -828,17 +828,6 @@ iframe {
     width: 25vw;
 }
 
-#ol-countdown {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin: 5px 0 0 0;
-    padding: 5px 0;
-    text-align: center;
-    border-radius: 3px;
-    margin: 0.2%;
-    border-radius: 5px;
-}
-
 .button-start-countdown.active,
 .button-stop-countdown.active {
     background-color: var(--color-selected, #f64747);
@@ -1101,6 +1090,37 @@ iframe {
 .show-countdown,
 .show-sponsors {
     font-weight: 600;
+}
+
+.popup-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.popup-table th,
+.popup-table td {
+    padding: 10px;
+    border: 1px solid #fff;
+}
+
+
+.popup-table td {
+    background-color: #161718;
+}
+
+.button.home-popup {
+    border-color: blue;
+}
+
+.button.away-popup {
+    border-color: orange;
+}
+
+.popup-cooldown {
+    filter: brightness(0.5);
+    cursor: not-allowed;
+    filter: grayscale(100%);
 }
 
 /* Rwd */
@@ -1459,36 +1479,22 @@ canvas {
 
 /*& Overlay.html styles */
 
+#ol-countdown {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 5px 0 0 0;
+    padding: 5px 0;
+    text-align: center;
+    border-radius: 3px;
+    margin: 0.2%;
+    border-radius: 5px;
+}
+
 .ol-popup-home.show {
     bottom: 9vh;
     opacity: 1;
     transition-delay: 0.2s;
     animation: borderPulse-home 2s ease-out infinite;
-}
-
-.popup-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: center;
-}
-
-.popup-table th,
-.popup-table td {
-    padding: 10px;
-    border: 1px solid #fff;
-}
-
-
-.popup-table td {
-    background-color: #161718;
-}
-
-.button.home-popup {
-    border-color: blue;
-}
-
-.button.away-popup {
-    border-color: orange;
 }
 
 .ol-parent-container {
@@ -1500,12 +1506,6 @@ canvas {
     align-items: flex-end;
     padding: 0.93vh;
     height: 100vh;
-}
-
-.popup-cooldown {
-    filter: brightness(0.5);
-    cursor: not-allowed;
-    filter: grayscale(100%);
 }
 
 #overlay-body {
@@ -1552,6 +1552,8 @@ canvas {
     height: 2.59vh;
     width: auto;
     margin-right: 0.5vw;
+    display: flex;
+    align-items: center;
 }
 
 .ol-team-name-info {
@@ -1567,6 +1569,7 @@ canvas {
 .ol-home-box,
 .ol-away-box {
     min-width: 9vw;
+    justify-content: flex-start; 
 }
 
 .ol-score-box h3,
@@ -1578,6 +1581,10 @@ canvas {
 .ol-down-togo-box h3 {
     margin: 0;
     white-space: nowrap;
+}
+
+.ol-home-box {
+    width: auto;
 }
 
 /* Ol-Popups */
