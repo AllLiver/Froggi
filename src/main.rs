@@ -41,6 +41,9 @@ lazy_static! {
     static ref COUNTDOWN_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref COUNTDOWN_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref LOGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref SPONSOR_TAGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref SPONSOR_IDX: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+    static ref SHOW_SPONSORS: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
 }
 
 #[derive(Clone)]
@@ -96,6 +99,8 @@ async fn main() -> Result<()> {
 
         let default_config = Config {
             secure_auth_cookie: true,
+            sponsor_wait_time: 5,
+            sponsor_img_height: 150,
         };
 
         f.write_all(
@@ -110,6 +115,9 @@ async fn main() -> Result<()> {
     create_dir_all(format!("./sponsors"))
         .await
         .expect("Could not create sponsors directory");
+
+    // Load sponsor img tags
+    load_sponsors().await;
 
     let app = Router::new()
         // Basic routes
@@ -169,6 +177,7 @@ async fn main() -> Result<()> {
         .route("/sponsors/upload", post(upload_sponsors_handler))
         .route("/sponsors/manage", put(sponsors_management_handler))
         .route("/sponsors/remove/:id", post(sponsor_remove_handler))
+        .route("/sponsors/display", put(sponsor_display_handler))
         // Overlay display routes
         .route("/points/overview", put(points_overview_handler))
         .route("/icon/:t", put(icon_handler))
@@ -193,6 +202,7 @@ async fn main() -> Result<()> {
         tokio::spawn(uptime_ticker());
         tokio::spawn(game_clock_ticker());
         tokio::spawn(countdown_clock_ticker());
+        tokio::spawn(sponsor_ticker());
         println!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
@@ -211,6 +221,8 @@ async fn main() -> Result<()> {
 #[derive(Serialize, Deserialize)]
 struct Config {
     secure_auth_cookie: bool,
+    sponsor_wait_time: u64,
+    sponsor_img_height: u16,
 }
 
 // region: basic pages
@@ -1268,6 +1280,8 @@ async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl In
                 .expect("Could not write to sponsor file");
         }
 
+        load_sponsors().await;
+
         return Response::builder()
             .status(StatusCode::OK)
             .header(
@@ -1351,6 +1365,69 @@ async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl 
             .body(String::new())
             .unwrap();
     }
+}
+
+async fn load_sponsors() {
+    create_dir_all(format!("./sponsors"))
+        .await
+        .expect("Could not create sponsors directory");
+
+    let cfg = tokio::fs::read_to_string("./config.json")
+        .await
+        .expect("Could not read config json");
+    let cfg_json: Config = serde_json::from_str(&cfg).expect("Could not deserialize config json");
+
+    let mut d = read_dir("./sponsors")
+        .await
+        .expect("Could not read sponsors dir");
+
+    while let Ok(Some(f)) = d.next_entry().await {
+        let fname = f.file_name().to_string_lossy().to_string();
+
+        let mime_type = match fname.split(".").collect::<Vec<&str>>()[1] {
+            "png" => "png",
+            "jpg" => "jpeg",
+            "jpeg" => "jpeg",
+            _ => "",
+        };
+
+        let f_bytes = tokio::fs::read(f.path())
+            .await
+            .expect("Could not read sponsor image");
+
+        *SPONSOR_IDX.lock().await = 0;
+        SPONSOR_TAGS.lock().await.push(format!(
+            "<img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"{}px\" width=\"auto\">",
+            mime_type,
+            BASE64_STANDARD.encode(f_bytes),
+            cfg_json.sponsor_img_height
+        ))
+    }
+}
+
+async fn sponsor_ticker() {
+    let cfg = tokio::fs::read_to_string("./config.json")
+        .await
+        .expect("Could not read config json");
+    let cfg_json: Config = serde_json::from_str(&cfg).expect("Could not deserialize config json");
+
+    loop {
+        tokio::time::sleep(tokio::time::Duration::from_secs(cfg_json.sponsor_wait_time)).await;
+        let mut sponsor_idx = SPONSOR_IDX.lock().await;
+        let show_sponsors = SHOW_SPONSORS.lock().await;
+
+        if *show_sponsors {
+            if *sponsor_idx < SPONSOR_TAGS.lock().await.len() {
+                *sponsor_idx += 1;
+            } else {
+                *sponsor_idx = 0;
+            }
+        }
+    }
+}
+
+async fn sponsor_display_handler() -> impl IntoResponse {
+    return Html::from(SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone());
 }
 
 // endregion: sponsors
