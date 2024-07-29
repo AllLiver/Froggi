@@ -100,7 +100,7 @@ async fn main() -> Result<()> {
         let default_config = Config {
             secure_auth_cookie: true,
             sponsor_wait_time: 5,
-            sponsor_img_height: 150,
+            sponsor_img_height: 50,
         };
 
         f.write_all(
@@ -1397,7 +1397,7 @@ async fn load_sponsors() {
 
         *SPONSOR_IDX.lock().await = 0;
         SPONSOR_TAGS.lock().await.push(format!(
-            "<img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"{}px\" width=\"auto\">",
+            "<img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"{}vh\" width=\"auto\">",
             mime_type,
             BASE64_STANDARD.encode(f_bytes),
             cfg_json.sponsor_img_height
@@ -1417,7 +1417,7 @@ async fn sponsor_ticker() {
         let show_sponsors = SHOW_SPONSORS.lock().await;
 
         if *show_sponsors {
-            if *sponsor_idx < SPONSOR_TAGS.lock().await.len() {
+            if *sponsor_idx < SPONSOR_TAGS.lock().await.len() - 1 {
                 *sponsor_idx += 1;
             } else {
                 *sponsor_idx = 0;
