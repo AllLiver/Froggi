@@ -196,6 +196,7 @@ async fn main() -> Result<()> {
         // Visibility routes
         .route("/visibility/buttons", put(visibility_buttons_handler))
         .route("/visibility/toggle/:v", post(visibility_toggle_handler))
+        .route("/visibility/css", put(visibility_css_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -1763,6 +1764,30 @@ async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>
             .unwrap()
     }
 } 
+
+async fn visibility_css_handler(State(state): State<AppState>) -> impl IntoResponse {
+    return Html::from(format!("
+    <style>
+        {}
+        {}
+    </style>",
+    if !*state.show_downs.lock().await {
+        ".downs { 
+            display: none; 
+        } 
+        .ol-down-box { 
+            display: none; 
+        }"
+    } else {
+        ""
+    },
+    if !*state.show_scoreboard.lock().await {
+        ".ol-parent-container { display: none; }"   
+    } else {
+        ""
+    }
+    ));
+}
 
 // endregion: visibility
 
