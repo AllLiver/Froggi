@@ -169,8 +169,6 @@ body {
     position: relative;
     margin-bottom: var(--margin-bottom, 0.65vh);
     margin-left: var(--margin-left, 0.5vw);
-    cursor: not-allowed;
-    filter: grayscale(100%);
 }
 
 .popups-rectangle {
