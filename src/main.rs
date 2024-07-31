@@ -43,7 +43,7 @@ lazy_static! {
     static ref LOGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
     static ref SPONSOR_TAGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
     static ref SPONSOR_IDX: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
-    static ref SHOW_SPONSORS: Arc<Mutex<bool>> = Arc::new(Mutex::new(true));
+    static ref SHOW_SPONSORS: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
 #[derive(Clone)]
@@ -58,6 +58,8 @@ struct AppState {
     downs_togo: Arc<Mutex<u8>>,
     countdown_text: Arc<Mutex<String>>,
     show_countdown: Arc<Mutex<bool>>,
+    show_downs: Arc<Mutex<bool>>,
+    show_scoreboard: Arc<Mutex<bool>>,
 }
 
 #[tokio::main]
@@ -73,7 +75,9 @@ async fn main() -> Result<()> {
         down: Arc::new(Mutex::new(1)),
         downs_togo: Arc::new(Mutex::new(0)),
         countdown_text: Arc::new(Mutex::new(String::from("Countdown"))),
-        show_countdown: Arc::new(Mutex::new(true)),
+        show_countdown: Arc::new(Mutex::new(false)),
+        show_downs: Arc::new(Mutex::new(false)),
+        show_scoreboard: Arc::new(Mutex::new(true)),
     };
 
     // Validate required files and directories
@@ -189,6 +193,9 @@ async fn main() -> Result<()> {
         .route("/downs/togo/set/:y", post(downs_togo_set_handler))
         .route("/downs/togo/update/:y", post(downs_togo_update_handler))
         .route("/downs/display/:t", put(downs_display_handler))
+        // Visibility routes
+        .route("/visibility/buttons", put(visibility_buttons_handler))
+        .route("/visibility/toggle/:v", post(visibility_toggle_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -1427,7 +1434,11 @@ async fn sponsor_ticker() {
 }
 
 async fn sponsor_display_handler() -> impl IntoResponse {
-    return Html::from(SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone());
+    if *SHOW_SPONSORS.lock().await {
+        return Html::from(SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone());
+    } else {
+        return Html::from(String::new());
+    }
 }
 
 // endregion: sponsors
@@ -1651,6 +1662,109 @@ async fn downs_display_handler(
 }
 
 // endregion: downs
+// region: visibility
+
+async fn visibility_buttons_handler(State(state): State<AppState>) -> impl IntoResponse {
+    return Html::from(format!(
+        "
+    <div class=\"visibility-buttons\">
+        <button class=\"show-countdown\" hx-post=\"/visibility/toggle/countdown\">{}</button>
+        <button class=\"show-downs\" hx-post=\"/visibility/toggle/downs\">{}</button>
+        <button class=\"show-scoreboard\" hx-post=\"/visibility/toggle/scoreboard\">{}</button>
+        <button class=\"show-sponsors\" hx-post=\"/visibility/toggle/sponsors\">{}</button>
+    </div>
+    ",
+        if !*state.show_countdown.lock().await {
+            "Show Countdown"
+        } else {
+            "Hide Countdown"
+        },
+        if !*state.show_downs.lock().await {
+            "Show Downs/To Go"
+        } else {
+            "Hide Downs/To Go"
+        },
+        if !*state.show_scoreboard.lock().await {
+            "Show Scoreboard"
+        } else {
+            "Hide Scoreboard"
+        },
+        if !*SHOW_SPONSORS.lock().await {
+            "Show Sponsors"
+        } else {
+            "Hide Sponsors"
+        }
+    ));
+}
+
+async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>, Path(v): Path<String>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut modified = ("", false);
+
+        match v.as_str() {
+            "countdown" => {
+                let mut countdown = state.show_countdown.lock().await;
+
+                if *countdown {
+                    *countdown = false;
+                } else {
+                    *countdown = true;
+                }
+                modified = ("Countdown", *countdown);
+            },
+            "downs" => {
+                let mut downs = state.show_downs.lock().await;
+
+                if *downs {
+                    *downs = false;
+                } else {
+                    *downs = true;
+                }
+                modified = ("Downs/To Go", *downs);
+            },
+            "scoreboard" => {
+                let mut scoreboard = state.show_scoreboard.lock().await;
+
+                if *scoreboard {
+                    *scoreboard = false;
+                } else {
+                    *scoreboard = true;
+                }
+                modified = ("Scoreboard", *scoreboard);
+            },
+            "sponsors" => {
+                let mut sponsors = SHOW_SPONSORS.lock().await;
+
+                if *sponsors {
+                    *sponsors = false;
+                } else {
+                    *sponsors = true;
+                }
+                modified = ("Sponsors", *sponsors);
+            },
+            _ => {}
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(format!("{} {}",
+            if !modified.1 {
+                "Show"
+            } else {
+                "Hide"
+            },
+            modified.0
+            ))
+            .unwrap()
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap()
+    }
+} 
+
+// endregion: visibility
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
