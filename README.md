@@ -2,17 +2,17 @@
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
-Is a self-hosted portable scoreboard solution that aims to provide an free an intuitive sports broadcasting overlay, liscenced under MIT.
+Is a self-hosted portable scoreboard solution that aims to provide an free and intuitive sports broadcasting overlay, liscenced under MIT.
 # Usage
-When the binary is first run, it will create all needed files.  
+On the first run, it will create all needed files.  
 Here is what each of those files/folders do.
- - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard, you can also add these through the "sponsors & teaminfo" page. A restart of the application is required to take effect.
+ - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard, you can also add these through the "sponsors & teaminfo" page.
  - teams (folder): this folder contains the images, names, and jersey color of all team presets you set
  - login (folder): this folder is not for manual editing and contains login information
- - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format  
+ - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format 
 
 When logging into the web interface for the first time you will be prompted to create a login for the web interface, remember it.  
-After creating a login simply sign in, upload team-info, and start streaming!
+After creating a login simply sign in, upload the team-info, and start streaming!
 
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/FOSSO/releases "releases")
@@ -33,7 +33,7 @@ The compiled binary will be in /target/release
 Froggi is an indev project so change is very likley.
 Here are some features/updates planned in no particular order
  - Jersey colors will reflect the color on the overlay
- - More sports
+ - Options for more sports
  - Integration with ScoreSight
  - Web acsessible logs
 
@@ -42,4 +42,4 @@ Here are some features/updates planned in no particular order
  - HTML, CSS, JavaScript, and the HTMX library for the frontend
 
 # Contribute
-If you are fammiliar with our tech stack, feel free to submit a poll request!
+If you are fammiliar with our tech stack, feel free to submit a pull request!
