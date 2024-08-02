@@ -12,7 +12,7 @@ use axum::{
         HeaderName, HeaderValue, Response, StatusCode,
     },
     response::{Html, IntoResponse},
-    routing::{get, post, put},
+    routing::{get, head, post, put},
     Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
@@ -126,6 +126,7 @@ async fn main() -> Result<()> {
     let app = Router::new()
         // Basic routes
         .route("/", get(index_handler))
+        .route("/", head(ping_handler))
         .route("/overlay", get(overlay_handler))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
@@ -197,6 +198,8 @@ async fn main() -> Result<()> {
         .route("/visibility/buttons", put(visibility_buttons_handler))
         .route("/visibility/toggle/:v", post(visibility_toggle_handler))
         .route("/visibility/css", put(visibility_css_handler))
+        // OCR API
+        //.route("/ocr", post(ocr_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -597,6 +600,10 @@ async fn verify_auth(jar: CookieJar) -> bool {
     } else {
         return false;
     }
+}
+
+async fn ping_handler() -> impl IntoResponse {
+    return StatusCode::OK;
 }
 
 // endregion: login
