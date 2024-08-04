@@ -5,10 +5,10 @@
 Is a self-hosted portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.
 
 # Features
--  ✨Optical character recognition using this [addon](https://github.com/AllLiver/froggi-ocr) and [this program](https://github.com/locaal-ai/scoresight), using a video source, the program will be automatic.
+-  ✨Optical character recognition using this [addon](https://github.com/AllLiver/froggi-ocr) and [this program](https://github.com/locaal-ai/scoresight), using a video source, the program can be automatic.
 - ✨An optional sponsor logo slideshow on overlay
 - ✨Team logos save for future use
-- ✨Ui optimized for iPad
+- ✨Ui is optimized for iPad like devices
 
 # Installation
 Pre-compiled binaries will be under [releases](https://github.com/AllLiver/Froggi/releases "releases")
