@@ -9,7 +9,7 @@ use axum::{
     extract::{Multipart, Path, State},
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
-        HeaderName, HeaderValue, Response, StatusCode,
+        HeaderMap, HeaderName, HeaderValue, Response, StatusCode,
     },
     response::{Html, IntoResponse},
     routing::{get, head, post, put},
@@ -19,9 +19,10 @@ use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
 use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use lazy_static::lazy_static;
-use rand::{thread_rng, Rng};
+use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
+    collections::HashMap,
     path::PathBuf,
     sync::Arc,
     time::{Instant, UNIX_EPOCH},
@@ -44,6 +45,7 @@ lazy_static! {
     static ref SPONSOR_TAGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
     static ref SPONSOR_IDX: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref SHOW_SPONSORS: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref OCR_API: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
 #[derive(Clone)]
@@ -128,6 +130,7 @@ async fn main() -> Result<()> {
         .route("/", get(index_handler))
         .route("/", head(ping_handler))
         .route("/overlay", get(overlay_handler))
+        .route("/settings", get(settings_handler))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
         .route("/app.js", get(app_js_handler))
@@ -199,7 +202,8 @@ async fn main() -> Result<()> {
         .route("/visibility/toggle/:v", post(visibility_toggle_handler))
         .route("/visibility/css", put(visibility_css_handler))
         // OCR API
-        //.route("/ocr", post(ocr_handler))
+        .route("/ocr", post(ocr_handler))
+        .route("/api/key/check/:k", post(api_key_check_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -278,6 +282,21 @@ async fn overlay_handler() -> impl IntoResponse {
         return Response::builder()
             .status(StatusCode::SEE_OTHER)
             .header(LOCATION, HeaderValue::from_static("/login/create"))
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn settings_handler(jar: CookieJar) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::from(include_str!("./html/settings.html")))
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header(LOCATION, HeaderValue::from_static("/login"))
             .body(String::new())
             .unwrap();
     }
@@ -367,6 +386,7 @@ struct CreateLogin {
 struct Login {
     username: String,
     password: String,
+    api_key: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -406,6 +426,7 @@ async fn create_login_handler(Form(data): Form<CreateLogin>) -> impl IntoRespons
             let new_login = Login {
                 username: data.username,
                 password: password_hash,
+                api_key: key_create(32),
             };
 
             f.write_all(serde_json::to_string(&new_login).unwrap().as_bytes())
@@ -701,7 +722,7 @@ async fn game_clock_ticker() {
         let mut game_clock = GAME_CLOCK.lock().await;
         let mut game_clock_start = GAME_CLOCK_START.lock().await;
 
-        if *game_clock_start {
+        if *game_clock_start && !*OCR_API.lock().await {
             let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
             if *game_clock as isize + time_diff >= 0 {
                 *game_clock = (*game_clock as isize + time_diff) as usize;
@@ -1705,7 +1726,11 @@ async fn visibility_buttons_handler(State(state): State<AppState>) -> impl IntoR
     ));
 }
 
-async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>, Path(v): Path<String>) -> impl IntoResponse {
+async fn visibility_toggle_handler(
+    jar: CookieJar,
+    State(state): State<AppState>,
+    Path(v): Path<String>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut modified = ("", false);
 
@@ -1719,7 +1744,7 @@ async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>
                     *countdown = true;
                 }
                 modified = ("Countdown", *countdown);
-            },
+            }
             "downs" => {
                 let mut downs = state.show_downs.lock().await;
 
@@ -1729,7 +1754,7 @@ async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>
                     *downs = true;
                 }
                 modified = ("Downs/To Go", *downs);
-            },
+            }
             "scoreboard" => {
                 let mut scoreboard = state.show_scoreboard.lock().await;
 
@@ -1739,7 +1764,7 @@ async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>
                     *scoreboard = true;
                 }
                 modified = ("Scoreboard", *scoreboard);
-            },
+            }
             "sponsors" => {
                 let mut sponsors = SHOW_SPONSORS.lock().await;
 
@@ -1749,54 +1774,144 @@ async fn visibility_toggle_handler(jar: CookieJar, State(state): State<AppState>
                     *sponsors = true;
                 }
                 modified = ("Sponsors", *sponsors);
-            },
+            }
             _ => {}
         }
 
         return Response::builder()
             .status(StatusCode::OK)
-            .body(format!("{} {}",
-            if !modified.1 {
-                "Show"
-            } else {
-                "Hide"
-            },
-            modified.0
+            .body(format!(
+                "{} {}",
+                if !modified.1 { "Show" } else { "Hide" },
+                modified.0
             ))
-            .unwrap()
+            .unwrap();
     } else {
         return Response::builder()
             .status(StatusCode::UNAUTHORIZED)
             .body(String::new())
-            .unwrap()
+            .unwrap();
     }
-} 
+}
 
 async fn visibility_css_handler(State(state): State<AppState>) -> impl IntoResponse {
-    return Html::from(format!("
+    return Html::from(format!(
+        "
     <style>
         {}
         {}
     </style>",
-    if !*state.show_downs.lock().await {
-        ".downs { 
+        if !*state.show_downs.lock().await {
+            ".downs { 
             display: none; 
         } 
         .ol-down-box { 
             display: none; 
         }"
-    } else {
-        ""
-    },
-    if !*state.show_scoreboard.lock().await {
-        ".ol-parent-container { display: none; }"   
-    } else {
-        ""
-    }
+        } else {
+            ""
+        },
+        if !*state.show_scoreboard.lock().await {
+            ".ol-parent-container { display: none; }"
+        } else {
+            ""
+        }
     ));
 }
 
 // endregion: visibility
+// region: api
+
+async fn api_key_check_handler(Path(k): Path<String>) -> impl IntoResponse {
+    let login: Login = serde_json::from_str(
+        &tokio::fs::read_to_string("./login.json")
+            .await
+            .expect("Could not read login.json"),
+    )
+    .expect("Could not deserialize login.json");
+
+    if k == login.api_key {
+        return StatusCode::OK;
+    } else {
+        return StatusCode::UNAUTHORIZED;
+    }
+}
+
+async fn ocr_handler(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    body: String,
+) -> impl IntoResponse {
+    if let Some(api_key) = headers.get("api-key") {
+        if *OCR_API.lock().await {
+            let login: Login = serde_json::from_str(
+                &tokio::fs::read_to_string("./login.json")
+                    .await
+                    .expect("Could not read login.json"),
+            )
+            .expect("Could not deserialize login.json");
+
+            if api_key.to_str().expect("Could not cast HeaderVale to str") == login.api_key {
+                let ocr_data: HashMap<String, String> =
+                    serde_json::from_str(&body).expect("Could not deserialize request body");
+
+                if let Some(d) = ocr_data.get("Time") {
+                    let time_vec = d.split(":").collect::<Vec<&str>>();
+
+                    if time_vec.len() == 2 && time_vec.iter().all(|x| x.parse::<u32>().is_ok()) {
+                        let time_vec: Vec<u32> = time_vec.iter().map(|x| x.parse::<u32>().unwrap()).collect();
+
+                        *GAME_CLOCK.lock().await = (time_vec[0] * 60 + time_vec[1]) as usize;
+                    }
+                }
+
+                if let Some(d) = ocr_data.get("Home Score") {
+                    if let Ok(s) = d.parse::<u32>() {
+                        *state.home_points.lock().await = s;
+                    }
+                }
+
+                if let Some(d) = ocr_data.get("Away Score") {
+                    if let Ok(s) = d.parse::<u32>() {
+                        *state.away_points.lock().await = s;
+                    }
+                }
+
+                if let Some(d) = ocr_data.get("Period") {
+                    if d.ends_with("st") || d.ends_with("nd") || d.ends_with("rd") || d.ends_with("th") {
+                        *state.quarter.lock().await = d.split_at(1).0.parse::<u8>().expect("Could not parse quarter from ocr data");
+                    } else if d.parse::<u8>().is_ok() {
+                        *state.quarter.lock().await = d.parse::<u8>().expect("Could not parse quarter from ocr data");
+                    }
+                }
+
+                if let Some(d) = ocr_data.get("To Go") {
+                    if let Ok(s) = d.parse::<u8>() {
+                        *state.downs_togo.lock().await = s;
+                    }
+                }
+
+                if let Some(d) = ocr_data.get("Down") {
+                    if d.ends_with("st") || d.ends_with("nd") || d.ends_with("rd") || d.ends_with("th") {
+                        *state.down.lock().await = d.split_at(1).0.parse::<u8>().expect("Could not parse quarter from ocr data");
+                    } else if d.parse::<u8>().is_ok() {
+                        *state.down.lock().await = d.parse::<u8>().expect("Could not parse quarter from ocr data");
+                    }
+                }
+
+                return StatusCode::OK;
+            } else {
+                return StatusCode::UNAUTHORIZED;
+            }
+        } else {
+            return StatusCode::CONFLICT;
+        }
+    } else {
+        return StatusCode::UNAUTHORIZED;
+    }
+}
+
+// endregion: api
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
@@ -1809,6 +1924,14 @@ fn id_create(l: u8) -> String {
     }
 
     id
+}
+
+fn key_create(l: usize) -> String {
+    thread_rng()
+        .sample_iter(&Alphanumeric)
+        .take(l)
+        .map(char::from)
+        .collect()
 }
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
