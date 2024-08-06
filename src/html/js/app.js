@@ -1,18 +1,18 @@
-const version = '2.0.0'; // Deprecated, update cargo.toml. Current version of the app, change when updating the app, using semantic versions.
 const ping_time = '1000'; // Change to update ping at a different interval, default is 1000ms.
-const ping_url = 'http://localhost:3000'; // Change when to the local ip when accessing from a different device, default is localhost:3000/
-const preview_url = 'http://localhost:3000/overlay'; // Change when to the local ip when accessing from a different device, default is localhost:3000/overlay
 const default_theme = 'theme-dark'; // Default theme, change to 'theme-light' or 'theme-colorblind' if you want to change the default theme (clear local storage), default is theme-dark.
-const lock_interface_btn = document.getElementById('lockInterfaceBtn'); // Change to the id of the button that will lock the interface, if null, the button will be disabled, default is 'lockInterfaceBtn'.
+const lock_interface_btn = document.getElementById('lockInterfaceBtn'); // Change to the id of the button that will lock the interface, if set to null, the button will be disabled, default is 'lockInterfaceBtn'.
 const popup_duration = "7500"; // Change to update the duration of the popup, default is 7500ms.
 
+// Default/backup URLs, if accessing from a 2nd device, set this to your local ip for fallback.
+let ping_url = 'http://localhost:3000'; // The url that will be pinged to check the connection, default is 'http://localhost:3000'.
+let preview_url = 'http://localhost:3000/overlay'; // The url that will be used for the preview iframe, default is 'http://localhost:3000/overlay'.
 
 function update_version() {
     const version_element = document.getElementById('version-value');
     if (version_element) {
         version_element.textContent = version;
     } else {
-        console.error('Version value not found');
+        console.error('E001: Version value not found');
     }
 }
 
@@ -34,11 +34,43 @@ function measure_ping(url, callback) {
                 callback(time);
             } else {
                 callback('Ping Error: ' + response.status);
+                console.error('E002: Ping failed with status', response.status);
             }
         })
         .catch(() => {
             callback('Ping Error');
+            console.error('E003: Ping request failed');
         });
+}
+
+function saveHostIP() {
+    const hostIPInput = document.getElementById('host-ip');
+    if (hostIPInput) {
+        const hostIP = hostIPInput.value.trim();
+        const isValid = /^([0-9]{1,3}\.){3}[0-9]{1,3}:\d+$/.test(hostIP); 
+        if (isValid) {
+            localStorage.setItem('hostIP', hostIP);
+            ping_url = `http://${hostIP}`; 
+            preview_url = `http://${hostIP}/overlay`; 
+            console.log('Host IP saved:', hostIP);
+        } else {
+            console.error('E004: Invalid Host IP format. Please use the format: X.X.X.X:PORT');
+        }
+    } else {
+        console.error('E005: Host IP input element not found');
+    }
+}
+
+function pingServer() {
+    const hostIP = localStorage.getItem('hostIP');
+    if (!hostIP) {
+        console.error('E006: Host IP is not set.');
+        return;
+    }
+
+    measure_ping(ping_url, function(pingTime) {
+        document.getElementById('ping-value').textContent = pingTime + ' ms';
+    });
 }
 
 lock_interface_btn.addEventListener('click', function(event) {
@@ -65,6 +97,13 @@ window.addEventListener('load', function() {
         document.body.classList.remove('interface-locked');
         lock_interface_btn.innerHTML = '<strong>Lock Interface</strong>';
     }
+
+    const savedHostIP = localStorage.getItem('hostIP');
+    if (savedHostIP) {
+        document.getElementById('host-ip').value = savedHostIP;
+        ping_url = `http://${savedHostIP}`;
+        preview_url = `http://${savedHostIP}/overlay`;
+    }
 });
 
 function test_latency() {
@@ -76,13 +115,18 @@ function test_latency() {
             document.getElementById('ping-value').textContent = latency + ' ms';
         })
         .catch(function(err) {
-            console.error('Error fetching data:', err);
+            console.error('E007: Error fetching data:', err);
         });
 }
 
 document.addEventListener("DOMContentLoaded", function() {
     const iframe = document.getElementById("previewIframe");
     iframe.src = preview_url;
+
+    const hostIPInput = document.getElementById('host-ip');
+    if (hostIPInput) {
+        hostIPInput.addEventListener('input', saveHostIP);
+    }
 });
 
 function sanitize(input_element) {
@@ -90,44 +134,46 @@ function sanitize(input_element) {
     input_element.value = sanitized_value;
 }
 
-function toggle_theme(theme) {
-    document.body.classList.remove('theme-light', 'theme-dark', 'theme-colorblind');
+function applyTheme(theme) {
+    document.body.classList.remove('theme-dark', 'theme-light', 'theme-colorblind');
+
     document.body.classList.add(theme);
-    localStorage.setItem('currentTheme', theme); 
+
+    localStorage.setItem('theme', theme);
 }
 
-function load_theme() {
-    const saved_theme = localStorage.getItem('currentTheme');
-    console.log('Saved Theme:', saved_theme);
+window.onload = function() {
+    const savedTheme = localStorage.getItem('theme') || 'theme-dark'; 
+    applyTheme(savedTheme);
+};
 
-    if (saved_theme) {
-        toggle_theme(saved_theme);
-    } else {
-        console.log('No theme set, applying default:', default_theme);
-        toggle_theme(default_theme); 
-    }
+if (document.getElementById('light-theme')) {
+    document.getElementById('light-theme').onclick = function() {
+        applyTheme('theme-light');
+    };
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('light-theme').addEventListener('click', function() {
-        toggle_theme('theme-light');
-    });
+if (document.getElementById('dark-theme')) {
+    document.getElementById('dark-theme').onclick = function() {
+        applyTheme('theme-dark');
+    };
+}
 
-    document.getElementById('dark-theme').addEventListener('click', function() {
-        toggle_theme('theme-dark');
-    });
-
-    document.getElementById('colorblind-theme').addEventListener('click', function() {
-        toggle_theme('theme-colorblind');
-    });
-
-    load_theme();
-});
+if (document.getElementById('colorblind-theme')) {
+    document.getElementById('colorblind-theme').onclick = function() {
+        applyTheme('theme-colorblind');
+    };
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     function initialize_buttons(start_button_id, stop_button_id, storage_key) {
         const start_button = document.getElementById(start_button_id);
         const stop_button = document.getElementById(stop_button_id);
+
+        if (!start_button || !stop_button) {
+            console.error('E008: Button elements not found for:', start_button_id, stop_button_id);
+            return;
+        }
 
         start_button.addEventListener("click", function () {
             start_button.classList.add("selector-active");
@@ -174,5 +220,5 @@ document.querySelectorAll('.cooldown').forEach(button => {
 });
 
 update_version();
-test_latency();
-setInterval(test_latency, ping_time);
+pingServer();
+setInterval(pingServer, ping_time);

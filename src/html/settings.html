@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
@@ -14,8 +15,8 @@
     <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
+
 <body id="settings-body">
-    <!--TODO:-->
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
             <span class="line"></span>
@@ -38,57 +39,56 @@
                 </div>
             </div>
             <div class="setting">
-                <input type="color" value="#00b140">
+                <input type="color" id="overlay-color" value="#00b140">
+                <button id="reset-color">Reset to Default</button>
             </div>
         </div>
         <div class="settings-box">
             <div class="settings-title">
                 <h2>Host IP</h2>
                 <div class="subtext-settings">
-                    <h6>When acsessing from a seperate device, this will need to be set to calculate ping and show the preview.</h6>
+                    <h6>When accessing from a separate device, this will need to be set to calculate ping and show
+                        the
+                        preview.</h6>
                 </div>
             </div>
             <div class="setting">
-                <input type="text" name="host-ip" placeholder="X.X.X.X:3000" oninput="sanitize(this)">
+                <input type="text" id="host-ip" name="host-ip" placeholder="X.X.X.X:3000" oninput="sanitize(this)">
             </div>
         </div>
         <div class="settings-box">
             <div class="settings-title">
                 <h2>Theme</h2>
                 <div class="subtext-settings">
-                    <h6>Changing themes can be helpful in different scenarios, and for those who bennefit WGAC AAA</h6>
+                    <h6>Changing themes can be helpful in different scenarios, and for those who benefit from WCAG
+                        AAA.
+                    </h6>
                 </div>
             </div>
             <div class="setting">
-                <div class="setting">
-                    <button id="light-theme">Light Theme</button>
-                    <button id="dark-theme">Dark Theme</button>
-                    <button id="colorblind-theme">Colorblind Theme</button>
+                <button id="light-theme">Light Theme</button>
+                <button id="dark-theme">Dark Theme</button>
+                <button id="colorblind-theme">Colorblind Theme</button>
             </div>
         </div>
-        <div class="settings-box-indev">
+        <div class="settings-box">
+            <h2>OCR</h2>
+        </div>
+        <div class="settings-box">
             <div class="settings-title">
-                <h2>Scoresight OCR</h2>
+                <h2>Reset Scoreboard</h2>
                 <div class="subtext-settings">
-                    <h6>Scoresight is an open source OCR built for scoreboards developed by royshil liscenced with MIT, it is not included with the download of froggi. It can be used to automate the scoreboard overlay, but requires to be setup individually.</h6><br>
-                    <h6>The scoresight liveserver needs to be saved to ../../.../ocr, and is not customizable.</h6>
                 </div>
             </div>
             <div class="setting">
-                <p>Ocr</p> 
-                <div class="switch-container">
-                    <label class="switch">
-                        <input type="checkbox">
-                        <span class="slider"></span>
-                    </label>
-                </div>
+                <button class="reset-button">⚠️Reset⚠️</button>
             </div>
         </div>
         <div class="settings-box-indev">
             <div class="settings-title">
                 <h2>Keybinds</h2>
                 <div class="subtext-settings">
-                    <h6>Customizable keybinds makes it a breeze to keep score without a touchscreen.</h6>
+                    <h6>Customizable keybinds make it a breeze to keep score without a touchscreen.</h6>
                 </div>
             </div>
             <div class="setting">
@@ -97,5 +97,65 @@
         </div>
     </div>
     <script src="/app.js"></script>
+    <script>
+        function applyTheme(theme) {
+            document.body.classList.remove('theme-dark', 'theme-light', 'theme-colorblind');
+            document.body.classList.add(theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        window.onload = function () {
+            const savedColor = localStorage.getItem('overlayColor') || '#00b140';
+            document.getElementById('overlay-color').value = savedColor;
+
+            const savedTheme = localStorage.getItem('theme') || 'theme-dark';
+            applyTheme(savedTheme);
+
+            const savedHostIP = localStorage.getItem('hostIP') || '';
+            document.getElementById('host-ip').value = savedHostIP;
+        };
+
+        document.getElementById('overlay-color').addEventListener('input', function () {
+            const selectedColor = this.value;
+            localStorage.setItem('overlayColor', selectedColor);
+        });
+
+        document.getElementById('reset-color').addEventListener('click', function () {
+            const defaultColor = '#00b140';
+            localStorage.setItem('overlayColor', defaultColor);
+            document.getElementById('overlay-color').value = defaultColor;
+            const overlayElement = document.querySelector('.overlay');
+            if (overlayElement) {
+                overlayElement.style.backgroundColor = defaultColor;
+            }
+        });
+
+        document.getElementById('host-ip').addEventListener('input', function () {
+            const hostIP = this.value;
+            localStorage.setItem('hostIP', hostIP);
+        });
+
+        document.getElementById('light-theme').onclick = function () {
+            applyTheme('theme-light');
+        };
+
+        document.getElementById('dark-theme').onclick = function () {
+            applyTheme('theme-dark');
+        };
+
+        document.getElementById('colorblind-theme').onclick = function () {
+            applyTheme('theme-colorblind');
+        };
+        document.querySelector('.reset-button').addEventListener('click', function () {
+        const confirmed = confirm('Are you sure you want to reset the scoreboard? This action cannot be undone.');
+        if (confirmed) {
+            console.log('Scoreboard reset confirmed.');
+        } else {
+            console.log('Canceled!');
+        }
+    });
+    </script>
+
 </body>
+
 </html>

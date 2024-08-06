@@ -390,6 +390,12 @@ struct Login {
 }
 
 #[derive(Serialize, Deserialize)]
+struct LoginForm {
+    username: String,
+    password: String
+}
+
+#[derive(Serialize, Deserialize)]
 struct Claims {
     sub: String,
     un: String,
@@ -473,7 +479,7 @@ async fn login_page_handler() -> impl IntoResponse {
     }
 }
 
-async fn login_handler(Form(data): Form<Login>) -> impl IntoResponse {
+async fn login_handler(Form(data): Form<LoginForm>) -> impl IntoResponse {
     if let Ok(f) = File::open("login.json").await {
         if !data.username.contains(" ")
             && !data.username.is_empty()
@@ -1354,10 +1360,10 @@ async fn sponsors_management_handler() -> impl IntoResponse {
             .expect("Could not read sponsor image");
 
         html += &format!(
-            "<div>
-            <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
-            <button hx-post=\"/sponsors/remove/{}\" hx-swap=\"none\">Remove</button>
-        </div>",
+            "<div class=\"sponsor-wrapper\">
+                <img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
+                <button class=\"remove-button\" hx-post=\"/sponsors/remove/{}\" hx-swap=\"none\">Remove</button>
+            </div>",
             mime,
             BASE64_STANDARD.encode(f_bytes),
             fname_vec[0]
@@ -1464,7 +1470,8 @@ async fn sponsor_ticker() {
 
 async fn sponsor_display_handler() -> impl IntoResponse {
     if *SHOW_SPONSORS.lock().await {
-        return Html::from(SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone());
+        let sponsor_img = SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone();
+        return Html::from(format!("<div class=\"ol-sponsor-parent\">{}</div>", sponsor_img));
     } else {
         return Html::from(String::new());
     }
