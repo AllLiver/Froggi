@@ -22,7 +22,7 @@ body {
 /* Index rectangles */
 .preview-rectangle {
     background-color: var(--chromakey-color, #00b140);
-    width: 37vw;
+    width: 47.5vw;
     height: 30vh;
     border-radius: 0.86vw;
     display: flex;
@@ -37,7 +37,7 @@ body {
 
 .score-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 25vh;
     border-radius: 0.86vw;
     display: flex;
@@ -52,7 +52,7 @@ body {
 
 .downs-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 30vh;
     border-radius: 0.86vw;
     display: flex;
@@ -67,7 +67,7 @@ body {
 
 .netstats-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 7vh;
     border-radius: 0.86vw;
     display: flex;
@@ -82,7 +82,7 @@ body {
 
 .countdown-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 29vh;
     border-radius: 0.86vw;
     display: flex;
@@ -99,7 +99,7 @@ body {
 
 .clock-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 29vh;
     border-radius: 0.86vw;
     display: flex;
@@ -114,7 +114,7 @@ body {
 
 .quarter-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 18vh;
     border-radius: 0.86vw;
     display: flex;
@@ -157,7 +157,7 @@ body {
 
 .visibility-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 10vh;
     border-radius: 0.86vw;
     display: flex;
@@ -172,7 +172,7 @@ body {
 
 .popups-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
-    width: 37vw;
+    width: 47.5vw;
     height: 36.5vh;
     border-radius: 0.86vw;
     display: flex;
@@ -549,10 +549,10 @@ iframe {
     color: var(--font-color, #fff);
     border: none;
     padding: 0.93vh;
-    margin: 5px;
+    margin: 0.26vw;
     font-size: 1.25rem;
     cursor: pointer;
-    width: 2.6vw;
+    width: 3.5vw;
     border-radius: 5px;
     font-weight: bold;
 }
@@ -586,7 +586,7 @@ iframe {
     margin: 0.40vh;
     font-size: 1.25rem;
     cursor: pointer;
-    width: 2.2vw;
+    width: 3.5vw;
     border-radius: 5px;
     font-weight: bold;
 }
@@ -594,7 +594,7 @@ iframe {
 .counter,
 .countdown-counter {
     font-size: 2.22vh;
-    margin: 0 10px;
+    margin: 0 0.52vw;
     min-width: 2.6vw;
     text-align: center;
     padding: 0.93vh;
@@ -609,7 +609,7 @@ iframe {
     border: none;
     font-size: 1rem;
     cursor: pointer;
-    width: 10.42vw;
+    width: 15vw;
     height: 4vh;
     border-radius: 5px;
     margin: 0.65vh;
@@ -630,7 +630,7 @@ iframe {
     border: none;
     font-size: 1rem;
     cursor: pointer;
-    width: 8.33vw;
+    width: 10.42vw;
     height: 4vh;
     border-radius: 5px;
     margin: 0.31vw;
@@ -642,7 +642,7 @@ iframe {
     border: none;
     font-size: 1rem;
     cursor: pointer;
-    width: 5.5vw;
+    width: 7.15vw;
     height: 4vh;
     border-radius: 5px;
     margin: 0.21vw;
@@ -768,13 +768,12 @@ iframe {
 #countdown-clock-text {
     align-items: center;
     border-radius: 10.5px;
-    width: 80%;
     box-sizing: border-box;
     padding: 10px;
     background-color: var(--font-color-contrast);
     color: var(--font-color, #000000);
     height: 3vh;
-    margin-left: 0.3vw;
+    width: 35.9vw;
 }
 
 
@@ -819,10 +818,6 @@ iframe {
 
 .countdown-form-grid {
     width: 100vw;
-}
-
-#countdown-clock-text {
-    width: 25vw;
 }
 
 .button-start-countdown.active,
@@ -983,8 +978,8 @@ iframe {
     border: none;
     font-size: 1rem;
     cursor: pointer;
-    width: 6.5vw;
-    height: 5vh;
+    width: 8.5vw;
+    height: 5.5vh;
     border-radius: 5px;
     display: flex;
     justify-content: center;

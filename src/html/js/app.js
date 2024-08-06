@@ -7,22 +7,6 @@ const popup_duration = "7500"; // Change to update the duration of the popup, de
 let ping_url = 'http://localhost:3000'; // The url that will be pinged to check the connection, default is 'http://localhost:3000'.
 let preview_url = 'http://localhost:3000/overlay'; // The url that will be used for the preview iframe, default is 'http://localhost:3000/overlay'.
 
-function update_version() {
-    const version_element = document.getElementById('version-value');
-    if (version_element) {
-        version_element.textContent = version;
-    } else {
-        console.error('E001: Version value not found');
-    }
-}
-
-function toggle_menu() {
-    const menu_button = document.querySelector('.hamburger-menu');
-    const side_nav = document.querySelector('.sidenavbar');
-    menu_button.classList.toggle('active');
-    side_nav.classList.toggle('active');
-}
-
 function measure_ping(url, callback) {
     const start_time = performance.now();
 
@@ -41,6 +25,13 @@ function measure_ping(url, callback) {
             callback('Ping Error');
             console.error('E003: Ping request failed');
         });
+}
+
+function toggle_menu() {
+    const menu_button = document.querySelector('.hamburger-menu');
+    const side_nav = document.querySelector('.sidenavbar');
+    menu_button.classList.toggle('active');
+    side_nav.classList.toggle('active');
 }
 
 function saveHostIP() {
@@ -68,10 +59,14 @@ function pingServer() {
         return;
     }
 
+    ping_url = `http://${hostIP}`; 
+    console.log('Pinging URL:', ping_url); 
+
     measure_ping(ping_url, function(pingTime) {
         document.getElementById('ping-value').textContent = pingTime + ' ms';
     });
 }
+
 
 lock_interface_btn.addEventListener('click', function(event) {
     if (event.target !== lock_interface_btn) {
@@ -219,6 +214,6 @@ document.querySelectorAll('.cooldown').forEach(button => {
     });
 });
 
-update_version();
+
 pingServer();
 setInterval(pingServer, ping_time);
