@@ -203,7 +203,12 @@ async fn main() -> Result<()> {
         .route("/visibility/css", put(visibility_css_handler))
         // OCR API
         .route("/ocr", post(ocr_handler))
+        .route("/ocr/api/toggle", post(ocr_api_toggle_handler))
+        .route("/ocr/api/button", put(ocr_api_button_handler))
+        // API
         .route("/api/key/check/:k", post(api_key_check_handler))
+        .route("/api/key/show", put(api_key_show_handler))
+        .route("/api/key/reveal", post(api_key_reveal_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -392,7 +397,7 @@ struct Login {
 #[derive(Serialize, Deserialize)]
 struct LoginForm {
     username: String,
-    password: String
+    password: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -1471,7 +1476,10 @@ async fn sponsor_ticker() {
 async fn sponsor_display_handler() -> impl IntoResponse {
     if *SHOW_SPONSORS.lock().await {
         let sponsor_img = SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone();
-        return Html::from(format!("<div class=\"ol-sponsor-parent\">{}</div>", sponsor_img));
+        return Html::from(format!(
+            "<div class=\"ol-sponsor-parent\">{}</div>",
+            sponsor_img
+        ));
     } else {
         return Html::from(String::new());
     }
@@ -1866,7 +1874,8 @@ async fn ocr_handler(
                     let time_vec = d.split(":").collect::<Vec<&str>>();
 
                     if time_vec.len() == 2 && time_vec.iter().all(|x| x.parse::<u32>().is_ok()) {
-                        let time_vec: Vec<u32> = time_vec.iter().map(|x| x.parse::<u32>().unwrap()).collect();
+                        let time_vec: Vec<u32> =
+                            time_vec.iter().map(|x| x.parse::<u32>().unwrap()).collect();
 
                         *GAME_CLOCK.lock().await = (time_vec[0] * 60 + time_vec[1]) as usize;
                     }
@@ -1885,10 +1894,20 @@ async fn ocr_handler(
                 }
 
                 if let Some(d) = ocr_data.get("Period") {
-                    if d.ends_with("st") || d.ends_with("nd") || d.ends_with("rd") || d.ends_with("th") {
-                        *state.quarter.lock().await = d.split_at(1).0.parse::<u8>().expect("Could not parse quarter from ocr data");
+                    if d.ends_with("st")
+                        || d.ends_with("nd")
+                        || d.ends_with("rd")
+                        || d.ends_with("th")
+                    {
+                        *state.quarter.lock().await = d
+                            .split_at(1)
+                            .0
+                            .parse::<u8>()
+                            .expect("Could not parse quarter from ocr data");
                     } else if d.parse::<u8>().is_ok() {
-                        *state.quarter.lock().await = d.parse::<u8>().expect("Could not parse quarter from ocr data");
+                        *state.quarter.lock().await = d
+                            .parse::<u8>()
+                            .expect("Could not parse quarter from ocr data");
                     }
                 }
 
@@ -1899,10 +1918,20 @@ async fn ocr_handler(
                 }
 
                 if let Some(d) = ocr_data.get("Down") {
-                    if d.ends_with("st") || d.ends_with("nd") || d.ends_with("rd") || d.ends_with("th") {
-                        *state.down.lock().await = d.split_at(1).0.parse::<u8>().expect("Could not parse quarter from ocr data");
+                    if d.ends_with("st")
+                        || d.ends_with("nd")
+                        || d.ends_with("rd")
+                        || d.ends_with("th")
+                    {
+                        *state.down.lock().await = d
+                            .split_at(1)
+                            .0
+                            .parse::<u8>()
+                            .expect("Could not parse quarter from ocr data");
                     } else if d.parse::<u8>().is_ok() {
-                        *state.down.lock().await = d.parse::<u8>().expect("Could not parse quarter from ocr data");
+                        *state.down.lock().await = d
+                            .parse::<u8>()
+                            .expect("Could not parse quarter from ocr data");
                     }
                 }
 
@@ -1915,6 +1944,90 @@ async fn ocr_handler(
         }
     } else {
         return StatusCode::UNAUTHORIZED;
+    }
+}
+
+async fn ocr_api_toggle_handler(jar: CookieJar) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let mut ocr_api = OCR_API.lock().await;
+
+        if !*ocr_api {
+            *ocr_api = true;
+        } else {
+            *ocr_api = false;
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(format!(
+                "{} OCR API",
+                if !*ocr_api { "Enable" } else { "Disable" }
+            ))
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn ocr_api_button_handler() -> impl IntoResponse {
+    return Html::from(format!(
+        "<button hx-post=\"/ocr/api/toggle\">{} OCR API</button>",
+        if !*OCR_API.lock().await {
+            "Enable"
+        } else {
+            "Disable"
+        }
+    ));
+}
+
+async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let login: Login = serde_json::from_str(
+            &tokio::fs::read_to_string("./login.json")
+                .await
+                .expect("Could not read login.json"),
+        )
+        .expect("Could not deserialize config.json");
+
+        let mut chars = login.api_key.chars();
+        let mut hidden_key = String::new();
+        while let Some(_) = chars.next() {
+            hidden_key.push('*');
+        }
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(format!("<h6 id=\"api-key\">{}</h6>", hidden_key))
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
+    }
+}
+
+async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        let login: Login = serde_json::from_str(
+            &tokio::fs::read_to_string("./login.json")
+                .await
+                .expect("Could not read login.json"),
+        )
+        .expect("Could not deserialize config.json");
+
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(format!("<h6 id=\"api-key\">{}</h6><button onclick\"copyText()\">Copy</button>", login.api_key))
+            .unwrap();
+    } else {
+        return Response::builder()
+            .status(StatusCode::UNAUTHORIZED)
+            .body(String::new())
+            .unwrap();
     }
 }
 

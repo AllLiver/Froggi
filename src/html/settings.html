@@ -45,34 +45,53 @@
         </div>
         <div class="settings-box">
             <div class="settings-title">
-                <h2>Host IP</h2>
-                <div class="subtext-settings">
-                    <h6>When accessing from a separate device, this will need to be set to calculate ping and show
-                        the
-                        preview.</h6>
-                </div>
-            </div>
-            <div class="setting">
-                <input type="text" id="host-ip" name="host-ip" placeholder="X.X.X.X:3000" oninput="sanitize(this)">
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
                 <h2>Theme</h2>
                 <div class="subtext-settings">
                     <h6>Changing themes can be helpful in different scenarios, and for those who benefit from WCAG
-                        AAA.
+                        AAA (not certified).
                     </h6>
                 </div>
             </div>
             <div class="setting">
-                <button id="light-theme">Light Theme</button>
-                <button id="dark-theme">Dark Theme</button>
-                <button id="colorblind-theme">Colorblind Theme</button>
+                <button id="light-theme" class="theme-button">Light Theme</button>
+                <button id="dark-theme" class="theme-button theme-active">Dark Theme</button>
+                <button id="colorblind-theme" class="theme-button">Colorblind Theme</button>
             </div>
         </div>
         <div class="settings-box">
-            <h2>OCR</h2>
+            <div class="settings-title">
+                <h2>Optical Character Regognition (OCR)</h2>
+                <div class="subtext-settings">
+                    <h6>Froggi has support for ScoreSight ocr, an open source program developed by locaal-ai, through
+                        froggi-ocr. To set up OCR, download both ScoreSight (<a
+                            href="https://github.com/locaal-ai/scoresight"
+                            target="_blank">https://github.com/locaal-ai/scoresight</a>) and froggi-ocr (<a
+                            href="https://github.com/AllLiver/froggi-ocr"
+                            target="_blank">https://github.com/AllLiver/froggi-ocr</a>), then lauch both of them and set
+                        them up.</h6>
+                    <h6>Froggi should automatically use the default name and format of all of ScoreSight's default
+                        fields that Froggi also supports. Although if you would like to add downs and to go for American
+                        Football, you have to name them "Down" and "To Go" respectively, in Scoresight. Then make sure
+                        froggi-ocr is getting StatusCode 200 OK from both ScoreSight and Froggi.</h6>
+                    <h6>You also need to make sure to enable the ocr-api in Froggi or else Froggi will return StatusCode
+                        409 CONFLICT to froggi-ocr.</h6>
+                </div>
+                <div class="setting" hx-put="/ocr/api/button" hx-trigger="load">
+                    <button hx-post="/ocr/api/toggle">OCR API</button>
+                </div>
+                <h6>*Enabling the OCR API disables the game clock</h6>
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>API Key</h2>
+
+                <div hx-put="/api/key/show" hx-trigger="load">
+                </div>
+
+                <button hx-post="/api/key/reveal" hx-target="#api-key" hx-swap="outerHTML" onclick="apiCopy()">Reveal
+                    Key</button>
+            </div>
         </div>
         <div class="settings-box">
             <div class="settings-title">
@@ -102,6 +121,13 @@
             document.body.classList.remove('theme-dark', 'theme-light', 'theme-colorblind');
             document.body.classList.add(theme);
             localStorage.setItem('theme', theme);
+
+            document.querySelectorAll('.theme-button').forEach(button => {
+                button.classList.remove('theme-active');
+            });
+            
+            let activeButton = document.querySelector(`#${theme.replace('theme-', '')}-theme`);
+            activeButton.classList.add('theme-active');
         }
 
         window.onload = function () {
@@ -110,9 +136,6 @@
 
             const savedTheme = localStorage.getItem('theme') || 'theme-dark';
             applyTheme(savedTheme);
-
-            const savedHostIP = localStorage.getItem('hostIP') || '';
-            document.getElementById('host-ip').value = savedHostIP;
         };
 
         document.getElementById('overlay-color').addEventListener('input', function () {
@@ -130,11 +153,6 @@
             }
         });
 
-        document.getElementById('host-ip').addEventListener('input', function () {
-            const hostIP = this.value;
-            localStorage.setItem('hostIP', hostIP);
-        });
-
         document.getElementById('light-theme').onclick = function () {
             applyTheme('theme-light');
         };
@@ -146,14 +164,25 @@
         document.getElementById('colorblind-theme').onclick = function () {
             applyTheme('theme-colorblind');
         };
+
         document.querySelector('.reset-button').addEventListener('click', function () {
-        const confirmed = confirm('Are you sure you want to reset the scoreboard? This action cannot be undone.');
-        if (confirmed) {
-            console.log('Scoreboard reset confirmed.');
-        } else {
-            console.log('Canceled!');
+            const confirmed = confirm('Are you sure you want to reset the scoreboard? This action cannot be undone.');
+            if (confirmed) {
+                console.log('Scoreboard reset confirmed.');
+            } else {
+                console.log('Canceled!');
+            }
+        });
+
+        function copyText() {
+            var copyText = document.getElementById("api-key");
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+
+            navigator.clipboard.writeText(copyText.value);
+
+            alert("Copied the text: " + copyText.value);
         }
-    });
     </script>
 
 </body>

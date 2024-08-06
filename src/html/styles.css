@@ -197,6 +197,7 @@ body {
     --font-color: #ffffff;
     --font-color-contrast: #000000;
     --chromakey-color: #00b140;
+    --shadow-color: #ffffff;
     --margin-left: 0.5vw;
     --margin-bottom: 0.65vh;
 }
@@ -212,6 +213,7 @@ body {
     --font-color: #ffffff;
     --font-color-contrast: #000000;
     --chromakey-color: #00b140;
+    --shadow-color: #ffffff;
 }
 
 .theme-light {
@@ -225,6 +227,7 @@ body {
     --font-color: #000000;
     --font-color-contrast: #fff;
     --chromakey-color: #00b140;
+    --shadow-color: #000000;
 }
 
 .theme-colorblind {
@@ -237,6 +240,7 @@ body {
     --font-color: #ffffff;
     --font-color-contrast: #000000;
     --chromakey-color: #00b140;
+    --shadow-color: #e9e9e9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -328,6 +332,7 @@ body {
     cursor: pointer;
     padding: 10px;
     filter: none;
+    position: fixed;
 }
 
 .line {
@@ -618,6 +623,7 @@ iframe {
 .button-preset-score-home {
     background-color: var(--color-blue, #007BFF);
 }
+
 .button-preset-score-away {
     background-color: var(--color-orange, #ff8601);
 }
@@ -747,14 +753,14 @@ iframe {
 
 /* Clock rectangle */
 
-.clock-title{
+.clock-title {
     font-size: 2vh;
     margin: 0 0.52vw;
     color: var(--font-color, #000000);
 }
 
 .clock-controls,
-.preset-clock-buttons{
+.preset-clock-buttons {
     width: 100%;
     display: flex;
     justify-content: space-around;
@@ -840,7 +846,7 @@ iframe {
     font-weight: 600;
 }
 
-.countdown-title{
+.countdown-title {
     font-size: 2vh;
     margin: 0 0.52vw;
     color: var(--font-color, #000000);
@@ -888,7 +894,8 @@ iframe {
     border-radius: 5px;
     margin-left: 0.65vh;
     text-align: center;
-    margin-top: 0;;
+    margin-top: 0;
+    ;
 }
 
 .countdown-actions-container {
@@ -1209,6 +1216,7 @@ iframe {
     .netstats-rectangle {
         margin-left: 8px;
     }
+
     .tab-button {
         width: 8vw;
     }
@@ -1479,7 +1487,7 @@ canvas {
     height: 100%;
     top: 0;
     left: 0;
-    z-index: 0; 
+    z-index: 0;
 }
 
 .ol-sponsor-parent {
@@ -1559,7 +1567,7 @@ canvas {
 .ol-home-box,
 .ol-away-box {
     min-width: 9vw;
-    justify-content: flex-start; 
+    justify-content: flex-start;
 }
 
 .ol-score-box h3,
@@ -1603,7 +1611,8 @@ canvas {
     text-align: center;
     border: 2px solid transparent;
     box-sizing: border-box;
-    z-index: 999; /* Make home appear above away :) */
+    z-index: 999;
+    /* Make home appear above away :) */
     pointer-events: none;
 }
 
@@ -1780,7 +1789,8 @@ form input[type="submit"],
     margin-top: 4vh;
 }
 
-.match-selector, .sponsor-wrapper {
+.match-selector,
+.sponsor-wrapper {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1875,6 +1885,10 @@ form input[type="submit"],
     color: #e0e0e0;
     font-style: italic;
     text-wrap: balance;
+}
+
+.theme-active {
+    filter: drop-shadow(0 0 1vh var(--shadow-color));
 }
 
 .setting {

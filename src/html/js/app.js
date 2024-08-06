@@ -34,24 +34,6 @@ function toggle_menu() {
     side_nav.classList.toggle('active');
 }
 
-function saveHostIP() {
-    const hostIPInput = document.getElementById('host-ip');
-    if (hostIPInput) {
-        const hostIP = hostIPInput.value.trim();
-        const isValid = /^([0-9]{1,3}\.){3}[0-9]{1,3}:\d+$/.test(hostIP); 
-        if (isValid) {
-            localStorage.setItem('hostIP', hostIP);
-            ping_url = `http://${hostIP}`; 
-            preview_url = `http://${hostIP}/overlay`; 
-            console.log('Host IP saved:', hostIP);
-        } else {
-            console.error('E004: Invalid Host IP format. Please use the format: X.X.X.X:PORT');
-        }
-    } else {
-        console.error('E005: Host IP input element not found');
-    }
-}
-
 function pingServer() {
     const hostIP = localStorage.getItem('hostIP');
     if (!hostIP) {
