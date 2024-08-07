@@ -1650,7 +1650,7 @@ async fn downs_togo_update_handler(
 ) -> impl IntoResponse {
     if verify_auth(jar).await {
         let mut downs_togo = state.downs_togo.lock().await;
-        if (1..=99).contains(&(*downs_togo as i8 + y)) {
+        if (0..=99).contains(&(*downs_togo as i8 + y)) {
             *downs_togo = (*downs_togo as i8 + y) as u8;
         }
 
