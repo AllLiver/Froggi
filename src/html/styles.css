@@ -80,6 +80,22 @@ body {
     margin-left: var(--margin-left, 0.5vw);
 }
 
+.clock-rectangle {
+    background-color: var(--color-background-contrast, #1d1e22);
+    width: 47.5vw;
+    height: 29vh;
+    border-radius: 0.86vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow: hidden;
+    padding: 0.5vh;
+    position: relative;
+    margin-bottom: var(--margin-bottom, 0.65vh);
+    margin-left: var(--margin-left, 0.5vw);
+    margin-top: 2vh;
+}
+
 .countdown-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
     width: 47.5vw;
@@ -95,21 +111,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-}
-
-.clock-rectangle {
-    background-color: var(--color-background-contrast, #1d1e22);
-    width: 47.5vw;
-    height: 29vh;
-    border-radius: 0.86vw;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow: hidden;
-    padding: 0.5vh;
-    position: relative;
-    margin-bottom: var(--margin-bottom, 0.65vh);
-    margin-left: var(--margin-left, 0.5vw);
+    margin-top: 2vh;
 }
 
 .quarter-rectangle {
@@ -123,7 +125,7 @@ body {
     overflow: hidden;
     padding: 0.46vh;
     position: relative;
-    margin-bottom: var(--margin-bottom, 0.65vh);
+    margin-bottom: 2vh;
     margin-left: var(--margin-left, 0.5vw);
 }
 
@@ -168,12 +170,12 @@ body {
     position: relative;
     margin-bottom: var(--margin-bottom, 0.65vh);
     margin-left: var(--margin-left, 0.5vw);
+    margin-top: 2vh;
 }
 
 .popups-rectangle {
     background-color: var(--color-background-contrast, #1d1e22);
     width: 47.5vw;
-    height: 36.5vh;
     border-radius: 0.86vw;
     display: flex;
     justify-content: space-between;
@@ -183,6 +185,7 @@ body {
     position: relative;
     margin-bottom: 0.65vh;
     margin-left: var(--margin-left, 0.5vw);
+    margin-top: 2vh;
 }
 
 /* Themes */
@@ -447,10 +450,6 @@ body {
 }
 
 /* Tabs */
-
-.tab-content {
-    display: none;
-}
 
 .tab-content.active {
     display: block;
@@ -733,7 +732,6 @@ iframe {
     border: none;
     font-size: 0.83vw;
     cursor: pointer;
-    padding: 0.52vw 1.85vh;
     border-radius: 5px;
     margin-right: 2.08vw;
     margin-left: 1vw;
@@ -743,6 +741,7 @@ iframe {
     width: 7vw;
     height: auto;
     text-wrap: balance;
+    padding: 0.8vh;
 }
 
 .unlock-interface-btn {

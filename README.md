@@ -38,12 +38,12 @@ The compiled binary will be located in /target/release
 # Roadmap
 Froggi is an indev project so change is very likley.
 Here are some features/updates planned in no particular order
- - 🗺️Jersey colors will reflect the color on the overlay
- - 🗺️Options for more sports
- - 🗺️Web acsessible logs
+ [] 🗺️Jersey colors will reflect the color on the overlay
+ [] 🗺️Options for more sports
+ [] 🗺️Web acsessible logs
 
 # Tech Stack
- - Rust with Axum for the backend
+ [-] Rust with Axum for the backend
  - HTML, CSS, JavaScript, and the HTMX library for the frontend
 
 # Contribute
