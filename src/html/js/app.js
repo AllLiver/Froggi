@@ -29,7 +29,7 @@ function measure_ping(url, callback) {
             }
         })
         .catch((error) => {
-            callback('Ping Error');
+            callback('Configure IP E003.5');
             console.error('E003: Ping request failed', error);
         });
 }
