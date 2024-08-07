@@ -1500,6 +1500,7 @@ canvas {
     padding: 0.93vh;
     height: 100vh;
     position: relative;
+    margin-right: 2vw;
 }
 
 #overlay-body {
@@ -1958,6 +1959,20 @@ input:focus+.slider {
 
 input:checked+.slider:before {
     transform: translateX(1.35vw);
+}
+
+.alpha-range-title {
+    margin: 0.2vw;
+}
+
+#reset-color {
+    background-color: var(--color-red, #f64747);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: 0.4vw;
 }
 
 #light-theme,
