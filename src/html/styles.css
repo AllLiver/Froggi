@@ -333,6 +333,7 @@ body {
     padding: 10px;
     filter: none;
     position: fixed;
+    z-index: 1000;
 }
 
 .line {
@@ -1083,11 +1084,6 @@ iframe {
 }
 
 .popup-subtitle {
-    font-weight: 600;
-}
-
-.show-countdown,
-.show-sponsors {
     font-weight: 600;
 }
 
