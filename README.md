@@ -11,8 +11,10 @@ Is a self-hosted portable scoreboard solution that aims to provide a free and in
 - ✨ Ui optimized for iPad like devices
 
 # Installation
-Pre-compiled binaries will be under [releases](https://github.com/AllLiver/Froggi/releases)  
-If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/Froggi?tab=readme-ov-file#compilation) the repository yourself
+Froggi is on [Docker Hub](https://hub.docker.com/repository/docker/allliver/froggi/general)  
+Alternatively, docker image archives can be found under [releases](https://github.com/AllLiver/Froggi/releases)  
+  
+If you would like to run Froggi as a standalone executable, then follow the guide on how to [compile](https://github.com/AllLiver/Froggi/edit/dev/README.md#compilation)
 
 # Usage
 Once you start Froggi it will prompt you to create a server username and password  
