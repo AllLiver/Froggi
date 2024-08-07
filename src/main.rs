@@ -48,7 +48,7 @@ lazy_static! {
     static ref OCR_API: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct AppState {
     home_points: Arc<Mutex<u32>>,
     home_name: Arc<Mutex<String>>,
@@ -64,23 +64,29 @@ struct AppState {
     show_scoreboard: Arc<Mutex<bool>>,
 }
 
+impl AppState {
+    fn default() -> AppState {
+        AppState {
+            home_points: Arc::new(Mutex::new(0)),
+            home_name: Arc::new(Mutex::new(String::from("Home"))),
+            away_points: Arc::new(Mutex::new(0)),
+            away_name: Arc::new(Mutex::new(String::from("Away"))),
+            quarter: Arc::new(Mutex::new(1)),
+            preset_id: Arc::new(Mutex::new(String::new())),
+            down: Arc::new(Mutex::new(1)),
+            downs_togo: Arc::new(Mutex::new(0)),
+            countdown_text: Arc::new(Mutex::new(String::from("Countdown"))),
+            show_countdown: Arc::new(Mutex::new(false)),
+            show_downs: Arc::new(Mutex::new(false)),
+            show_scoreboard: Arc::new(Mutex::new(true)),
+        }
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     // Initialize the application state
-    let state = AppState {
-        home_points: Arc::new(Mutex::new(0)),
-        home_name: Arc::new(Mutex::new(String::from("Home"))),
-        away_points: Arc::new(Mutex::new(0)),
-        away_name: Arc::new(Mutex::new(String::from("Away"))),
-        quarter: Arc::new(Mutex::new(1)),
-        preset_id: Arc::new(Mutex::new(String::new())),
-        down: Arc::new(Mutex::new(1)),
-        downs_togo: Arc::new(Mutex::new(0)),
-        countdown_text: Arc::new(Mutex::new(String::from("Countdown"))),
-        show_countdown: Arc::new(Mutex::new(false)),
-        show_downs: Arc::new(Mutex::new(false)),
-        show_scoreboard: Arc::new(Mutex::new(true)),
-    };
+    let state = AppState::default();
 
     // Validate required files and directories
     if let Err(_) = File::open("secret.key").await {
@@ -209,6 +215,8 @@ async fn main() -> Result<()> {
         .route("/api/key/check/:k", post(api_key_check_handler))
         .route("/api/key/show", put(api_key_show_handler))
         .route("/api/key/reveal", post(api_key_reveal_handler))
+        // Misc Handlers
+        .route("/reset", post(reset_handler))
         // Information routes, state, and fallback
         .route(
             "/version",
@@ -2032,6 +2040,37 @@ async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
 }
 
 // endregion: api
+// region: misc
+
+async fn reset_handler(jar: CookieJar, State(ref mut state): State<AppState>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        *state.home_points.lock().await = 0;
+        *state.home_name.lock().await = String::from("Home");
+        *state.away_points.lock().await = 0;
+        *state.away_name.lock().await = String::from("Away");
+        *state.quarter.lock().await = 1;
+        *state.preset_id.lock().await = String::new();
+        *state.down.lock().await = 1;
+        *state.downs_togo.lock().await = 0;
+        *state.countdown_text.lock().await = String::from("Countdown");
+        *state.show_countdown.lock().await = false;
+        *state.show_downs.lock().await = false;
+        *state.show_scoreboard.lock().await = true;
+
+        *GAME_CLOCK.lock().await = 0;
+        *GAME_CLOCK_START.lock().await = false;
+        *COUNTDOWN_CLOCK.lock().await = 0;
+        *COUNTDOWN_CLOCK_START.lock().await = false;
+        *SHOW_SPONSORS.lock().await = false;
+        *OCR_API.lock().await = false;
+
+        return StatusCode::OK;
+    } else {
+        return StatusCode::UNAUTHORIZED;
+    }
+}
+
+// endregion: misc
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
