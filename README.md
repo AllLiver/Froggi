@@ -5,35 +5,33 @@
 Is a self-hosted portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.
 
 # Features
--  ✨Optical character recognition using this [addon](https://github.com/AllLiver/froggi-ocr) and [this program](https://github.com/locaal-ai/scoresight), using a video source, the program can be automatic.
-- ✨An optional sponsor logo slideshow on overlay
-- ✨Team logos save for future use
-- ✨Ui is optimized for iPad like devices
+- ✨ Optical character recognition using this [froggi-ocr](https://github.com/AllLiver/froggi-ocr) and [scoresight-ocr](https://github.com/locaal-ai/scoresight), using a video source, the program can be automatic
+- ✨ An optional sponsor logo slideshow on overlay
+- ✨ Match presets
+- ✨ Ui optimized for iPad like devices
 
 # Installation
-Pre-compiled binaries will be under [releases](https://github.com/AllLiver/Froggi/releases "releases")
-If your platform does not have a pre-compiled binary please follow the instructions to [compile]https://github.com/AllLiver/Froggi?tab=readme-ov-file#compilation "how to compile") repository yourself
+Pre-compiled binaries will be under [releases](https://github.com/AllLiver/Froggi/releases)  
+If your platform does not have a pre-compiled binary please follow the instructions to [compile](https://github.com/AllLiver/Froggi?tab=readme-ov-file#compilation) the repository yourself
 
 # Usage
-On the first run, it will create all needed files.  
-Here is what each of those files/folders do.
- - sponsors (folder): any png file you put in here will be cycled every 5 seconds if you press the show sponsors button on the dashboard, you can also add these through the "sponsors & teaminfo" page.
- - teams (folder): this folder contains the images, names, and jersey color of all team presets you set
- - login (folder): this folder is not for manual editing and contains login information
- - config.cfg (file): this file is where you can set the address the server listens on and the background color of the overlay page in RGB format 
-
-When logging into the web interface for the first time you will be prompted to create a login for the web interface, remember it.  
-After creating a login simply sign in, upload the team-info, and start streaming!
+Once you start Froggi it will prompt you to create a server username and password  
+Setting up match presets and sponsors is done through the "Sponsors & Teaminfo" tab in the burger menu  
+Other settings can be found in the "Settings" tab in the burger menu  
+Finally, there are some niche settings in "settings.json" located in the directory of Froggi's binary, these settings will only take effect on a restart of Froggi  
 
 # Compilation 
-- Download the source code from the latest [release](https://github.com/AllLiver/FOSSO/releases "releases") (usually main branch is not stable)
-- Install [Rust](https://rustup.rs/ "rustup") if you have not
-- Make sure you have basic C build tools (Windows and MacOS usually have them pre-installed)
-- Run this command in the same directory as the cloned repository
+- Clone the main branch of Froggi by running
+```
+git clone https://github.com/allliver/froggi.git
+```
+- Install the [Rust Toolchain](https://rustup.rs/ "rustup") if you have not
+- If you are compiling for Linux, ensure essential C build tools are installed
+- Then finally compile Froggi by running
 ```
 cargo build --release
 ```
-The compiled binary will be in /target/release
+The compiled binary will be located in /target/release
 
 # Roadmap
 Froggi is an indev project so change is very likley.
@@ -43,7 +41,7 @@ Here are some features/updates planned in no particular order
  - Web acsessible logs
 
 # Tech Stack
- - Rust with Axum in the backend
+ - Rust with Axum for the backend
  - HTML, CSS, JavaScript, and the HTMX library for the frontend
 
 # Contribute
