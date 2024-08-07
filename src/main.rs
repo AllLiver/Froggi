@@ -77,7 +77,7 @@ impl AppState {
             downs_togo: Arc::new(Mutex::new(0)),
             countdown_text: Arc::new(Mutex::new(String::from("Countdown"))),
             show_countdown: Arc::new(Mutex::new(false)),
-            show_downs: Arc::new(Mutex::new(false)),
+            show_downs: Arc::new(Mutex::new(true)),
             show_scoreboard: Arc::new(Mutex::new(true)),
         }
     }
@@ -2054,7 +2054,7 @@ async fn reset_handler(jar: CookieJar, State(ref mut state): State<AppState>) ->
         *state.downs_togo.lock().await = 0;
         *state.countdown_text.lock().await = String::from("Countdown");
         *state.show_countdown.lock().await = false;
-        *state.show_downs.lock().await = false;
+        *state.show_downs.lock().await = true;
         *state.show_scoreboard.lock().await = true;
 
         *GAME_CLOCK.lock().await = 0;
