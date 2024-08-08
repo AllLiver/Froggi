@@ -204,17 +204,17 @@
             // const apiKeyElement = document.getElementById('api-key');
             // const apiKey = apiKeyElement.textContent || apiKeyElement.innerText;
 
-            // Sorry for touching js :(
-            // But this works :)
-            // const tempInput = document.createElement('input');
-            // tempInput.value = apiKey;
-            // document.body.appendChild(tempInput);
-            // tempInput.select();
-            // document.execCommand('copy');
-            // document.body.removeChild(tempInput);
+            const tempInput = document.createElement('input');
+            tempInput.value = text;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            // Top works for some situations bottom works for others, I will let you decide because I just reworked it so it doesnt grab from the DOM
 
             // navigator.clipboard.writeText(apiKey);
-            navigator.clipboard.writeText(text);
+            // navigator.clipboard.writeText(text);
         }
     </script>
 
