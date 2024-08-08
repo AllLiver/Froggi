@@ -2060,7 +2060,7 @@ async fn popup_handler(jar: CookieJar, Query(params): Query<HashMap<String, Stri
 }
 
 async fn popup_ticker() {
-    let mut last_len = 0;
+    //let mut last_len = 0;
     loop {
         let start_time = Instant::now();
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
@@ -2080,7 +2080,7 @@ async fn popup_ticker() {
                 popups.remove(i);
             }
         }
-        last_len = popups.len();
+        //last_len = popups.len();
     }
 }
 
