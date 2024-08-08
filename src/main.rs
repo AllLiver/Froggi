@@ -6,7 +6,7 @@ use argon2::{
 };
 use axum::{
     body::Body,
-    extract::{Multipart, Path, State},
+    extract::{Multipart, Path, Query, State},
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderMap, HeaderName, HeaderValue, Response, StatusCode,
@@ -46,6 +46,7 @@ lazy_static! {
     static ref SPONSOR_IDX: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref SHOW_SPONSORS: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref OCR_API: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
+    static ref POPUPS: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
 }
 
 #[derive(Clone, Debug)]
@@ -215,6 +216,9 @@ async fn main() -> Result<()> {
         .route("/api/key/check/:k", post(api_key_check_handler))
         .route("/api/key/show", put(api_key_show_handler))
         .route("/api/key/reveal", post(api_key_reveal_handler))
+        // Popups
+        .route("/popup", post(popup_handler))
+        .route("/popup/show", put(popup_show_handler))
         // Misc Handlers
         .route("/reset", post(reset_handler))
         // Information routes, state, and fallback
@@ -231,6 +235,7 @@ async fn main() -> Result<()> {
         tokio::spawn(game_clock_ticker());
         tokio::spawn(countdown_clock_ticker());
         tokio::spawn(sponsor_ticker());
+        tokio::spawn(popup_ticker());
         println!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
@@ -2040,6 +2045,58 @@ async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
 }
 
 // endregion: api
+// region: popups
+
+async fn popup_handler(jar: CookieJar, Query(params): Query<HashMap<String, String>>) -> impl IntoResponse {
+    if verify_auth(jar).await {
+        if let Some(p) = params.get("text") {
+            POPUPS.lock().await.push((p.clone(), 7));
+        }
+
+        return StatusCode::OK;
+    } else {
+        return StatusCode::UNAUTHORIZED;
+    }
+}
+
+async fn popup_ticker() {
+    let mut last_len = 0;
+    loop {
+        let start_time = Instant::now();
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        let mut popups = POPUPS.lock().await;
+
+        let mut i = 0;
+        loop {
+            if i >= popups.len() {
+                break;
+            }
+
+            let time_diff = (Instant::now() - start_time).as_secs();
+            if popups[i].1 - time_diff > 0 {
+                popups[i].1 -= time_diff;
+                i += 1;
+            } else {
+                popups.remove(i);
+            }
+        }
+        last_len = popups.len();
+    }
+}
+
+async fn popup_show_handler() -> impl IntoResponse {
+    let mut str_vec = Vec::new();
+
+    for i in POPUPS.lock().await.clone() {
+        str_vec.push(i.0);
+    }
+
+    let display = str_vec.join("<br>");
+
+    return Html::from(display);
+}
+
+// endregion: popups
 // region: misc
 
 async fn reset_handler(jar: CookieJar, State(ref mut state): State<AppState>) -> impl IntoResponse {
