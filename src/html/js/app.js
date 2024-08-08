@@ -3,9 +3,8 @@ const default_theme = 'theme-dark'; // Default theme, change to 'theme-light' or
 const lock_interface_btn = document.getElementById('lockInterfaceBtn'); // Change to the id of the button that will lock the interface, if set to null, the button will be disabled, default is 'lockInterfaceBtn'.
 const popup_duration = "7500"; // Change to update the duration of the popup, default is 7500ms.
 
-// Default/backup URLs, if accessing from a 2nd device, set this to your local ip for fallback.
-let ping_url = 'http://localhost:3000'; // The url that will be pinged to check the connection, default is 'http://localhost:3000'.
-let preview_url = 'http://localhost:3000/overlay'; // The url that will be used for the preview iframe, default is 'http://localhost:3000/overlay'.
+let ping_url = '/'; // The relative url that will be pinged to check the connection
+let preview_url = '/overlay'; // The relative url that will be used for the preview iframe
 
 
 function pingServer() {

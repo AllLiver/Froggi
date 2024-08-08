@@ -21,6 +21,7 @@ use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use lazy_static::lazy_static;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::{Deserialize, Serialize};
+use tower_http::cors::CorsLayer;
 use std::{
     collections::HashMap,
     path::PathBuf,
@@ -132,6 +133,13 @@ async fn main() -> Result<()> {
     // Load sponsor img tags
     load_sponsors().await;
 
+    // Set up CORS
+    let cors = CorsLayer::new()
+        .allow_origin(tower_http::cors::Any) // Allow requests from any origin
+        .allow_methods([axum::http::Method::GET, axum::http::Method::POST, axum::http::Method::HEAD]) // Allow specific methods
+        .allow_headers(tower_http::cors::Any)
+        .allow_private_network(true);
+
     let app = Router::new()
         // Basic routes
         .route("/", get(index_handler))
@@ -228,7 +236,8 @@ async fn main() -> Result<()> {
         )
         .route("/uptime-display", put(uptime_display_handler))
         .with_state(state)
-        .fallback(get(not_found_handler));
+        .fallback(get(not_found_handler))
+        .layer(cors);
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
         tokio::spawn(uptime_ticker());
