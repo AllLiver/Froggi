@@ -2022,7 +2022,7 @@ async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
 
         return Response::builder()
             .status(StatusCode::OK)
-            .body(format!("<h6 id=\"api-key\">{}</h6>", hidden_key))
+            .body(format!("<h6 id=\"api-key\">{}</h6><button onclick=\"apiCopy('{}')\">Copy</button>", hidden_key, login.api_key))
             .unwrap();
     } else {
         return Response::builder()
@@ -2043,7 +2043,7 @@ async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
 
         return Response::builder()
             .status(StatusCode::OK)
-            .body(format!("<h6 id=\"api-key\">{}</h6><button onclick\"copyText()\">Copy</button>", login.api_key))
+            .body(format!("{}", login.api_key))
             .unwrap();
     } else {
         return Response::builder()

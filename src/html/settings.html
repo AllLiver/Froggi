@@ -92,8 +92,8 @@
 
                 <div hx-put="/api/key/show" hx-trigger="load">
                 </div>
-
-                <button hx-post="/api/key/reveal" hx-target="#api-key" hx-swap="outerHTML" onclick="apiCopy()">Reveal
+                
+                <button hx-post="/api/key/reveal" hx-target="#api-key">Reveal
                     Key</button>
             </div>
         </div>
@@ -200,16 +200,21 @@
             }
         });
 
-        function apiCopy() {
-            const apiKeyElement = document.getElementById('api-key');
-            const apiKey = apiKeyElement.textContent || apiKeyElement.innerText;
+        function apiCopy(text) {
+            // const apiKeyElement = document.getElementById('api-key');
+            // const apiKey = apiKeyElement.textContent || apiKeyElement.innerText;
 
-            const tempInput = document.createElement('input');
-            tempInput.value = apiKey;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
+            // Sorry for touching js :(
+            // But this works :)
+            // const tempInput = document.createElement('input');
+            // tempInput.value = apiKey;
+            // document.body.appendChild(tempInput);
+            // tempInput.select();
+            // document.execCommand('copy');
+            // document.body.removeChild(tempInput);
+
+            // navigator.clipboard.writeText(apiKey);
+            navigator.clipboard.writeText(text);
         }
     </script>
 
