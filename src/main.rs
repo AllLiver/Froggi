@@ -6,7 +6,7 @@ use argon2::{
 };
 use axum::{
     body::Body,
-    extract::{Multipart, Path, Query, State},
+    extract::{DefaultBodyLimit, Multipart, Path, Query, State},
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderMap, HeaderName, HeaderValue, Response, StatusCode,
@@ -114,7 +114,7 @@ async fn main() -> Result<()> {
         let default_config = Config {
             secure_auth_cookie: true,
             sponsor_wait_time: 5,
-            sponsor_img_height: 50,
+            sponsor_img_width: 50,
         };
 
         f.write_all(
@@ -197,7 +197,7 @@ async fn main() -> Result<()> {
         .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
         .route("/teaminfo/name/:t", put(team_name_display_handler))
         // Sponsor routes
-        .route("/sponsors/upload", post(upload_sponsors_handler))
+        .route("/sponsors/upload", post(upload_sponsors_handler).layer(DefaultBodyLimit::max(2000000000)))
         .route("/sponsors/manage", put(sponsors_management_handler))
         .route("/sponsors/remove/:id", post(sponsor_remove_handler))
         .route("/sponsors/display", put(sponsor_display_handler))
@@ -264,7 +264,7 @@ async fn main() -> Result<()> {
 struct Config {
     secure_auth_cookie: bool,
     sponsor_wait_time: u64,
-    sponsor_img_height: u16,
+    sponsor_img_width: u16,
 }
 
 // region: basic pages
@@ -1466,10 +1466,10 @@ async fn load_sponsors() {
 
         *SPONSOR_IDX.lock().await = 0;
         SPONSOR_TAGS.lock().await.push(format!(
-            "<img src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"{}vh\" width=\"auto\">",
+            "<img src=\"data:image/{};base64,{}\" alt=\"away-img\" width=\"{}vw\" height=\"auto\">",
             mime_type,
             BASE64_STANDARD.encode(f_bytes),
-            cfg_json.sponsor_img_height
+            cfg_json.sponsor_img_width
         ))
     }
 }
