@@ -7,6 +7,8 @@ FROM debian:bookworm-slim
 RUN rm -rf /var/lib/apt/lists/*
 COPY --from=builder /usr/local/cargo/bin/froggi /usr/local/bin/froggi
 
+RUN apt-get update -y && apt-get install -y nano
+
 EXPOSE 3000
 
 CMD ["froggi"]
