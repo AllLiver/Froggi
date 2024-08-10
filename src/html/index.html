@@ -16,7 +16,7 @@
 </head>
 
 <body>
-   <!--TODO: Clock margin top-->
+   <!--TODO: Local storage for ping Clock margin top-->
     <div hx-put="/visibility/css" hx-trigger="every 100ms"></div>
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
@@ -154,7 +154,7 @@
 
         <div class="middle-column">
             <div class="tab-container">
-                <div class="tabset">
+                <div class="tabset" id="top-tabset">
                     <input type="radio" name="tabset" id="tab1" aria-controls="Clock" checked>
                     <label for="tab1">Clock</label>
                     <input type="radio" name="tabset" id="tab2" aria-controls="Countdown">
