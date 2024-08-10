@@ -1466,7 +1466,7 @@ async fn load_sponsors() {
 
         *SPONSOR_IDX.lock().await = 0;
         SPONSOR_TAGS.lock().await.push(format!(
-            "<img src=\"data:image/{};base64,{}\" alt=\"away-img\" width=\"{}vw\" height=\"auto\">",
+            "<img class=\"ol-sponsor-img\" src=\"data:image/{};base64,{}\" alt=\"away-img\" width=\"{}vw\" height=\"auto\">",
             mime_type,
             BASE64_STANDARD.encode(f_bytes),
             cfg_json.sponsor_img_width
