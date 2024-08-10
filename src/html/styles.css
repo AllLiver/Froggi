@@ -1097,7 +1097,7 @@ iframe {
     background-color: var(--color-green, #27a644);
     color: #fff;
     border: none;
-    font-size: 1rem;
+    font-size: 0.8rem;
     cursor: pointer;
     width: 8.5vw;
     height: 5.5vh;
@@ -1419,10 +1419,6 @@ iframe {
         font-size: 14px;
     }
 
-    .button-preset-quarter {
-        font-size: 0.5rem;
-    }
-
     .ol-home-box,
     .ol-away-box,
     .ol-score-box,
@@ -1633,6 +1629,12 @@ iframe {
     .ol-sponsor-parent {
         position: absolute;
         bottom: 0;
+    }
+
+    .ol-sponsor-img {
+        width: 10vw;
+        height: auto;
+        max-height: 20vw;
     }
 
     .ol-parent-container {
@@ -2093,16 +2095,12 @@ iframe {
         border-radius: 50%;
     }
 
-    input:checked+.slider {
-        background-color: #2196F3;
+    .update-banner {
+        color: white;
     }
 
-    input:focus+.slider {
-        box-shadow: 0 0 0.05vw #2196F3;
-    }
-
-    input:checked+.slider:before {
-        transform: translateX(1.35vw);
+    a:link, a:visited {
+        color: var(--font-color, #ffffff);
     }
 
     .alpha-range-title {

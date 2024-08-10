@@ -92,7 +92,7 @@
 
                 <div hx-put="/api/key/show" hx-trigger="load">
                 </div>
-                
+
                 <button hx-post="/api/key/reveal" hx-target="#api-key">Reveal
                     Key</button>
             </div>
@@ -201,8 +201,6 @@
         });
 
         function apiCopy(text) {
-            // const apiKeyElement = document.getElementById('api-key');
-            // const apiKey = apiKeyElement.textContent || apiKeyElement.innerText;
 
             const tempInput = document.createElement('input');
             tempInput.value = text;
@@ -216,6 +214,47 @@
             // navigator.clipboard.writeText(apiKey);
             // navigator.clipboard.writeText(text);
         }
+
+        async function fetchLatestRelease() {
+            try {
+                const response = await fetch('https://api.github.com/repos/AllLiver/Froggi/releases/latest');
+                const data = await response.json();
+                console.log(`Latest release version: ${data.tag_name}`);
+                return data;
+            } catch (error) {
+                console.error('18: Error fetching the latest release:', error);
+            }
+        }
+
+        function checkForUpdate(currentVersion) {
+            fetchLatestRelease().then(latestRelease => {
+                const latestVersion = latestRelease.tag_name;
+                if (currentVersion !== latestVersion) {
+                    notifyUserOfUpdate(latestRelease);
+                }
+            });
+        }
+
+        function notifyUserOfUpdate(latestRelease) {
+            const updateMessage = `New update available: ${latestRelease.tag_name}. 
+        Download`;
+
+            const updateBanner = document.createElement('div');
+            updateBanner.innerHTML = `<a href="${latestRelease.assets[0].browser_download_url}" target="_blank">${updateMessage}</a>`;
+            updateBanner.style.backgroundColor = "#fc0303";
+            updateBanner.style.padding = "10px";
+            updateBanner.style.textAlign = "center";
+            updateBanner.style.color = "white";
+            updateBanner.classList.add('update-banner');
+            document.body.prepend(updateBanner);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentVersion = "2.0.0"; 
+            checkForUpdate(currentVersion);
+        });
+
+
     </script>
 
 </body>
