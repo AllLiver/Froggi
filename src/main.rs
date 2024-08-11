@@ -1019,7 +1019,7 @@ async fn countdown_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> i
 
 async fn countdown_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
     if verify_session(jar).await {
-        let mut countdown_clock = COUNTDOWN_CLOCK.lock().await; 
+        let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
         *countdown_clock = mins * 60;
 
         printlg!("SET countdown_clock: {}", *countdown_clock);
@@ -1088,7 +1088,7 @@ async fn countdown_text_set_handler(
     Form(payload): Form<TextPayload>,
 ) -> impl IntoResponse {
     if verify_session(jar).await {
-        let mut countdown_text = state.countdown_text.lock().await; 
+        let mut countdown_text = state.countdown_text.lock().await;
         *countdown_text = payload.text;
 
         printlg!("SET countdown_text: {}", countdown_text);
@@ -1269,7 +1269,12 @@ async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> 
             .await
             .expect("Could not write to teams.json");
 
-        printlg!("CREATE teaminfo_preset: {} vs {} (id: {})", teaminfo.home_name, teaminfo.away_name, id);
+        printlg!(
+            "CREATE teaminfo_preset: {} vs {} (id: {})",
+            teaminfo.home_name,
+            teaminfo.away_name,
+            id
+        );
 
         return Response::builder()
             .status(StatusCode::OK)
@@ -1414,7 +1419,12 @@ async fn teaminfo_preset_select_handler(
                     let team_info: Teaminfo =
                         serde_json::from_str(&a_json).expect("Could not deserialize preset file");
 
-                    printlg!("SELECT teaminfo_preset: {} vs {} (id: {})", team_info.home_name, team_info.away_name, id);
+                    printlg!(
+                        "SELECT teaminfo_preset: {} vs {} (id: {})",
+                        team_info.home_name,
+                        team_info.away_name,
+                        id
+                    );
 
                     *state.home_name.lock().await = team_info.home_name;
                     *state.away_name.lock().await = team_info.away_name;
