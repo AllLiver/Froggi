@@ -279,11 +279,20 @@ struct Config {
 // region: basic pages
 
 async fn index_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar).await {
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::from(include_str!("./html/index.html")))
-            .unwrap();
+    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
+        const HTML: &'static str = include_str!("./html/index.html");
+        if verify_session(jar).await {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .body(String::from(HTML))
+                .unwrap();
+        } else {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header(SET_COOKIE, session_cookie_builder().await)
+                .body(String::from(HTML))
+                .unwrap();
+        }
     } else {
         return Response::builder()
             .status(StatusCode::SEE_OTHER)
@@ -294,11 +303,20 @@ async fn index_handler(jar: CookieJar) -> impl IntoResponse {
 }
 
 async fn teaminfo_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar).await {
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::from(include_str!("./html/teaminfo.html")))
-            .unwrap();
+    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
+        const HTML: &'static str = include_str!("./html/teaminfo.html");
+        if verify_session(jar).await {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .body(String::from(HTML))
+                .unwrap();
+        } else {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header(SET_COOKIE, session_cookie_builder().await)
+                .body(String::from(HTML))
+                .unwrap();
+        }
     } else {
         return Response::builder()
             .status(StatusCode::SEE_OTHER)
@@ -324,11 +342,20 @@ async fn overlay_handler() -> impl IntoResponse {
 }
 
 async fn settings_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar).await {
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::from(include_str!("./html/settings.html")))
-            .unwrap();
+    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
+        const HTML: &'static str = include_str!("./html/settings.html");
+        if verify_session(jar).await {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .body(String::from(HTML))
+                .unwrap();
+        } else {
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header(SET_COOKIE, session_cookie_builder().await)
+                .body(String::from(HTML))
+                .unwrap();
+        }
     } else {
         return Response::builder()
             .status(StatusCode::SEE_OTHER)
@@ -435,6 +462,12 @@ struct LoginForm {
 struct Claims {
     sub: String,
     un: String,
+    exp: usize,
+}
+
+#[derive(Serialize, Deserialize)]
+struct SessionClaims {
+    sub: String,
     exp: usize,
 }
 
@@ -584,56 +617,95 @@ async fn login_handler(Form(data): Form<LoginForm>) -> impl IntoResponse {
 }
 
 async fn auth_cookie_builder(username: String) -> String {
-    let mut secret = String::new();
+    if let Ok(secret) = tokio::fs::read_to_string("./secret.key").await {
+        let claims = Claims {
+            sub: Uuid::new_v4().to_string(),
+            un: username,
+            exp: (std::time::SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_secs()
+                + std::time::Duration::from_secs(60 * 60 * 24 * 7).as_secs())
+                as usize,
+        };
 
-    let secret_f = File::open("secret.key")
-        .await
-        .expect("Could not open secret.key");
-    let mut buf_reader = BufReader::new(secret_f);
+        let token = jsonwebtoken::encode(
+            &jsonwebtoken::Header::default(),
+            &claims,
+            &EncodingKey::from_secret(secret.as_bytes()),
+        )
+        .expect("Could not create auth token!");
 
-    if let Err(_) = buf_reader.read_to_string(&mut secret).await {
-        panic!("Cannot read secret.key! Generating a auth token with an empty private key is unsecure!");
-    };
+        let mut config_str = String::new();
 
-    let claims = Claims {
-        sub: Uuid::new_v4().to_string(),
-        un: username,
-        exp: (std::time::SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_secs()
-            + std::time::Duration::from_secs(60 * 60 * 24 * 7).as_secs()) as usize,
-    };
+        let config_f = File::open("config.json")
+            .await
+            .expect("Could not open config.json");
+        let mut buf_reader = BufReader::new(config_f);
+        buf_reader
+            .read_to_string(&mut config_str)
+            .await
+            .expect("Could not read config.json");
 
-    let token = jsonwebtoken::encode(
-        &jsonwebtoken::Header::default(),
-        &claims,
-        &EncodingKey::from_secret(secret.as_bytes()),
-    )
-    .expect("Could not create auth token!");
+        let config: Config =
+            serde_json::from_str(&config_str).expect("Could not deserialize config.json");
 
-    let mut config_str = String::new();
+        let cookie = Cookie::build(("AuthToken", token))
+            .path("/")
+            .secure(config.secure_auth_cookie)
+            .http_only(true)
+            .max_age(cookie::time::Duration::days(7))
+            .same_site(SameSite::Strict);
 
-    let config_f = File::open("config.json")
-        .await
-        .expect("Could not open config.json");
-    let mut buf_reader = BufReader::new(config_f);
-    buf_reader
-        .read_to_string(&mut config_str)
-        .await
-        .expect("Could not read config.json");
+        cookie.to_string()
+    } else {
+        panic!("Could not read secret.key!");
+    }
+}
 
-    let config: Config =
-        serde_json::from_str(&config_str).expect("Could not deserialize config.json");
+async fn session_cookie_builder() -> String {
+    if let Ok(secret) = tokio::fs::read_to_string("./secret.key").await {
+        let claims = SessionClaims {
+            sub: Uuid::new_v4().to_string(),
+            exp: (std::time::SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .expect("Time went backwards")
+                .as_secs()
+                + std::time::Duration::from_secs(60 * 60 * 24 * 2).as_secs())
+                as usize,
+        };
 
-    let cookie = Cookie::build(("AuthToken", token))
-        .path("/")
-        .secure(config.secure_auth_cookie)
-        .http_only(true)
-        .max_age(cookie::time::Duration::days(7))
-        .same_site(SameSite::Strict);
+        let token = jsonwebtoken::encode(
+            &jsonwebtoken::Header::default(),
+            &claims,
+            &EncodingKey::from_secret(secret.as_bytes()),
+        )
+        .expect("Could not create auth token!");
 
-    cookie.to_string()
+        let mut config_str = String::new();
+
+        let config_f = File::open("config.json")
+            .await
+            .expect("Could not open config.json");
+        let mut buf_reader = BufReader::new(config_f);
+        buf_reader
+            .read_to_string(&mut config_str)
+            .await
+            .expect("Could not read config.json");
+
+        let config: Config =
+            serde_json::from_str(&config_str).expect("Could not deserialize config.json");
+
+        let cookie = Cookie::build(("SessionToken", token))
+            .path("/")
+            .secure(config.secure_auth_cookie)
+            .http_only(true)
+            .same_site(SameSite::Strict);
+
+        cookie.to_string()
+    } else {
+        panic!("Could not read secret.key!");
+    }
 }
 
 async fn verify_auth(jar: CookieJar) -> bool {
@@ -665,6 +737,35 @@ async fn verify_auth(jar: CookieJar) -> bool {
     }
 }
 
+async fn verify_session(jar: CookieJar) -> bool {
+    if let Some(auth_token) = jar.get("SessionToken") {
+        let validation = Validation::new(jsonwebtoken::Algorithm::HS256);
+
+        let mut secret = String::new();
+
+        let secret_f = File::open("secret.key")
+            .await
+            .expect("Could not open secret.key");
+        let mut buf_reader = BufReader::new(secret_f);
+        buf_reader
+            .read_to_string(&mut secret)
+            .await
+            .expect("Could not read secret.key");
+
+        if let Ok(_) = decode::<SessionClaims>(
+            &auth_token.value(),
+            &DecodingKey::from_secret(secret.as_bytes()),
+            &validation,
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        return false;
+    }
+}
+
 async fn ping_handler() -> impl IntoResponse {
     return StatusCode::OK;
 }
@@ -677,7 +778,7 @@ async fn home_points_update_handler(
     jar: CookieJar,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut home_points = state.home_points.lock().await;
 
         if *home_points as i32 + a >= 0 {
@@ -703,7 +804,7 @@ async fn away_points_update_handler(
     jar: CookieJar,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut away_points = state.away_points.lock().await;
 
         if *away_points as i32 + a >= 0 {
@@ -776,7 +877,7 @@ async fn game_clock_ticker() {
 }
 
 async fn game_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut game_clock_start = GAME_CLOCK_START.lock().await;
 
         if a == "start" {
@@ -798,7 +899,7 @@ async fn game_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl I
 }
 
 async fn game_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         *GAME_CLOCK.lock().await = mins * 60;
 
         return Response::builder()
@@ -817,7 +918,7 @@ async fn game_clock_update_handler(
     jar: CookieJar,
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut game_clock = GAME_CLOCK.lock().await;
         let time_diff = mins * 60 + secs;
 
@@ -871,7 +972,7 @@ async fn countdown_clock_ticker() {
 }
 
 async fn countdown_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
 
         if a == "start" {
@@ -893,7 +994,7 @@ async fn countdown_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> i
 }
 
 async fn countdown_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         *COUNTDOWN_CLOCK.lock().await = mins * 60;
 
         return Response::builder()
@@ -912,7 +1013,7 @@ async fn countdown_clock_update_handler(
     jar: CookieJar,
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut coundown_clock = COUNTDOWN_CLOCK.lock().await;
         let time_diff = mins * 60 + secs;
 
@@ -957,7 +1058,7 @@ async fn countdown_text_set_handler(
     State(state): State<AppState>,
     Form(payload): Form<TextPayload>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         *state.countdown_text.lock().await = payload.text;
 
         return Response::builder()
@@ -994,7 +1095,7 @@ async fn quarter_set_handler(
     Path(q): Path<u8>,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         *state.quarter.lock().await = q;
 
         return Response::builder()
@@ -1014,7 +1115,7 @@ async fn quarter_update_handler(
     State(state): State<AppState>,
     Path(a): Path<i8>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut quarter = state.quarter.lock().await;
 
         if *quarter as i8 + a >= 1 && *quarter as i8 + a <= 5 {
@@ -1055,7 +1156,7 @@ impl Teaminfo {
 }
 
 async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut teaminfo = Teaminfo::new();
         let id = id_create(12);
 
@@ -1244,7 +1345,7 @@ async fn teaminfo_preset_select_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut dir = read_dir("./team-presets").await.unwrap();
 
         while let Ok(Some(a)) = dir.next_entry().await {
@@ -1299,7 +1400,7 @@ async fn teaminfo_preset_remove_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         if let Ok(_) = remove_dir_all(format!("./team-presets/{}", id)).await {
             *state.preset_id.lock().await = String::new();
         }
@@ -1337,7 +1438,7 @@ async fn team_name_display_handler(
 // region: sponsors
 
 async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         create_dir_all(format!("./sponsors"))
             .await
             .expect("Could not create sponsors directory");
@@ -1412,7 +1513,7 @@ async fn sponsors_management_handler() -> impl IntoResponse {
 }
 
 async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut d = read_dir("./sponsors").await.unwrap();
         let mut p = PathBuf::new();
 
@@ -1641,7 +1742,7 @@ async fn downs_set_handler(
     State(state): State<AppState>,
     Path(d): Path<u8>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         if (1..=4).contains(&d) {
             *state.down.lock().await = d;
         }
@@ -1663,7 +1764,7 @@ async fn downs_update_handler(
     State(state): State<AppState>,
     Path(y): Path<i8>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut down = state.down.lock().await;
         if (1..=4).contains(&(*down as i8 + y)) {
             *down = (*down as i8 + y) as u8;
@@ -1686,7 +1787,7 @@ async fn downs_togo_set_handler(
     State(state): State<AppState>,
     Path(y): Path<u8>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         *state.downs_togo.lock().await = y;
 
         return Response::builder()
@@ -1706,7 +1807,7 @@ async fn downs_togo_update_handler(
     State(state): State<AppState>,
     Path(y): Path<i8>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut downs_togo = state.downs_togo.lock().await;
         if (0..=99).contains(&(*downs_togo as i8 + y)) {
             *downs_togo = (*downs_togo as i8 + y) as u8;
@@ -1804,7 +1905,7 @@ async fn visibility_toggle_handler(
     State(state): State<AppState>,
     Path(v): Path<String>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut modified = ("", false);
 
         match v.as_str() {
@@ -2006,7 +2107,7 @@ async fn ocr_handler(
 }
 
 async fn ocr_api_toggle_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let mut ocr_api = OCR_API.lock().await;
 
         if !*ocr_api {
@@ -2042,7 +2143,7 @@ async fn ocr_api_button_handler() -> impl IntoResponse {
 }
 
 async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let login: Login = serde_json::from_str(
             &tokio::fs::read_to_string("./login.json")
                 .await
@@ -2072,7 +2173,7 @@ async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
 }
 
 async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         let login: Login = serde_json::from_str(
             &tokio::fs::read_to_string("./login.json")
                 .await
@@ -2099,7 +2200,7 @@ async fn popup_handler(
     jar: CookieJar,
     Query(params): Query<HashMap<String, String>>,
 ) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         if let Some(p) = params.get("text") {
             POPUPS.lock().await.push((p.clone(), 7));
         }
@@ -2143,14 +2244,22 @@ async fn popup_show_handler() -> impl IntoResponse {
 
     let display = str_vec.join("<br>");
 
-    return Html::from(format!("<div class=\"{}\">{}</div>", if popups.len() == 0 { "ol-popup-hidden" } else { "ol-popup" }, display));
+    return Html::from(format!(
+        "<div class=\"{}\">{}</div>",
+        if popups.len() == 0 {
+            "ol-popup-hidden"
+        } else {
+            "ol-popup"
+        },
+        display
+    ));
 }
 
 // endregion: popups
 // region: misc
 
 async fn reset_handler(jar: CookieJar, State(ref mut state): State<AppState>) -> impl IntoResponse {
-    if verify_auth(jar).await {
+    if verify_session(jar).await {
         *state.home_points.lock().await = 0;
         *state.home_name.lock().await = String::from("Home");
         *state.away_points.lock().await = 0;
