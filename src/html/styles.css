@@ -137,7 +137,6 @@ body {
     overflow: hidden;
     padding: 0.26vw;
     position: relative;
-    margin-bottom: var(--margin-bottom, 0.65vh);
     margin-top: 2vh;
 }
 
@@ -152,7 +151,6 @@ body {
     padding: 5px;
     position: relative;
     margin-bottom: 0.65vh;
-    margin-left: var(--margin-left, 0.5vw);
     margin-top: 2vh;
 }
 
