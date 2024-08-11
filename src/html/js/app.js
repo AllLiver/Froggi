@@ -245,5 +245,36 @@ document.querySelectorAll('.cooldown').forEach(button => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+    const popup = document.getElementById('log-popup');
+    const closeButton = document.querySelector('.popup-close');
+    const openLogsButton = document.getElementById('open-logs');
+
+    function togglePopup() {
+        popup.style.display = popup.style.display === 'none' || popup.style.display === '' ? 'block' : 'none';
+    }
+
+    function openPopup() {
+        popup.style.display = 'block';
+    }
+
+    function closePopup() {
+        popup.style.display = 'none';
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === '`' || event.key === '~') {
+            togglePopup();
+        }
+    });
+    closeButton.addEventListener('click', closePopup);
+
+    openLogsButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        openPopup();
+    });
+
+    closePopup();
+});
 pingServer();
 setInterval(pingServer, ping_time);

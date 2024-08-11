@@ -16,7 +16,7 @@
 </head>
 
 <body>
-   <!--TODO: Local storage for ping Clock margin top-->
+    <!--TODO: Local storage for ping Clock margin top-->
     <div hx-put="/visibility/css" hx-trigger="every 100ms"></div>
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
@@ -29,6 +29,7 @@
             <li><a href="/teaminfo">Sponsors & Teaminfo</a></li>
             <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
             <li><a href="/settings">Settings</a></li>
+            <li><a href="/" id="open-logs">Open Logs</a></li>
         </ul>
     </nav>
 
@@ -350,19 +351,23 @@
                                             <tr>
                                                 <td>TIMEOUT</td>
                                                 <td><button class="button home-popup cooldown"
-                                                        hx-post="/popup?text=Timeout%20Home" hx-swap="none">HOME</button>
+                                                        hx-post="/popup?text=Timeout%20Home"
+                                                        hx-swap="none">HOME</button>
                                                 </td>
                                                 <td><button class="button away-popup cooldown"
-                                                        hx-post="/popup?text=Timeout%20Away" hx-swap="none">AWAY</button>
+                                                        hx-post="/popup?text=Timeout%20Away"
+                                                        hx-swap="none">AWAY</button>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td>TOUCHDOWN</td>
                                                 <td><button class="button home-popup cooldown"
-                                                        hx-post="/popup?text=Touchdown%20Home" hx-swap="none">HOME</button>
+                                                        hx-post="/popup?text=Touchdown%20Home"
+                                                        hx-swap="none">HOME</button>
                                                 </td>
                                                 <td><button class="button away-popup cooldown"
-                                                        hx-post="/popup?text=Touchdown%20Away" hx-swap="none">AWAY</button>
+                                                        hx-post="/popup?text=Touchdown%20Away"
+                                                        hx-swap="none">AWAY</button>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -382,6 +387,16 @@
                     </div>
                 </div>
             </div>
+            <div id="log-popup" class="popup">
+                <div class="popup-header">
+                    <h2>Logs</h2>
+                    <span class="popup-close">&times;</span>
+                </div>
+                <div class="popup-content">
+                    <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
+                </div>
+            </div>
+
             <script src="/app.js"></script>
 </body>
 

@@ -420,6 +420,54 @@ body {
     filter: none;
 }
 
+/* Logs */
+
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-background-contrast, #1d1e22);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    z-index: 1000;
+    opacity: 0.95;
+    overflow-y: auto;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f1f1f1;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #191a1b;
+}
+
+.popup-content {
+    padding: 20px;
+    overflow-y: auto;
+    user-select: text;
+}
+
+.popup-close {
+    font-size: 24px;
+    cursor: pointer;
+    color: #e4dada;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.popup-close:hover {
+    color: #f00;
+}
+
 /*& Dashboard styles */
 
 /* Columns */
@@ -2038,7 +2086,9 @@ form input[type="submit"],
     align-items: center;
 }
 
-.button-settings, .copy-button, .ocr-button {
+.button-settings,
+.copy-button,
+.ocr-button {
     background-color: var(--font-color, #000000);
     color: var(--font-color-contrast);
     border: none;
