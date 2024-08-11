@@ -113,8 +113,7 @@ async fn main() -> Result<()> {
 
         let default_config = Config {
             secure_auth_cookie: true,
-            sponsor_wait_time: 5,
-            sponsor_img_width: 50,
+            sponsor_wait_time: 5
         };
 
         f.write_all(
@@ -264,7 +263,6 @@ async fn main() -> Result<()> {
 struct Config {
     secure_auth_cookie: bool,
     sponsor_wait_time: u64,
-    sponsor_img_width: u16,
 }
 
 // region: basic pages
@@ -1441,11 +1439,6 @@ async fn load_sponsors() {
         .await
         .expect("Could not create sponsors directory");
 
-    let cfg = tokio::fs::read_to_string("./config.json")
-        .await
-        .expect("Could not read config json");
-    let cfg_json: Config = serde_json::from_str(&cfg).expect("Could not deserialize config json");
-
     let mut d = read_dir("./sponsors")
         .await
         .expect("Could not read sponsors dir");
@@ -1466,10 +1459,9 @@ async fn load_sponsors() {
 
         *SPONSOR_IDX.lock().await = 0;
         SPONSOR_TAGS.lock().await.push(format!(
-            "<img class=\"ol-sponsor-img\" src=\"data:image/{};base64,{}\" alt=\"away-img\" width=\"{}vw\" height=\"auto\">",
+            "<img class=\"ol-sponsor-img\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"auto\">",
             mime_type,
             BASE64_STANDARD.encode(f_bytes),
-            cfg_json.sponsor_img_width
         ))
     }
 }
