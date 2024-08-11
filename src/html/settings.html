@@ -81,7 +81,7 @@
                         409 CONFLICT to froggi-ocr.</h6>
                 </div>
                 <div class="setting" hx-put="/ocr/api/button" hx-trigger="load">
-                    <button hx-post="/ocr/api/toggle">OCR API</button>
+                    <button class="api-button" hx-post="/ocr/api/toggle">OCR API</button>
                 </div>
                 <h6>*Enabling the OCR API disables the game clock</h6>
             </div>
@@ -227,20 +227,20 @@
         }
 
         function checkForUpdate(currentVersion) {
-            fetchLatestRelease().then(latestRelease => {
-                const latestVersion = latestRelease.tag_name;
-                if (currentVersion !== latestVersion) {
-                    notifyUserOfUpdate(latestRelease);
-                }
-            });
+       //     fetchLatestRelease().then(latestRelease => {
+          //      const latestVersion = latestRelease.tag_name;
+          //      if (currentVersion !== latestVersion) {
+         //           notifyUserOfUpdate(latestRelease);
+           //     }
+       //     });
         }
-
+        // remove comments for public build
         function notifyUserOfUpdate(latestRelease) {
             const updateMessage = `New update available: ${latestRelease.tag_name}. 
         Download`;
 
             const updateBanner = document.createElement('div');
-            updateBanner.innerHTML = `<a href="${latestRelease.assets[0].browser_download_url}" target="_blank">${updateMessage}</a>`;
+            updateBanner.innerHTML = `<a href="https://github.com/AllLiver/Froggi/releases/tag/v1.0.0" target="_blank">${updateMessage}</a>`;
             updateBanner.style.backgroundColor = "#fc0303";
             updateBanner.style.padding = "10px";
             updateBanner.style.textAlign = "center";
@@ -250,7 +250,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const currentVersion = "2.0.0"; 
+            const currentVersion = "2.0.0";
             checkForUpdate(currentVersion);
         });
 
