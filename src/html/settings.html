@@ -81,7 +81,7 @@
                         409 CONFLICT to froggi-ocr.</h6>
                 </div>
                 <div class="setting" hx-put="/ocr/api/button" hx-trigger="load">
-                    <button class="api-button" hx-post="/ocr/api/toggle">OCR API</button>
+                    <button class="ocr-button" hx-post="/ocr/api/toggle">OCR API</button>
                 </div>
                 <h6>*Enabling the OCR API disables the game clock</h6>
             </div>
@@ -92,8 +92,8 @@
 
                 <div hx-put="/api/key/show" hx-trigger="load">
                 </div>
-
-                <button hx-post="/api/key/reveal" hx-target="#api-key">Reveal
+                
+                <button class="button-settings" hx-post="/api/key/reveal" hx-target="#api-key">Reveal
                     Key</button>
             </div>
         </div>
