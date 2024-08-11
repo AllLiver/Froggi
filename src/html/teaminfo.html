@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
     <title>Teaminfo & Sponsors</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css"crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
@@ -14,6 +14,7 @@
     <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
+
 <body id="teaminfo-body">
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
@@ -24,35 +25,37 @@
         <ul class="sidenavbar">
             <li><a href="/">Dashboard</a></li>
             <li><a href="/teaminfo" class="nav-active">Sponsors & Teaminfo</a></li>
-            <li><a href="/overlay"  target="_blank"  rel="noopener noreferrer">Overlay</a></li>
+            <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
             <li><a href="/settings">Settings</a></li>
+            <li><a href="/" id="open-logs">Open Logs</a></li>
         </ul>
     </nav>
     <div class="teaminfo-container">
         <div class="teaminfo-rectangle">
             <h1>Team Preset Creation</h1>
-            <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data" onsubmit="return sanitize(this);">
+            <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data"
+                onsubmit="return sanitize(this);">
                 <div class="ti-home-section">
                     <label for="home_name">Home name:</label> <br>
                     <input type="text" id="home_name" name="home_name" required maxlength="25"><br>
-    
+
                     <label for="home_img">Home icon:</label> <br>
                     <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" required><br>
-    
+
                     <label for="home_color">Home jersey color:</label><br>
                     <input type="color" id="home_color" name="home_color" value="#007BFF" required><br>
                 </div>
                 <div class="ti-away-section">
                     <label for="away_name">Away name:</label> <br>
                     <input type="text" id="away_name" name="away_name" required maxlength="25"><br>
-    
+
                     <label for="away_img">Away icon:</label> <br>
                     <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" required><br>
-    
+
                     <label for="away_color">Away jersey color:</label> <br>
                     <input type="color" id="away_color" name="away_color" value="#ff8601" required><br>
                 </div>
-                
+
                 <input type="submit" value="Submit">
                 <img class="htmx-indicator" src="/spinner.svg">
             </form>
@@ -73,9 +76,20 @@
                 <img class="htmx-indicator" src="/spinner.svg">
             </form>
             <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body">
+            </div>
         </div>
-    </div>
-    <script src="/app.js"></script>
+        <div id="log-popup" class="popup">
+            <div class="popup-header">
+                <h2>Logs</h2>
+                <span class="popup-close">&times;</span>
+            </div>
+            <div class="popup-content">
+                <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
+            </div>
+        </div>
+        <script> document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("log-popup"),t=document.querySelector(".popup-close"),n=document.getElementById("open-logs");function l(){e.style.display="none"}function o(){let e=document.getElementById("popup-content");e&&(e.scrollTop=e.scrollHeight)}document.addEventListener("keydown",function(t){("`"===t.key||"~"===t.key)&&(e.style.display="none"===e.style.display||""===e.style.display?"block":"none")}),t&&t.addEventListener("click",l),n&&n.addEventListener("click",function(t){t.preventDefault(),e.style.display="block"}),l(),document.body.addEventListener("htmx:afterOnLoad",function(e){"log-content"===e.detail.elt.id&&o()});let d=document.getElementById("popup-content");d&&d.addEventListener("DOMSubtreeModified",o)});
+</script>
+        <script src="/app.js"></script>
 </body>
 
 </html>

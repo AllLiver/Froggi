@@ -423,23 +423,29 @@ body {
 /* Logs */
 
 #log-popup {
-    width: 80%; 
-    max-width: 25vw; 
-    margin: 0 auto; 
+    width: 80%;
+    max-width: 25vw;
+    margin: 0 auto;
     border-radius: 5px;
-    overflow: hidden; 
+    text-overflow: ellipsis;
 }
 
 .popup-content {
-    max-height: 95vh; 
-    overflow-y: auto;
+    max-height: 95vh;
+    text-overflow: ellipsis;
 }
 
 #log-content {
-    font-family: monospace; 
-    font-size: 14px; 
+    font-family: monospace;
+    font-size: 1rem;
     color: var(--font-color, #000000);
-    line-height: 1.5;
+    line-height: normal;
+    font-kerning: normal;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0.2vh;
+
 }
 
 .popup {
@@ -448,14 +454,16 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: var(--color-background-contrast, #1d1e22);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 5px;
     width: 80%;
     max-width: 25vw;
     z-index: 1000;
     opacity: 0.95;
-    overflow-y: auto;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
     max-height: 95vh;
+    line-height: normal;
 }
 
 .popup-header {
@@ -472,12 +480,14 @@ body {
     padding: 20px;
     overflow-y: auto;
     user-select: text;
+    line-height: normal;
+    font-kerning: normal;
 }
 
 .popup-close {
     font-size: 2rem;
     cursor: pointer;
-    color: #e4dada;
+    color: var(--font-color, #ffffff);
     background: none;
     border: none;
     outline: none;

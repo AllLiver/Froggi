@@ -96,6 +96,35 @@
                 }, 7500);
             }
         });
+
+        function checkClassChange(mutations) {
+  mutations.forEach(mutation => {
+    if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+      const element = mutation.target;
+      if (element.classList.contains('ol-popup') && !element.classList.contains('ol-popup-hidden')) {
+        console.log('Class changed from ol-popup-hidden to ol-popup');
+        
+        // Alert the user
+        alert('The class has changed to ol-popup!');
+        
+        // Or, if you prefer, you can change the page in some visible way
+        document.body.style.backgroundColor = 'yellow';
+        
+        // You could also trigger a custom event
+        const event = new CustomEvent('popupClassChanged');
+        document.dispatchEvent(event);
+      }
+    }
+  });
+}
+
+// ... rest of the script remains the same
+
+// You can listen for the custom event elsewhere in your code
+document.addEventListener('popupClassChanged', function() {
+  console.log('Popup class change detected!');
+  // Add any additional actions here
+});
     </script>
 </body>
 

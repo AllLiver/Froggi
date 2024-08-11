@@ -28,6 +28,8 @@
             <li><a href="/teaminfo">Sponsors & Teaminfo</a></li>
             <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
             <li><a href="/settings" class="nav-active">Settings</a></li>
+            <li><a href="/" id="open-logs">Open Logs</a></li>
+
         </ul>
     </nav>
     <div class="settings-container">
@@ -92,7 +94,7 @@
 
                 <div hx-put="/api/key/show" hx-trigger="load">
                 </div>
-                
+
                 <button class="button-settings" hx-post="/api/key/reveal" hx-target="#api-key">Reveal
                     Key</button>
             </div>
@@ -117,6 +119,15 @@
             <div class="setting">
                 <input type="text" id="keybind-input" name="keybind" placeholder="Press a key" readonly>
             </div>
+        </div>
+    </div>
+    <div id="log-popup" class="popup" style="display: none;">
+        <div class="popup-header">
+            <h2>Logs</h2>
+            <span class="popup-close">&times;</span>
+        </div>
+        <div id="popup-content" class="popup-content">
+            <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
         </div>
     </div>
     <script src="/app.js"></script>
@@ -227,12 +238,12 @@
         }
 
         function checkForUpdate(currentVersion) {
-       //     fetchLatestRelease().then(latestRelease => {
-          //      const latestVersion = latestRelease.tag_name;
-          //      if (currentVersion !== latestVersion) {
-         //           notifyUserOfUpdate(latestRelease);
-           //     }
-       //     });
+            //     fetchLatestRelease().then(latestRelease => {
+            //      const latestVersion = latestRelease.tag_name;
+            //      if (currentVersion !== latestVersion) {
+            //           notifyUserOfUpdate(latestRelease);
+            //     }
+            //     });
         }
         // remove comments for public build
         function notifyUserOfUpdate(latestRelease) {
@@ -253,8 +264,8 @@
             const currentVersion = "2.0.0";
             checkForUpdate(currentVersion);
         });
-
-
+ 
+        document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("log-popup"),t=document.querySelector(".popup-close"),n=document.getElementById("open-logs");function l(){e.style.display="none"}function o(){let e=document.getElementById("popup-content");e&&(e.scrollTop=e.scrollHeight)}document.addEventListener("keydown",function(t){("`"===t.key||"~"===t.key)&&(e.style.display="none"===e.style.display||""===e.style.display?"block":"none")}),t&&t.addEventListener("click",l),n&&n.addEventListener("click",function(t){t.preventDefault(),e.style.display="block"}),l(),document.body.addEventListener("htmx:afterOnLoad",function(e){"log-content"===e.detail.elt.id&&o()});let d=document.getElementById("popup-content");d&&d.addEventListener("DOMSubtreeModified",o)});
     </script>
 
 </body>

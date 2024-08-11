@@ -244,22 +244,46 @@ document.querySelectorAll('.cooldown').forEach(button => {
         }, popup_duration);
     });
 });
-
 document.addEventListener('DOMContentLoaded', function () {
     const popup = document.getElementById('log-popup');
     const closeButton = document.querySelector('.popup-close');
     const openLogsButton = document.getElementById('open-logs');
 
+    if (!popup) {
+        console.error('E018: Log popup element not found');
+        return;
+    }
+    if (!closeButton) {
+        console.error('E019: Close button element not found');
+        return;
+    }
+    if (!openLogsButton) {
+        console.error('E020: Open logs button element not found');
+        return;
+    }
+
     function togglePopup() {
-        popup.style.display = popup.style.display === 'none' || popup.style.display === '' ? 'block' : 'none';
+        try {
+            popup.style.display = popup.style.display === 'none' || popup.style.display === '' ? 'block' : 'none';
+        } catch (error) {
+            console.error('E021: Error toggling popup display', error);
+        }
     }
 
     function openPopup() {
-        popup.style.display = 'block';
+        try {
+            popup.style.display = 'block';
+        } catch (error) {
+            console.error('E022: Error opening popup', error);
+        }
     }
 
     function closePopup() {
-        popup.style.display = 'none';
+        try {
+            popup.style.display = 'none';
+        } catch (error) {
+            console.error('E023: Error closing popup', error);
+        }
     }
 
     document.addEventListener('keydown', function (event) {
@@ -267,6 +291,7 @@ document.addEventListener('DOMContentLoaded', function () {
             togglePopup();
         }
     });
+
     closeButton.addEventListener('click', closePopup);
 
     openLogsButton.addEventListener('click', function (event) {
@@ -274,7 +299,36 @@ document.addEventListener('DOMContentLoaded', function () {
         openPopup();
     });
 
-    closePopup();
+    closePopup(); 
 });
+
+function scrollToBottom() {
+    const popupContent = document.getElementById('popup-content');
+    if (!popupContent) {
+        console.error('E024: Popup content element not found');
+        return;
+    }
+    try {
+        popupContent.scrollTop = popupContent.scrollHeight;
+    } catch (error) {
+        console.error('E025: Error scrolling to bottom', error);
+    }
+}
+
+document.body.addEventListener('htmx:afterOnLoad', function(event) {
+    if (event.detail.elt.id === 'log-content') {
+        scrollToBottom();
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const popupContent = document.getElementById('popup-content');
+    if (!popupContent) {
+        console.error('E026: Popup content element not found during DOMContentLoaded');
+        return;
+    }
+    popupContent.addEventListener('DOMSubtreeModified', scrollToBottom);
+});
+
 pingServer();
 setInterval(pingServer, ping_time);
