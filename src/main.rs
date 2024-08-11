@@ -2111,7 +2111,6 @@ async fn popup_handler(
 }
 
 async fn popup_ticker() {
-    //let mut last_len = 0;
     loop {
         let start_time = Instant::now();
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
@@ -2131,20 +2130,20 @@ async fn popup_ticker() {
                 popups.remove(i);
             }
         }
-        //last_len = popups.len();
     }
 }
 
 async fn popup_show_handler() -> impl IntoResponse {
     let mut str_vec = Vec::new();
+    let popups = POPUPS.lock().await;
 
-    for i in POPUPS.lock().await.clone() {
-        str_vec.push(i.0);
+    for i in popups.clone() {
+        str_vec.push(format!("<span>{}</span>", i.0));
     }
 
     let display = str_vec.join("<br>");
 
-    return Html::from(display);
+    return Html::from(format!("<div class=\"{}\">{}</div>", if popups.len() == 0 { "ol-popup-hidden" } else { "ol-popup" }, display));
 }
 
 // endregion: popups
