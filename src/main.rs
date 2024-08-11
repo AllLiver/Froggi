@@ -21,7 +21,6 @@ use jsonwebtoken::{decode, DecodingKey, EncodingKey, Validation};
 use lazy_static::lazy_static;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::{Deserialize, Serialize};
-use tower_http::cors::CorsLayer;
 use std::{
     collections::HashMap,
     path::PathBuf,
@@ -34,6 +33,7 @@ use tokio::{
     signal,
     sync::Mutex,
 };
+use tower_http::cors::CorsLayer;
 use uuid::Uuid;
 
 lazy_static! {
@@ -113,7 +113,7 @@ async fn main() -> Result<()> {
 
         let default_config = Config {
             secure_auth_cookie: true,
-            sponsor_wait_time: 5
+            sponsor_wait_time: 5,
         };
 
         f.write_all(
@@ -135,7 +135,11 @@ async fn main() -> Result<()> {
     // Set up CORS
     let cors = CorsLayer::new()
         .allow_origin(tower_http::cors::Any) // Allow requests from any origin
-        .allow_methods([axum::http::Method::GET, axum::http::Method::POST, axum::http::Method::HEAD]) // Allow specific methods
+        .allow_methods([
+            axum::http::Method::GET,
+            axum::http::Method::POST,
+            axum::http::Method::HEAD,
+        ]) // Allow specific methods
         .allow_headers(tower_http::cors::Any)
         .allow_private_network(true);
 
@@ -196,7 +200,10 @@ async fn main() -> Result<()> {
         .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
         .route("/teaminfo/name/:t", put(team_name_display_handler))
         // Sponsor routes
-        .route("/sponsors/upload", post(upload_sponsors_handler).layer(DefaultBodyLimit::max(2000000000)))
+        .route(
+            "/sponsors/upload",
+            post(upload_sponsors_handler).layer(DefaultBodyLimit::max(2000000000)),
+        )
         .route("/sponsors/manage", put(sponsors_management_handler))
         .route("/sponsors/remove/:id", post(sponsor_remove_handler))
         .route("/sponsors/display", put(sponsor_display_handler))
@@ -205,6 +212,10 @@ async fn main() -> Result<()> {
         .route("/icon/:t", put(icon_handler))
         .route("/overlay/clock", put(overlay_clock_handler))
         .route("/countdown/display", put(countdown_display_handler))
+        .route(
+            "/overlay/team-border-css",
+            put(overlay_team_border_css_handler),
+        )
         // Downs routes
         .route("/downs/set/:d", post(downs_set_handler))
         .route("/downs/update/:d", post(downs_update_handler))
@@ -1589,6 +1600,37 @@ async fn countdown_display_handler(State(state): State<AppState>) -> impl IntoRe
     }
 }
 
+async fn overlay_team_border_css_handler(State(state): State<AppState>) -> impl IntoResponse {
+    let preset_id = state.preset_id.lock().await;
+    if preset_id.is_empty() {
+        return Html::from(String::new());
+    } else {
+        if let Ok(teaminfo) = serde_json::from_str::<Teaminfo>(
+            &tokio::fs::read_to_string(format!("./team-presets/{}/teams.json", *preset_id))
+                .await
+                .unwrap(),
+        ) {
+            return Html::from(format!(
+                "
+            <style>
+                .ol-home-box {{
+                    border-color: {};
+                    border-style: solid;
+                }}
+                .ol-away-box {{
+                    border-color: {};
+                    border-style: solid;
+                }}
+            </style>
+            ",
+                teaminfo.home_color, teaminfo.away_color
+            ));
+        } else {
+            return Html::from(String::new());
+        }
+    }
+}
+
 // endregion: overlay
 // region: downs
 
@@ -2014,7 +2056,10 @@ async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
 
         return Response::builder()
             .status(StatusCode::OK)
-            .body(format!("<h6 id=\"api-key\">{}</h6><button onclick=\"apiCopy('{}')\">Copy</button>", hidden_key, login.api_key))
+            .body(format!(
+                "<h6 id=\"api-key\">{}</h6><button class=\"copy-button\" onclick=\"apiCopy('{}')\">Copy</button>",
+                hidden_key, login.api_key
+            ))
             .unwrap();
     } else {
         return Response::builder()
@@ -2048,7 +2093,10 @@ async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
 // endregion: api
 // region: popups
 
-async fn popup_handler(jar: CookieJar, Query(params): Query<HashMap<String, String>>) -> impl IntoResponse {
+async fn popup_handler(
+    jar: CookieJar,
+    Query(params): Query<HashMap<String, String>>,
+) -> impl IntoResponse {
     if verify_auth(jar).await {
         if let Some(p) = params.get("text") {
             POPUPS.lock().await.push((p.clone(), 7));
