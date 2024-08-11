@@ -1216,18 +1216,20 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
 
             html += &format!(
             "<div class=\"match-selector\">
-                <img class=\"home-logo\" src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\">
+                <img class=\"home-logo\" src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\" style=\"border-color: {}; border-style: solid; border-radius: 3px; border-width: 2px\">
                 <p class=\"teampreset-title\">{} vs {}</p>
-                <img class=\"away-logo\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\">
+                <img class=\"away-logo\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\" style=\"border-color: {}; border-style: solid; border-radius: 3px; border-width: 2px;\">
                 <button class=\"select-button\" hx-post=\"/teaminfo/select/{}\" hx-swap=\"none\">Select</button>
                 <button class=\"remove-button\" hx-post=\"/teaminfo/remove/{}\" hx-swap=\"none\">Remove</button>
             </div>",
                 home_tag_type,
                 BASE64_STANDARD.encode(home_img_bytes),
+                teaminfo.home_color,
                 teaminfo.home_name,
                 teaminfo.away_name,
                 away_tag_type,
                 BASE64_STANDARD.encode(away_img_bytes),
+                teaminfo.away_color,
                 id,
                 id
             );
