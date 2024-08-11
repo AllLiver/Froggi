@@ -5,7 +5,7 @@
 Is a self-hosted portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.
 
 # Features
-- ✨ Optical character recognition using this [froggi-ocr](https://github.com/AllLiver/froggi-ocr) and [scoresight-ocr](https://github.com/locaal-ai/scoresight), using a video source, the program can be automatic
+- ✨ Optical character recognition (OCR) using [froggi-ocr](https://github.com/AllLiver/froggi-ocr) and [scoresight-ocr](https://github.com/locaal-ai/scoresight), using a video source, OCR can be automatic
 - ✨ An optional sponsor logo slideshow on overlay
 - ✨ Match presets
 - ✨ Ui optimized for iPad like devices
