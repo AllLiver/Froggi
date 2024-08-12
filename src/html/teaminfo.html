@@ -83,12 +83,12 @@
                 <h2>Logs</h2>
                 <span class="popup-close">&times;</span>
             </div>
-            <div class="popup-content">
+            <div id="popup-content" class="popup-content">
                 <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
             </div>
         </div>
-        <script> document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("log-popup"),t=document.querySelector(".popup-close"),n=document.getElementById("open-logs");function l(){e.style.display="none"}function o(){let e=document.getElementById("popup-content");e&&(e.scrollTop=e.scrollHeight)}document.addEventListener("keydown",function(t){("`"===t.key||"~"===t.key)&&(e.style.display="none"===e.style.display||""===e.style.display?"block":"none")}),t&&t.addEventListener("click",l),n&&n.addEventListener("click",function(t){t.preventDefault(),e.style.display="block"}),l(),document.body.addEventListener("htmx:afterOnLoad",function(e){"log-content"===e.detail.elt.id&&o()});let d=document.getElementById("popup-content");d&&d.addEventListener("DOMSubtreeModified",o)});
-</script>
+        <script> document.addEventListener("DOMContentLoaded", function () { let e = document.getElementById("log-popup"), t = document.querySelector(".popup-close"), n = document.getElementById("open-logs"); function l() { e.style.display = "none" } function o() { let e = document.getElementById("popup-content"); e && (e.scrollTop = e.scrollHeight) } document.addEventListener("keydown", function (t) { ("`" === t.key || "~" === t.key) && (e.style.display = "none" === e.style.display || "" === e.style.display ? "block" : "none") }), t && t.addEventListener("click", l), n && n.addEventListener("click", function (t) { t.preventDefault(), e.style.display = "block" }), l(), document.body.addEventListener("htmx:afterOnLoad", function (e) { "log-content" === e.detail.elt.id && o() }); let d = document.getElementById("popup-content"); d && d.addEventListener("DOMSubtreeModified", o) });
+        </script>
         <script src="/app.js"></script>
 </body>
 

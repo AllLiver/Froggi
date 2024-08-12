@@ -19,6 +19,11 @@ body {
     letter-spacing: 0.05em;
 }
 
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    display: none;
+}
+
 /* Index rectangles */
 .preview-rectangle {
     background-color: var(--chromakey-color, #00b140);
@@ -1747,6 +1752,7 @@ canvas {
     box-sizing: border-box;
     gap: 0.5rem;
     position: fixed;
+    text-wrap: nowrap;
 }
 
 .ol-home-box,
@@ -1806,6 +1812,33 @@ canvas {
 }
 
 /* Ol-Popups */
+
+.ol-popup {
+    opacity: 1;
+    transform: translateY(0);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.ol-popup-hidden {
+    opacity: 0;
+    transform: translateY(100%);
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+}
+
+.popup-text {
+    position: fixed;
+    bottom: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #000;
+    padding: 1.85vh;
+    border-radius: 10px;
+    bottom: 9vh;
+    opacity: 1;
+    transition-delay: 0.2s;
+    animation: borderPulse-away 2s ease-out infinite;
+}
 
 .ol-popup-home.show {
     bottom: 9vh;

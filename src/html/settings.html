@@ -212,19 +212,27 @@
         });
 
         function apiCopy(text) {
-
-            const tempInput = document.createElement('input');
-            tempInput.value = text;
-            document.body.appendChild(tempInput);
-            tempInput.select();
-            document.execCommand('copy');
-            document.body.removeChild(tempInput);
-
-            // Top works for some situations bottom works for others, I will let you decide because I just reworked it so it doesnt grab from the DOM
-
-            // navigator.clipboard.writeText(apiKey);
-            // navigator.clipboard.writeText(text);
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    console.log('Text copied to clipboard');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            } else {
+                const tempInput = document.createElement('input');
+                tempInput.value = text;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                try {
+                    document.execCommand('copy');
+                    console.log('Text copied to clipboard');
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+                document.body.removeChild(tempInput);
+            }
         }
+
 
         async function fetchLatestRelease() {
             try {
@@ -261,11 +269,10 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            const currentVersion = "2.0.0";
-            checkForUpdate(currentVersion);
+            checkForUpdate(version);
         });
- 
-        document.addEventListener("DOMContentLoaded",function(){let e=document.getElementById("log-popup"),t=document.querySelector(".popup-close"),n=document.getElementById("open-logs");function l(){e.style.display="none"}function o(){let e=document.getElementById("popup-content");e&&(e.scrollTop=e.scrollHeight)}document.addEventListener("keydown",function(t){("`"===t.key||"~"===t.key)&&(e.style.display="none"===e.style.display||""===e.style.display?"block":"none")}),t&&t.addEventListener("click",l),n&&n.addEventListener("click",function(t){t.preventDefault(),e.style.display="block"}),l(),document.body.addEventListener("htmx:afterOnLoad",function(e){"log-content"===e.detail.elt.id&&o()});let d=document.getElementById("popup-content");d&&d.addEventListener("DOMSubtreeModified",o)});
+
+        document.addEventListener("DOMContentLoaded", function () { let e = document.getElementById("log-popup"), t = document.querySelector(".popup-close"), n = document.getElementById("open-logs"); function l() { e.style.display = "none" } function o() { let e = document.getElementById("popup-content"); e && (e.scrollTop = e.scrollHeight) } document.addEventListener("keydown", function (t) { ("`" === t.key || "~" === t.key) && (e.style.display = "none" === e.style.display || "" === e.style.display ? "block" : "none") }), t && t.addEventListener("click", l), n && n.addEventListener("click", function (t) { t.preventDefault(), e.style.display = "block" }), l(), document.body.addEventListener("htmx:afterOnLoad", function (e) { "log-content" === e.detail.elt.id && o() }); let d = document.getElementById("popup-content"); d && d.addEventListener("DOMSubtreeModified", o) });
     </script>
 
 </body>

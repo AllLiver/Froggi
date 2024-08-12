@@ -2,6 +2,7 @@ const ping_time = '1000'; // Change to update ping at a different interval, defa
 const default_theme = 'theme-dark'; // Default theme, change to 'theme-light' or 'theme-colorblind' if you want to change the default theme (clear local storage), default is theme-dark.
 const lock_interface_btn = document.getElementById('lockInterfaceBtn'); // Change to the id of the button that will lock the interface, if set to null, the button will be disabled, default is 'lockInterfaceBtn'.
 const popup_duration = "7500"; // Change to update the duration of the popup, default is 7500ms.
+const version = '2.0.0'; // Change to update the version number
 
 let ping_url = '/'; // The relative url that will be pinged to check the connection
 let preview_url = '/overlay'; // The relative url that will be used for the preview iframe

@@ -2319,7 +2319,7 @@ async fn popup_show_handler() -> impl IntoResponse {
     let popups = POPUPS.lock().await;
 
     for i in popups.clone() {
-        str_vec.push(format!("<span>{}</span>", i.0));
+        str_vec.push(format!("<span class=\"popup-text\">{}</span>", i.0));
     }
 
     let display = str_vec.join("<br>");
