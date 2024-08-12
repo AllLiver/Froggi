@@ -2373,7 +2373,7 @@ async fn logs_handler() -> impl IntoResponse {
     let mut logs_display = Vec::new();
 
     for i in 0..logs.len() {
-        logs_display.push(format!("<span>{}</span>", logs[i]))
+        logs_display.push(format!("<span>({}) {}</span>", i + 1, logs[i]))
     }
 
     Html::from(logs_display.join("<br>"))
