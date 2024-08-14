@@ -1,335 +1,295 @@
-const ping_time = '1000'; // Change to update ping at a different interval, default is 1000ms.
-const default_theme = 'theme-dark'; // Default theme, change to 'theme-light' or 'theme-colorblind' if you want to change the default theme (clear local storage), default is theme-dark.
-const lock_interface_btn = document.getElementById('lockInterfaceBtn'); // Change to the id of the button that will lock the interface, if set to null, the button will be disabled, default is 'lockInterfaceBtn'.
-const popup_duration = "7500"; // Change to update the duration of the popup, default is 7500ms.
-const version = '2.0.0'; // Change to update the version number
+// Constants
+const PING_TIME = 1000;
+const DEFAULT_THEME = 'theme-dark';
+const LOCK_INTERFACE_BTN_ID = 'lockInterfaceBtn';
+const POPUP_DURATION = 7500;
+const VERSION = '2.0.1';
+const PING_URL = '/';
+const PREVIEW_URL = '/overlay';
 
-let ping_url = '/'; // The relative url that will be pinged to check the connection
-let preview_url = '/overlay'; // The relative url that will be used for the preview iframe
+// Cache DOM elements
+const pingValue = document.getElementById('ping-value');
+const lockInterfaceBtn = document.getElementById(LOCK_INTERFACE_BTN_ID);
+const body = document.body;
 
+// Utility functions
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => document.querySelectorAll(selector);
 
+// Error handling
+function handleError(code, message, error) {
+    console.error(`E${code}: ${message}`, error);
+    // Implement logging or error reporting here
+}
+
+// Ping functionality
 function pingServer() {
-    measure_ping(ping_url, function (time) {
-        document.getElementById('ping-value').textContent = time + ' ms';
+    const startTime = performance.now();
+    fetch(PING_URL, { method: 'HEAD', cache: 'no-store' })
+        .then(response => {
+            if (response.ok) {
+                const time = Math.round(performance.now() - startTime);
+                pingValue.textContent = `${time} ms`;
+            } else {
+                throw new Error(`Ping failed with status ${response.status}`);
+            }
+        })
+        .catch(error => {
+            pingValue.textContent = 'Configure IP E003.5';
+            handleError('003', 'Ping request failed', error);
+        });
+}
+
+// Menu toggle
+function toggleMenu() {
+    try {
+        $('.hamburger-menu')?.classList.toggle('active');
+        $('.sidenavbar')?.classList.toggle('active');
+    } catch (error) {
+        handleError('005', 'Error toggling menu', error);
+    }
+}
+
+// Interface lock functionality
+function toggleInterfaceLock() {
+    body.classList.toggle('interface-locked');
+    const isLocked = body.classList.contains('interface-locked');
+    lockInterfaceBtn.innerHTML = `<strong>${isLocked ? 'Unlock' : 'Lock'} Interface</strong>`;
+    localStorage.setItem('lockState', isLocked ? 'locked' : 'unlocked');
+}
+
+// Theme application
+function applyTheme(theme) {
+    body.className = theme;
+    localStorage.setItem('theme', theme);
+    $$('.theme-button').forEach(btn => btn.classList.toggle('theme-active', btn.id === `${theme.replace('theme-', '')}-theme`));
+}
+
+// Button indicator functionality
+function initializeButtonIndicators(startButtonId, stopButtonId, storageKey) {
+    const startButton = document.getElementById(startButtonId);
+    const stopButton = document.getElementById(stopButtonId);
+
+    if (!startButton || !stopButton) {
+        handleError('008', `Button elements not found for: ${startButtonId}, ${stopButtonId}`);
+        return;
+    }
+
+    function updateButtonState(isStart) {
+        startButton.classList.toggle('selector-active', isStart);
+        stopButton.classList.toggle('selector-active', !isStart);
+        localStorage.setItem(storageKey, isStart ? 'start' : 'stop');
+    }
+
+    startButton.addEventListener('click', () => updateButtonState(true));
+    stopButton.addEventListener('click', () => updateButtonState(false));
+
+    // Initialize state from localStorage
+    const savedState = localStorage.getItem(storageKey);
+    if (savedState === 'start' || savedState === 'stop') {
+        updateButtonState(savedState === 'start');
+    }
+}
+
+// Event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize theme
+    applyTheme(localStorage.getItem('theme') || DEFAULT_THEME);
+
+    // Initialize lock state
+    const lockState = localStorage.getItem('lockState');
+    if (lockState === 'locked') {
+        body.classList.add('interface-locked');
+        lockInterfaceBtn.innerHTML = '<strong>Unlock Interface</strong>';
+    }
+
+    // Set up preview iframe
+    const iframe = $('#previewIframe');
+    if (iframe) iframe.src = PREVIEW_URL;
+
+    // Set up host IP input
+    const hostIPInput = $('#host-ip');
+    if (hostIPInput) {
+        hostIPInput.value = localStorage.getItem('hostIP') || '';
+        hostIPInput.addEventListener('input', () => {
+            const sanitizedValue = hostIPInput.value.replace(/[&<>"'\\/?*]/g, '');
+            hostIPInput.value = sanitizedValue;
+            localStorage.setItem('hostIP', sanitizedValue);
+        });
+    }
+
+    // Set up theme buttons
+    ['light', 'dark', 'colorblind'].forEach(themeName => {
+        $(`#${themeName}-theme`)?.addEventListener('click', () => applyTheme(`theme-${themeName}`));
+    });
+
+    // Set up lock interface button
+    lockInterfaceBtn?.addEventListener('click', toggleInterfaceLock);
+
+    // Set up menu toggle
+    $('.hamburger-menu')?.addEventListener('click', toggleMenu);
+
+    // Initialize button indicators
+    initializeButtonIndicators('countdownStartButton', 'countdownStopButton', 'countdownState');
+    initializeButtonIndicators('clockStartButton', 'clockStopButton', 'clockState');
+
+    // Start ping interval
+    setInterval(pingServer, PING_TIME);
+
+    // Initialize popup
+    initializePopup();
+});
+
+// Popup functionality
+function initializePopup() {
+    const popup = $('#log-popup');
+    const popupContent = $('#popup-content');
+
+    function togglePopup() {
+        popup.style.display = popup.style.display === 'none' || popup.style.display === '' ? 'block' : 'none';
+        if (popup.style.display === 'block') scrollToBottom();
+    }
+
+    function scrollToBottom() {
+        if (popupContent) popupContent.scrollTop = popupContent.scrollHeight;
+    }
+
+    document.addEventListener('keydown', (event) => {
+        if (event.key === '`' || event.key === '~') togglePopup();
+    });
+
+    $('.popup-close')?.addEventListener('click', () => popup.style.display = 'none');
+    $('#open-logs')?.addEventListener('click', (event) => {
+        event.preventDefault();
+        togglePopup();
+    });
+
+    body.addEventListener('htmx:afterOnLoad', (event) => {
+        if (event.detail.elt.id === 'log-content') scrollToBottom();
+    });
+
+    popupContent?.addEventListener('DOMSubtreeModified', scrollToBottom);
+
+    // Initially hide the popup
+    popup.style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', () => {
+    checkForUpdate(); // Check for updates on page load
+});
+
+function notifyUserOfUpdate(latestRelease) {
+    // Check if the banner was previously ignored and if it's still within the week
+    const ignoredTimestamp = localStorage.getItem('update-banner-ignored');
+    if (ignoredTimestamp) {
+        const oneWeek = 7 * 24 * 60 * 60 * 1000; 
+        const currentTime = Date.now();
+        if (currentTime - parseInt(ignoredTimestamp, 10) < oneWeek) {
+            return; // Don't show the banner if it was ignored less than a week ago
+        }
+    }
+
+    // Create the banner element
+    const updateBanner = document.createElement('div');
+    updateBanner.classList.add('update-banner');
+    
+    // Add the HTML content to the banner
+    updateBanner.innerHTML = `
+        <div class="update-banner-content">
+            <a href="${latestRelease.html_url}" target="_blank" class="update-banner-link">
+                New update available: ${latestRelease.tag_name}. Click to download
+            </a>
+            <button class="update-banner-ignore">Ignore</button>
+        </div>
+    `;
+    
+    // Append the banner to the body
+    document.body.prepend(updateBanner);
+    
+    // Add event listener for the Ignore button
+    document.querySelector('.update-banner-ignore').addEventListener('click', () => {
+        updateBanner.style.display = 'none';
+        // Set the timestamp for when the banner was ignored
+        localStorage.setItem('update-banner-ignored', Date.now());
     });
 }
 
-function measure_ping(url, callback) {
-    const start_time = performance.now();
-
-    fetch(url, { method: 'HEAD', cache: 'no-store', timeout: 5000 })
-        .then(response => {
-            if (response.ok) {
-                const end_time = performance.now();
-                const time = Math.round(end_time - start_time);
-                callback(time);
-            } else {
-                callback('Ping Error: ' + response.status);
-                console.error('E002: Ping failed with status', response.status);
-            }
-        })
-        .catch((error) => {
-            callback('Configure IP E003.5');
-            console.error('E003: Ping request failed', error);
-        });
-}
-
-function toggle_menu() {
+async function checkForUpdate() {
     try {
-        const menu_button = document.querySelector('.hamburger-menu');
-        const side_nav = document.querySelector('.sidenavbar');
-        if (!menu_button || !side_nav) {
-            throw new Error('E004: Menu elements not found');
+        const response = await fetch('https://api.github.com/repos/AllLiver/Froggi/releases/latest');
+        const data = await response.json();
+        if (data.tag_name !== VERSION) {
+            notifyUserOfUpdate(data);
         }
-        menu_button.classList.toggle('active');
-        side_nav.classList.toggle('active');
     } catch (error) {
-        console.error('E005: Error toggling menu', error);
+        handleError('018', 'Error fetching the latest release', error);
     }
 }
 
-function test_latency() {
-    const start_time = Date.now();
-    fetch(window.location.href, { timeout: 5000 })
-        .then(function (response) {
-            const end_time = Date.now();
-            const latency = end_time - start_time;
-            try {
-                document.getElementById('ping-value').textContent = latency + ' ms';
-            } catch (error) {
-                console.error('E006: Error updating latency value', error);
-            }
-        })
-        .catch(function (err) {
-            console.error('E007: Error fetching data for latency test:', err);
-        });
-}
+   // Load saved values from local storage on page load
+   window.onload = function() {
+    const savedColor = localStorage.getItem('overlayColor');
+    const savedAlpha = localStorage.getItem('overlayAlpha');
 
-lock_interface_btn.addEventListener('click', function (event) {
-    if (event.target !== lock_interface_btn) {
-        document.body.classList.toggle('interface-locked');
-
-        try {
-            if (document.body.classList.contains('interface-locked')) {
-                lock_interface_btn.innerHTML = '<strong>Unlock Interface</strong>';
-                localStorage.setItem('lockState', 'locked');
-            } else {
-                lock_interface_btn.innerHTML = '<strong>Lock Interface</strong>';
-                localStorage.setItem('lockState', 'unlocked');
-            }
-        } catch (error) {
-            console.error('E009: Error updating lock state', error);
-        }
+    if (savedColor) {
+        document.getElementById('overlay-color').value = savedColor;
+        document.getElementById('color-value').textContent = savedColor;
     }
-});
 
-window.addEventListener('load', function () {
-    try {
-        const lock_state = localStorage.getItem('lockState');
-
-        if (lock_state === 'locked') {
-            document.body.classList.add('interface-locked');
-            lock_interface_btn.innerHTML = '<strong>Unlock Interface</strong>';
-        } else {
-            document.body.classList.remove('interface-locked');
-            lock_interface_btn.innerHTML = '<strong>Lock Interface</strong>';
-        }
-
-        const savedHostIP = localStorage.getItem('hostIP');
-        if (savedHostIP) {
-            document.getElementById('host-ip').value = savedHostIP;
-            ping_url = `http://${savedHostIP}`;
-            preview_url = `http://${savedHostIP}/overlay`;
-        }
-    } catch (error) {
-        console.error('E010: Error loading saved state', error);
-    }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    try {
-        const iframe = document.getElementById("previewIframe");
-        if (!iframe) {
-            throw new Error('E011: Preview iframe not found');
-        }
-        iframe.src = preview_url;
-
-        const hostIPInput = document.getElementById('host-ip');
-        if (hostIPInput) {
-            hostIPInput.addEventListener('input', saveHostIP);
-        } else {
-            console.warn('W001: Host IP input not found');
-        }
-    } catch (error) {
-        console.error('E012: Error setting up DOM elements', error);
-    }
-});
-
-function sanitize(input_element) {
-    if (!input_element) {
-        console.error('E013: Invalid input element for sanitization');
-        return;
-    }
-    const sanitized_value = input_element.value.replace(/[&<>"'\\/?*]/g, '');
-    input_element.value = sanitized_value;
-}
-
-function applyTheme(theme) {
-    try {
-        document.body.classList.remove('theme-dark', 'theme-light', 'theme-colorblind');
-        document.body.classList.add(theme);
-        localStorage.setItem('theme', theme);
-
-        document.querySelectorAll('.theme-button').forEach(button => {
-            button.classList.remove('theme-active');
-        });
-
-        let activeButton = document.querySelector(`#${theme.replace('theme-', '')}-theme`);
-        if (activeButton) {
-            activeButton.classList.add('theme-active');
-        } else {
-            console.warn('W002: Active theme button not found');
-        }
-    } catch (error) {
-        console.error('E014: Error applying theme', error);
-    }
-}
-
-window.onload = function () {
-    try {
-        const savedTheme = localStorage.getItem('theme') || default_theme;
-        applyTheme(savedTheme);
-    } catch (error) {
-        console.error('E015: Error loading saved theme', error);
-        applyTheme(default_theme);
+    if (savedAlpha) {
+        document.getElementById('overlay-alpha').value = savedAlpha;
+        document.getElementById('alpha-value').textContent = savedAlpha;
     }
 };
 
-['light', 'dark', 'colorblind'].forEach(themeName => {
-    const themeButton = document.getElementById(`${themeName}-theme`);
-    if (themeButton) {
-        themeButton.onclick = function () {
-            applyTheme(`theme-${themeName}`);
-        };
+// Save values to local storage when inputs change
+document.getElementById('overlay-color').addEventListener('input', function() {
+    const color = this.value;
+    document.getElementById('color-value').textContent = color;
+    localStorage.setItem('overlayColor', color);
+});
+
+document.getElementById('overlay-alpha').addEventListener('input', function() {
+    const alpha = this.value;
+    document.getElementById('alpha-value').textContent = alpha;
+    localStorage.setItem('overlayAlpha', alpha);
+});
+
+// Reset to default values
+document.getElementById('reset-color').addEventListener('click', function() {
+    const defaultColor = '#00b140';
+    const defaultAlpha = '100';
+
+    document.getElementById('overlay-color').value = defaultColor;
+    document.getElementById('color-value').textContent = defaultColor;
+    localStorage.setItem('overlayColor', defaultColor);
+
+    document.getElementById('overlay-alpha').value = defaultAlpha;
+    document.getElementById('alpha-value').textContent = defaultAlpha;
+    localStorage.setItem('overlayAlpha', defaultAlpha);
+});
+
+function apiCopy(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(() => {
+            console.log('Text copied to clipboard');
+        }).catch(err => {
+            console.error('Failed to copy text: ', err);
+        });
     } else {
-        console.warn(`W003: Theme button for ${themeName} not found`);
-    }
-});
-
-document.addEventListener("DOMContentLoaded", function () {
-    function initialize_buttons(start_button_id, stop_button_id, storage_key) {
-        const start_button = document.getElementById(start_button_id);
-        const stop_button = document.getElementById(stop_button_id);
-
-        if (!start_button || !stop_button) {
-            console.error(`E008: Button elements not found for: ${start_button_id}, ${stop_button_id}`);
-            return;
-        }
-
-        start_button.addEventListener("click", function () {
-            start_button.classList.add("selector-active");
-            stop_button.classList.remove("selector-active");
-            try {
-                localStorage.setItem(storage_key, "start");
-            } catch (error) {
-                console.error('E016: Error saving button state to localStorage', error);
-            }
-        });
-
-        stop_button.addEventListener("click", function () {
-            stop_button.classList.add("selector-active");
-            start_button.classList.remove("selector-active");
-            try {
-                localStorage.setItem(storage_key, "stop");
-            } catch (error) {
-                console.error('E016: Error saving button state to localStorage', error);
-            }
-        });
-
+        const tempInput = document.createElement('input');
+        tempInput.value = text;
+        document.body.appendChild(tempInput);
+        tempInput.select();
         try {
-            const saved_state = localStorage.getItem(storage_key);
-            if (saved_state === "start") {
-                start_button.classList.add("selector-active");
-                stop_button.classList.remove("selector-active");
-            } else if (saved_state === "stop") {
-                stop_button.classList.add("selector-active");
-                start_button.classList.remove("selector-active");
-            }
-        } catch (error) {
-            console.error('E017: Error loading saved button state', error);
+            document.execCommand('copy');
+            console.log('Text copied to clipboard');
+        } catch (err) {
+            console.error('Failed to copy text: ', err);
         }
-    }
-
-    const buttonPairs = [
-        ["countdownStartButton", "countdownStopButton", "countdownState"],
-        ["clockStartButton", "clockStopButton", "clockState"],
-        ["showAnimationStartButton", "showAnimationStopButton", "showAnimationState"],
-        ["showCountdownStartButton", "showCountdownStopButton", "showCountdownState"],
-        ["showDownsStartButton", "showDownsStopButton", "showDownsState"],
-        ["showScoreboardStartButton", "showScoreboardStopButton", "showScoreboardState"],
-        ["showPopupStartButton", "showPopupStopButton", "showPopupState"],
-        ["showSponsorsStartButton", "showSponsorsStopButton", "showSponsorsState"]
-    ];
-
-    buttonPairs.forEach(pair => initialize_buttons(...pair));
-});
-
-document.querySelectorAll('.cooldown').forEach(button => {
-    button.addEventListener('click', function () {
-        this.disabled = true;
-        this.classList.add('popup-cooldown');
-
-        setTimeout(() => {
-            this.disabled = false;
-            this.classList.remove('popup-cooldown');
-        }, popup_duration);
-    });
-});
-document.addEventListener('DOMContentLoaded', function () {
-    const popup = document.getElementById('log-popup');
-    const closeButton = document.querySelector('.popup-close');
-    const openLogsButton = document.getElementById('open-logs');
-
-    if (!popup) {
-        console.error('E018: Log popup element not found');
-        return;
-    }
-    if (!closeButton) {
-        console.error('E019: Close button element not found');
-        return;
-    }
-    if (!openLogsButton) {
-        console.error('E020: Open logs button element not found');
-        return;
-    }
-
-    function togglePopup() {
-        try {
-            popup.style.display = popup.style.display === 'none' || popup.style.display === '' ? 'block' : 'none';
-        } catch (error) {
-            console.error('E021: Error toggling popup display', error);
-        }
-    }
-
-    function openPopup() {
-        try {
-            popup.style.display = 'block';
-        } catch (error) {
-            console.error('E022: Error opening popup', error);
-        }
-    }
-
-    function closePopup() {
-        try {
-            popup.style.display = 'none';
-        } catch (error) {
-            console.error('E023: Error closing popup', error);
-        }
-    }
-
-    document.addEventListener('keydown', function (event) {
-        if (event.key === '`' || event.key === '~') {
-            togglePopup();
-        }
-    });
-
-    closeButton.addEventListener('click', closePopup);
-
-    openLogsButton.addEventListener('click', function (event) {
-        event.preventDefault();
-        openPopup();
-    });
-
-    closePopup(); 
-});
-
-function scrollToBottom() {
-    const popupContent = document.getElementById('popup-content');
-    if (!popupContent) {
-        console.error('E024: Popup content element not found');
-        return;
-    }
-    try {
-        popupContent.scrollTop = popupContent.scrollHeight;
-    } catch (error) {
-        console.error('E025: Error scrolling to bottom', error);
+        document.body.removeChild(tempInput);
     }
 }
 
-document.body.addEventListener('htmx:afterOnLoad', function(event) {
-    if (event.detail.elt.id === 'log-content') {
-        scrollToBottom();
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function() {
-    const popupContent = document.getElementById('popup-content');
-    if (!popupContent) {
-        console.error('E026: Popup content element not found during DOMContentLoaded');
-        return;
-    }
-    popupContent.addEventListener('DOMSubtreeModified', scrollToBottom);
-});
-
+// Initial calls
 pingServer();
-setInterval(pingServer, ping_time);
+checkForUpdate();

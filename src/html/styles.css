@@ -200,6 +200,7 @@ body::-webkit-scrollbar {
     --font-color-contrast: #000000;
     --chromakey-color: #00b140;
     --shadow-color: #ffffff;
+    --font-color-italic: #e0e0e0;
     --margin-left: 0.5vw;
     --margin-bottom: 0.65vh;
 }
@@ -230,6 +231,7 @@ body::-webkit-scrollbar {
     --font-color-contrast: #fff;
     --chromakey-color: #00b140;
     --shadow-color: #000000;
+    --font-color-italic: #306090;
 }
 
 .theme-colorblind {
@@ -243,6 +245,7 @@ body::-webkit-scrollbar {
     --font-color-contrast: #000000;
     --chromakey-color: #00b140;
     --shadow-color: #e9e9e9;
+    --font-color-italic: #a7a8af;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -318,7 +321,7 @@ body::-webkit-scrollbar {
     font-size: 18px;
     transition: right 0.3s ease;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    color: #000000;
+    color: var(--font-color-contrast, #fff);
 }
 
 .off-screen-menu.active {
@@ -540,7 +543,7 @@ body::-webkit-scrollbar {
     background-color: var(--color-green, #27a644);
     border: none;
     border-radius: 5px;
-    color: var(--font-color);
+    color: var(--font-color, #000000);
     font-weight: 600;
     height: 4vh;
     margin-left: var(--margin-left);
@@ -805,7 +808,7 @@ iframe {
 
 .button-preset-score-home,
 .button-preset-score-away {
-    color: white;
+    color: var(--font-color, #000000);
     border: none;
     font-size: 1rem;
     cursor: pointer;
@@ -1176,9 +1179,9 @@ iframe {
 
 .button-preset-quarter {
     background-color: var(--color-green, #27a644);
-    color: #fff;
+    color: var(--font-color, #000000);
     border: none;
-    font-size: 0.8rem;
+    font-size: 0.96rem;
     cursor: pointer;
     width: 8.5vw;
     height: 5.5vh;
@@ -1228,6 +1231,7 @@ iframe {
     border-radius: 10.5px;
     margin: 0.3vh;
     cursor: pointer;
+    color: var(--font-color, #000000);
 }
 
 .visibility-active {
@@ -1813,18 +1817,6 @@ canvas {
 
 /* Ol-Popups */
 
-.ol-popup {
-    opacity: 1;
-    transform: translateY(0);
-    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-}
-
-.ol-popup-hidden {
-    opacity: 0;
-    transform: translateY(100%);
-    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
-}
-
 .popup-text {
     position: fixed;
     bottom: -100%;
@@ -1837,7 +1829,7 @@ canvas {
     bottom: 9vh;
     opacity: 1;
     transition-delay: 0.2s;
-    animation: borderPulse-away 2s ease-out infinite;
+    animation: borderPulse-home 2s ease-out infinite;
 }
 
 .ol-popup-home.show {
@@ -2135,7 +2127,7 @@ form input[type="submit"],
     margin: 0.56vh 0 1.67vh;
     font-size: 1.56vh;
     font-weight: normal;
-    color: #e0e0e0;
+    color: var(--font-color-italic, #e0e0e0);
     font-style: italic;
     text-wrap: balance;
 }
@@ -2218,15 +2210,6 @@ form input[type="submit"],
     border-radius: 50%;
 }
 
-.update-banner {
-    color: white;
-}
-
-a:link,
-a:visited {
-    color: var(--font-color, #ffffff);
-}
-
 .alpha-range-title {
     margin: 0.2vw;
 }
@@ -2239,6 +2222,58 @@ a:visited {
     font-size: 1rem;
     cursor: pointer;
     margin-left: 0.4vw;
+}
+
+a:link,
+a:visited {
+    color: var(--font-color, #ffffff);
+}
+
+.update-banner {
+    position: fixed;
+    top: 5px; 
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #fc0303;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    font-family: Arial, sans-serif;
+}
+
+.update-banner-content {
+    display: flex;
+    align-items: center;
+}
+
+.update-banner-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.update-banner-link:hover {
+    text-decoration: underline;
+}
+
+.update-banner-ignore {
+    background-color: transparent;
+    border: none;
+    color: var(--font-color, #000000);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+.update-banner-ignore:hover {
+    background-color: #d10d0d;
 }
 
 #light-theme,
