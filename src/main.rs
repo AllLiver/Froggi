@@ -2354,7 +2354,9 @@ async fn popup_show_handler() -> impl IntoResponse {
         h_vec.push(format!("<span>{}</span>", popups_home[i].0));
     }
 
-    html += &format!("<div class=\"home-popup\">{}</div>", h_vec.join("<br>"));
+    if h_vec.len() > 0 {
+        html += &format!("<div class=\"home-popup\">{}</div>", h_vec.join("<br>"));
+    }
 
     drop(h_vec);
 
@@ -2365,7 +2367,9 @@ async fn popup_show_handler() -> impl IntoResponse {
         a_vec.push(format!("<span>{}</span>", popups_away[i].0));
     }
 
-    html += &format!("<div class=\"away-popup\">{}</div>", a_vec.join("<br>"));
+    if a_vec.len() > 0 {
+        html += &format!("<div class=\"away-popup\">{}</div>", a_vec.join("<br>"));
+    }
 
     drop(a_vec);
 
