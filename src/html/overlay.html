@@ -96,19 +96,6 @@
                 }, 7500);
             }
         });
-        const checkPopup = setInterval(() => {
-            const popup = document.querySelector('.ol-popup');
-
-            if (popup) {
-                popup.classList.add('show');
-
-                setTimeout(() => {
-                    popup.classList.remove('show');
-                }, 7500);
-
-                clearInterval(checkPopup);
-            }
-        }, 10);
 
     </script>
 </body>
