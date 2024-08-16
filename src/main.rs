@@ -47,7 +47,8 @@ lazy_static! {
     static ref SPONSOR_IDX: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
     static ref SHOW_SPONSORS: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref OCR_API: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
-    static ref POPUPS: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref POPUPS_HOME: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref POPUPS_AWAY: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
 }
 
 #[macro_export]
@@ -249,7 +250,7 @@ async fn main() -> Result<()> {
         .route("/api/key/show", put(api_key_show_handler))
         .route("/api/key/reveal", post(api_key_reveal_handler))
         // Popups
-        .route("/popup", post(popup_handler))
+        .route("/popup/:t", post(popup_handler))
         .route("/popup/show", put(popup_show_handler))
         // Misc Handlers
         .route("/reset", post(reset_handler))
@@ -269,7 +270,8 @@ async fn main() -> Result<()> {
         tokio::spawn(game_clock_ticker());
         tokio::spawn(countdown_clock_ticker());
         tokio::spawn(sponsor_ticker());
-        tokio::spawn(popup_ticker());
+        tokio::spawn(popup_home_ticker());
+        tokio::spawn(popup_away_ticker());
         printlg!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
@@ -2276,12 +2278,16 @@ async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
 
 async fn popup_handler(
     jar: CookieJar,
+    Path(a): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> impl IntoResponse {
     if verify_session(jar).await {
         if let Some(p) = params.get("text") {
-            POPUPS.lock().await.push((p.clone(), 7));
-
+            if a == "home" {
+                POPUPS_HOME.lock().await.push((p.clone(), 7));
+            } else if a == "away" {
+                POPUPS_AWAY.lock().await.push((p.clone(), 7));
+            }
             printlg!("POPUP: {}", p);
         }
 
@@ -2291,11 +2297,35 @@ async fn popup_handler(
     }
 }
 
-async fn popup_ticker() {
+async fn popup_home_ticker() {
+    loop {
+
+        let start_time = Instant::now();
+        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        let mut popups = POPUPS_HOME.lock().await;
+
+        let mut i = 0;
+        loop {
+            if i >= popups.len() {
+                break;
+            }
+
+            let time_diff = (Instant::now() - start_time).as_secs();
+            if popups[i].1 - time_diff > 0 {
+                popups[i].1 -= time_diff;
+                i += 1;
+            } else {
+                popups.remove(i);
+            }
+        }
+    }
+}
+
+async fn popup_away_ticker() {
     loop {
         let start_time = Instant::now();
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        let mut popups = POPUPS.lock().await;
+        let mut popups = POPUPS_AWAY.lock().await;
 
         let mut i = 0;
         loop {
@@ -2315,24 +2345,31 @@ async fn popup_ticker() {
 }
 
 async fn popup_show_handler() -> impl IntoResponse {
-    let mut str_vec = Vec::new();
-    let popups = POPUPS.lock().await;
+    let mut html = String::new();
 
-    for i in popups.clone() {
-        str_vec.push(format!("<span class=\"popup-text\">{}</span>", i.0));
+    let popups_home = POPUPS_HOME.lock().await;
+    let mut h_vec = Vec::new();
+
+    for i in 0..popups_home.len() {
+        h_vec.push(format!("<span>{}</span>", popups_home[i].0));
     }
 
-    let display = str_vec.join("<br>");
+    html += &format!("<div class=\"home-popup\">{}</home>", h_vec.join("<br>"));
 
-    return Html::from(format!(
-        "<div class=\"{}\">{}</div>",
-        if popups.len() == 0 {
-            "ol-popup-hidden"
-        } else {
-            "ol-popup"
-        },
-        display
-    ));
+    drop(h_vec);
+
+    let popups_away = POPUPS_AWAY.lock().await;
+    let mut a_vec = Vec::new();
+
+    for i in 0..popups_away.len() {
+        a_vec.push(format!("<span>{}</span>", popups_away[i].0));
+    }
+
+    html += &format!("<div class=\"away-popup\">{}</home>", a_vec.join("<br>"));
+
+    drop(a_vec);
+
+    return Html::from(html);
 }
 
 // endregion: popups
