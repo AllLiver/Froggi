@@ -290,24 +290,18 @@ function apiCopy(text) {
     }
 }
 
-// Cooldown duration in milliseconds
-const COOLDOWN_DURATION = 7500; // 7.5 seconds
-
-// Function to apply cooldown to a button
 function applyCooldown(button) {
-    button.disabled = true; // Disable the button
-    button.classList.add('popup-cooldown'); // Add popup-cooldown class
+    // Disable the button and add the popup-cooldown class
+    button.disabled = true;
+    button.classList.add('popup-cooldown');
 
-    setTimeout(() => {
-        button.disabled = false; // Re-enable the button after cooldown
+    // Re-enable the button and remove the popup-cooldown class after 7.5 seconds
+    setTimeout(function() {
+        button.disabled = false;
         button.classList.remove('popup-cooldown');
-    }, COOLDOWN_DURATION);
+    }, 7500);
 }
 
-// Attach event listeners to buttons with the 'cooldown' class
-document.querySelectorAll('.cooldown').forEach(button => {
-    button.addEventListener('click', () => applyCooldown(button));
-});
 // Initial calls
 pingServer();
 checkForUpdate();

@@ -1817,9 +1817,42 @@ canvas {
 }
 
 /* Ol-Popups */
-.ol-popup-container {
-    display: none;
+
+.ol-away-popup {  
+    position: fixed;
+    bottom: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #000;
+    padding: 1.85vh;
+    border-radius: 10px;
+    bottom: 9vh;
+    opacity: 1;
+    transition-delay: 0.2s;
+    animation: borderPulse-away 2s ease-out infinite;
 }
+
+.ol-home-popup {
+    position: fixed;
+    bottom: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #000;
+    padding: 1.85vh;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    font-size: large;
+    width: auto;
+    text-align: center;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+    z-index: 999;
+    /* Make home appear above away :) */
+    pointer-events: none;
+ }
 
 .popup-home {
     position: fixed;
@@ -1834,6 +1867,13 @@ canvas {
     opacity: 1;
     transition-delay: 0.2s;
     animation: borderPulse-home 2s ease-out infinite;
+}
+
+.ol-popup-home.show {
+    bottom: 9vh;
+    opacity: 1;
+    transition-delay: 0.2s;
+    animation: borderPulse-away 2s ease-out infinite;
 }
 
 .popup-away {
@@ -1869,28 +1909,6 @@ canvas {
 .ol-popup-home {
     display: none;
 }
-
-.ol-home-popup {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    font-size: large;
-    width: auto;
-    text-align: center;
-    border: 2px solid transparent;
-    box-sizing: border-box;
-    z-index: 999;
-    /* Make home appear above away :) */
-    pointer-events: none;
-}
-
 @keyframes borderPulse-home {
     0% {
         border-color: transparent;
