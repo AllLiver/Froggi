@@ -1661,8 +1661,9 @@ async fn sponsor_ticker() {
 }
 
 async fn sponsor_display_handler() -> impl IntoResponse {
-    if *SHOW_SPONSORS.lock().await {
-        let sponsor_img = SPONSOR_TAGS.lock().await[*SPONSOR_IDX.lock().await].clone();
+    let sponsor_tags = SPONSOR_TAGS.lock().await;
+    if *SHOW_SPONSORS.lock().await && sponsor_tags.len() > 0 {
+        let sponsor_img = sponsor_tags[*SPONSOR_IDX.lock().await].clone();
         return Html::from(format!(
             "<div class=\"ol-sponsor-parent\">{}</div>",
             sponsor_img
