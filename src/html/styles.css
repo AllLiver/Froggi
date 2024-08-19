@@ -976,7 +976,7 @@ iframe {
     box-sizing: border-box;
     padding: 10px;
     background-color: var(--font-color-contrast);
-    color: var(--font-color, #000000);
+    color: var(--font-color, #ffffff);
     height: 3vh;
     width: 35.9vw;
 }
