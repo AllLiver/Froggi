@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <!--TODO: popup cooldown, alpha channel , look into copy, E008 + W001-3+3-->
+    <!--TODO: Raise ol off the popup cooldown, alpha channel , look into copy, E008 + W001-3+3-->
     <div hx-put="/visibility/css" hx-trigger="every 100ms"></div>
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
@@ -118,12 +118,12 @@
                                 hx-swap="none">+</button>
                         </div>
                         <div class="preset-togo-buttons">
-                            <button class="button-preset-togo" hx-post="/downs/togo/set/0" hx-swap="none">0</button>
-                            <button class="button-preset-togo" hx-post="/downs/togo/set/10" hx-swap="none">10</button>
-                            <button class="button-preset-togo" hx-post="/downs/togo/set/20" hx-swap="none">20</button>
-                            <button class="button-preset-togo" hx-post="/downs/togo/set/30" hx-swap="none">30</button>
-                            <button class="button-preset-togo" hx-post="/downs/togo/set/40" hx-swap="none">40</button>
-                            <button class="button-preset-togo" hx-post="/downs/togo/set/50" hx-swap="none">50</button>
+                            <button class="button-preset-togo" id="togo-button-1" hx-post="/downs/togo/set/0" hx-swap="none">0</button>
+                            <button class="button-preset-togo" id="togo-button-2" hx-post="/downs/togo/set/10" hx-swap="none">10</button>
+                            <button class="button-preset-togo" id="togo-button-3" hx-post="/downs/togo/set/20" hx-swap="none">20</button>
+                            <button class="button-preset-togo" id="togo-button-4" hx-post="/downs/togo/set/30" hx-swap="none">30</button>
+                            <button class="button-preset-togo" id="togo-button-5" hx-post="/downs/togo/set/40" hx-swap="none">40</button>
+                            <button class="button-preset-togo" id="togo-button-6" hx-post="/downs/togo/set/50" hx-swap="none">50</button>  
                         </div>
                     </div>
                 </div>
@@ -405,6 +405,6 @@
                 </div>
             </div>
             <script src="/app.js" defer></script>
-</body>
+            <script>document.addEventListener("DOMContentLoaded",()=>{let o=1,t=[{post:"/downs/togo/set/0",label:"0"},{post:"/downs/togo/set/10",label:"10"},{post:"/downs/togo/set/20",label:"20"},{post:"/downs/togo/set/30",label:"30"},{post:"/downs/togo/set/40",label:"40"},{post:"/downs/togo/set/50",label:"50"}],e=[{post:"/downs/togo/set/0",label:"0"},{post:"/downs/togo/set/3",label:"3"},{post:"/downs/togo/set/6",label:"6"},{post:"/downs/togo/set/9",label:"9"},{post:"/downs/togo/set/13",label:"13"},{post:"/downs/togo/set/17",label:"17"}];function s(){console.log("Toggling button group");let s=document.querySelectorAll(".button-preset-togo"),l=1===o?e:t;s.forEach((o,t)=>{l[t]&&(o.setAttribute("hx-post",l[t].post),o.textContent=l[t].label,htmx.process(o),console.log(`Updated button ${t}: ${l[t].label}`))}),o=1===o?2:1}"true"===localStorage.getItem("toggleButtonGroup")&&(s(),localStorage.removeItem("toggleButtonGroup"))});</script></body>
 
 </html>

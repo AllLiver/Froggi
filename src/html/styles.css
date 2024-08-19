@@ -561,6 +561,8 @@ body::-webkit-scrollbar {
     filter: drop-shadow(0 0 1vh var(--color-selected));
     border: 2px solid var(--color-selected);
     border: none;
+    background-color: #27a644;
+    text-decoration: underline dotted white;
 }
 
 .tabset>input[type="radio"] {
@@ -839,7 +841,7 @@ iframe {
     margin: 0.65vh;
 }
 
-.button-preset-togo {
+.button-preset-togo, #togo-button-6 {
     background-color: var(--color-green, #27a644);
     color: var(--font-color, #000000);
     border: none;
@@ -1037,10 +1039,11 @@ iframe {
     margin: 0.46vh;
     font-size: 1rem;
     cursor: pointer;
-    width: 48.8%;
+    width: 49%;
     border-radius: 5px;
     white-space: nowrap;
     font-weight: 600;
+    height: 6vh;
 }
 
 .countdown-title {
@@ -1133,6 +1136,7 @@ iframe {
     border-radius: 5px;
     white-space: nowrap;
     font-weight: 900;
+    height: 6vh;
 }
 
 .button-preset-clock {
@@ -1218,7 +1222,7 @@ iframe {
 .show-scoreboard,
 .show-downs,
 .show-animation,
-.show-popup {
+.show-popup, .change-togo {
     display: flex;
     flex-direction: column;
     font-size: 1rem;
@@ -1243,7 +1247,7 @@ iframe {
     display: grid;
     flex-direction: column;
     align-items: center;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
     gap: 0.65vh;
 }
 

@@ -85,7 +85,7 @@
                 <div class="setting" hx-put="/ocr/api/button" hx-trigger="load">
                     <button class="ocr-button" hx-post="/ocr/api/toggle">OCR API</button>
                 </div>
-                <h6>*Enabling the OCR API disables the game clock</h6>
+                <h6>*Enabling the OCR API disables the manual game clock control</h6>
             </div>
         </div>
         <div class="settings-box">
@@ -109,15 +109,15 @@
                 <button class="reset-button" hx-post="/reset" hx-swap="none">⚠️Reset⚠️</button>
             </div>
         </div>
-        <div class="settings-box-indev">
+        <div class="settings-box">
             <div class="settings-title">
-                <h2>Keybinds</h2>
+                <h2>To-Go Distances</h2>
                 <div class="subtext-settings">
-                    <h6>Customizable keybinds make it a breeze to keep score without a touchscreen.</h6>
+                    <h6> </h6>
                 </div>
             </div>
             <div class="setting">
-                <input type="text" id="keybind-input" name="keybind" placeholder="Press a key" readonly>
+                <button id="toggle-group" class="button-settings" onclick="toggleButtonGroup()">Jason Mode</button>
             </div>
         </div>
     </div>
@@ -131,7 +131,20 @@
         </div>
     </div>
     <script src="/app.js"></script>
+    <script>    function toggleButtonGroup() {
+        // Retrieve the current state from localStorage
+        let currentState = localStorage.getItem('toggleButtonGroup') === 'true';
 
+        // Toggle the state
+        let newState = !currentState;
+
+        // Save the new state to localStorage
+        localStorage.setItem('toggleButtonGroup', newState.toString());
+
+        // Optionally, log the new state for debugging
+        console.log('Jason Mode:', newState);
+    }
+    </script>
 </body>
 
 </html>
