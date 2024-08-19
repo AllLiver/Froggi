@@ -181,7 +181,7 @@ function notifyUserOfUpdate(latestRelease) {
     // Check if the banner was previously ignored and if it's still within the week
     const ignoredTimestamp = localStorage.getItem('update-banner-ignored');
     if (ignoredTimestamp) {
-        const oneWeek = 7 * 24 * 60 * 60 * 1000; 
+        const oneWeek = 7 * 24 * 60 * 60 * 1000;
         const currentTime = Date.now();
         if (currentTime - parseInt(ignoredTimestamp, 10) < oneWeek) {
             return; // Don't show the banner if it was ignored less than a week ago
@@ -191,7 +191,7 @@ function notifyUserOfUpdate(latestRelease) {
     // Create the banner element
     const updateBanner = document.createElement('div');
     updateBanner.classList.add('update-banner');
-    
+
     // Add the HTML content to the banner
     updateBanner.innerHTML = `
         <div class="update-banner-content">
@@ -201,10 +201,10 @@ function notifyUserOfUpdate(latestRelease) {
             <button class="update-banner-ignore">Ignore</button>
         </div>
     `;
-    
+
     // Append the banner to the body
     document.body.prepend(updateBanner);
-    
+
     // Add event listener for the Ignore button
     document.querySelector('.update-banner-ignore').addEventListener('click', () => {
         updateBanner.style.display = 'none';
@@ -225,8 +225,8 @@ async function checkForUpdate() {
     }
 }
 
-   // Load saved values from local storage on page load
-   window.onload = function() {
+// Load saved values from local storage on page load
+window.onload = function () {
     const savedColor = localStorage.getItem('overlayColor');
     const savedAlpha = localStorage.getItem('overlayAlpha');
 
@@ -242,20 +242,20 @@ async function checkForUpdate() {
 };
 
 // Save values to local storage when inputs change
-document.getElementById('overlay-color').addEventListener('input', function() {
+document.getElementById('overlay-color').addEventListener('input', function () {
     const color = this.value;
     document.getElementById('color-value').textContent = color;
     localStorage.setItem('overlayColor', color);
 });
 
-document.getElementById('overlay-alpha').addEventListener('input', function() {
+document.getElementById('overlay-alpha').addEventListener('input', function () {
     const alpha = this.value;
     document.getElementById('alpha-value').textContent = alpha;
     localStorage.setItem('overlayAlpha', alpha);
 });
 
 // Reset to default values
-document.getElementById('reset-color').addEventListener('click', function() {
+document.getElementById('reset-color').addEventListener('click', function () {
     const defaultColor = '#00b140';
     const defaultAlpha = '100';
 
@@ -291,17 +291,76 @@ function apiCopy(text) {
 }
 
 function applyCooldown(button) {
-    // Disable the button and add the popup-cooldown class
     button.disabled = true;
     button.classList.add('popup-cooldown');
-
-    // Re-enable the button and remove the popup-cooldown class after 7.5 seconds
-    setTimeout(function() {
+    setTimeout(function () {
         button.disabled = false;
         button.classList.remove('popup-cooldown');
     }, 7500);
 }
 
+let modes = ["High School", "Professional", "Jason Mode", "Custom"];
+let currentModeIndex = 0;
+
+function toggleButtonGroup() {
+    currentModeIndex = (currentModeIndex + 1) % modes.length;
+    let currentMode = modes[currentModeIndex];
+    localStorage.setItem('currentMode', currentMode);
+    document.getElementById('current-mode').textContent = `Mode: ${currentMode}`;
+    loadDefaultDistances(currentMode);
+
+    // Toggle custom inputs visibility
+    document.getElementById('custom-togo-inputs').style.display =
+        currentMode === "Custom" ? "block" : "none";
+
+    applyCooldown(document.getElementById('toggle-mode'));
+}
+
+function loadDefaultDistances(mode) {
+    let defaultDistances = {
+        "High School": [0, 10, 20, 30, 40, 50],
+        "Professional": [0, 15, 25, 35, 45, 55],
+        "Jason Mode": [0, 3, 6, 9, 13, 17],
+        "Custom": JSON.parse(localStorage.getItem('customDistances')) || [0, 0, 0, 0, 0, 0]
+    };
+    let distances = defaultDistances[mode];
+    updateToGoButtons(distances);
+}
+
+function updateToGoButtons(distances) {
+    for (let i = 0; i < 6; i++) {
+        let button = document.getElementById(`togo-button-${i + 1}`);
+        button.textContent = distances[i];
+        button.setAttribute('hx-post', `/downs/togo/set/${distances[i]}`);
+    }
+    if (modes[currentModeIndex] === "Custom") {
+        for (let i = 0; i < 6; i++) {
+            document.getElementById(`input${i + 1}`).value = distances[i];
+        }
+    }
+}
+
+function saveDistances() {
+    let distances = [];
+    for (let i = 1; i <= 6; i++) {
+        distances.push(parseInt(document.getElementById(`input${i}`).value) || 0);
+    }
+    localStorage.setItem('customDistances', JSON.stringify(distances));
+    updateToGoButtons(distances);
+    alert('Distances saved!');
+}
+
+// On page load
+window.onload = function () {
+    let savedMode = localStorage.getItem('currentMode') || "High School";
+    currentModeIndex = modes.indexOf(savedMode);
+    document.getElementById('current-mode').textContent = `Mode: ${savedMode}`;
+    loadDefaultDistances(savedMode);
+
+    // Set initial visibility of custom inputs
+    document.getElementById('custom-togo-inputs').style.display =
+        savedMode === "Custom" ? "block" : "none";
+};
 // Initial calls
 pingServer();
 checkForUpdate();

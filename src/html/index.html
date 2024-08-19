@@ -17,7 +17,7 @@
 </head>
 
 <body>
-    <!--TODO: Raise ol off the popup cooldown, alpha channel , look into copy, E008 + W001-3+3-->
+    <!--TODO: Raise ol off the popup cooldown, look into copy, E008 + W001-3+3-->
     <div hx-put="/visibility/css" hx-trigger="every 100ms"></div>
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
@@ -118,12 +118,18 @@
                                 hx-swap="none">+</button>
                         </div>
                         <div class="preset-togo-buttons">
-                            <button class="button-preset-togo" id="togo-button-1" hx-post="/downs/togo/set/0" hx-swap="none">0</button>
-                            <button class="button-preset-togo" id="togo-button-2" hx-post="/downs/togo/set/10" hx-swap="none">10</button>
-                            <button class="button-preset-togo" id="togo-button-3" hx-post="/downs/togo/set/20" hx-swap="none">20</button>
-                            <button class="button-preset-togo" id="togo-button-4" hx-post="/downs/togo/set/30" hx-swap="none">30</button>
-                            <button class="button-preset-togo" id="togo-button-5" hx-post="/downs/togo/set/40" hx-swap="none">40</button>
-                            <button class="button-preset-togo" id="togo-button-6" hx-post="/downs/togo/set/50" hx-swap="none">50</button>  
+                            <button class="button-preset-togo" id="togo-button-1" hx-post="/downs/togo/set/0"
+                                hx-swap="none">0</button>
+                            <button class="button-preset-togo" id="togo-button-2" hx-post="/downs/togo/set/10"
+                                hx-swap="none">10</button>
+                            <button class="button-preset-togo" id="togo-button-3" hx-post="/downs/togo/set/20"
+                                hx-swap="none">20</button>
+                            <button class="button-preset-togo" id="togo-button-4" hx-post="/downs/togo/set/30"
+                                hx-swap="none">30</button>
+                            <button class="button-preset-togo" id="togo-button-5" hx-post="/downs/togo/set/40"
+                                hx-swap="none">40</button>
+                            <button class="button-preset-togo" id="togo-button-6" hx-post="/downs/togo/set/50"
+                                hx-swap="none">50</button>
                         </div>
                     </div>
                 </div>
@@ -337,12 +343,12 @@
                                         <table class="popup-table">
                                             <td>FLAG</td>
                                             <td>
-                                                <button class="button home-popup cooldown"
+                                                <button class="button trigger-home-popup cooldown"
                                                     hx-post="/popup/home?text=Flag%20Home" hx-swap="none"
                                                     onclick="applyCooldown(this)">HOME</button>
                                             </td>
                                             <td>
-                                                <button class="button away-popup cooldown"
+                                                <button class="button trigger-away-popup cooldown"
                                                     hx-post="/popup/away?text=Flag%20Away" hx-swap="none"
                                                     onclick="applyCooldown(this)">AWAY</button>
                                             </td>
@@ -350,12 +356,12 @@
                                             <tr>
                                                 <td>TIMEOUT</td>
                                                 <td>
-                                                    <button class="button home-popup cooldown"
+                                                    <button class="button trigger-home-popup cooldown"
                                                         hx-post="/popup/home?text=Timeout%20Home" hx-swap="none"
                                                         onclick="applyCooldown(this)">HOME</button>
                                                 </td>
                                                 <td>
-                                                    <button class="button away-popup cooldown"
+                                                    <button class="button trigger-away-popup cooldown"
                                                         hx-post="/popup/away?text=Timeout%20Away" hx-swap="none"
                                                         onclick="applyCooldown(this)">AWAY</button>
                                                 </td>
@@ -363,12 +369,12 @@
                                             <tr>
                                                 <td>TOUCHDOWN</td>
                                                 <td>
-                                                    <button class="button home-popup cooldown"
+                                                    <button class="button trigger-home-popup cooldown"
                                                         hx-post="/popup/home?text=Touchdown%20Home" hx-swap="none"
                                                         onclick="applyCooldown(this)">HOME</button>
                                                 </td>
                                                 <td>
-                                                    <button class="button away-popup cooldown"
+                                                    <button class="button trigger-away-popup cooldown"
                                                         hx-post="/popup/away?text=Touchdown%20Away" hx-swap="none"
                                                         onclick="applyCooldown(this)">AWAY</button>
                                                 </td>
@@ -376,12 +382,12 @@
                                             <tr>
                                                 <td>FOUL</td>
                                                 <td>
-                                                    <button class="button home-popup cooldown"
+                                                    <button class="button trigger-home-popup cooldown"
                                                         hx-post="/popup/home?text=Foul%20Home" hx-swap="none"
                                                         onclick="applyCooldown(this)">HOME</button>
                                                 </td>
                                                 <td>
-                                                    <button class="button away-popup cooldown"
+                                                    <button class="button trigger-away-popup cooldown"
                                                         hx-post="/popup/away?text=Foul%20Away" hx-swap="none"
                                                         onclick="applyCooldown(this)">AWAY</button>
                                                 </td>
@@ -405,6 +411,7 @@
                 </div>
             </div>
             <script src="/app.js" defer></script>
-            <script>document.addEventListener("DOMContentLoaded",()=>{let o=1,t=[{post:"/downs/togo/set/0",label:"0"},{post:"/downs/togo/set/10",label:"10"},{post:"/downs/togo/set/20",label:"20"},{post:"/downs/togo/set/30",label:"30"},{post:"/downs/togo/set/40",label:"40"},{post:"/downs/togo/set/50",label:"50"}],e=[{post:"/downs/togo/set/0",label:"0"},{post:"/downs/togo/set/3",label:"3"},{post:"/downs/togo/set/6",label:"6"},{post:"/downs/togo/set/9",label:"9"},{post:"/downs/togo/set/13",label:"13"},{post:"/downs/togo/set/17",label:"17"}];function s(){console.log("Toggling button group");let s=document.querySelectorAll(".button-preset-togo"),l=1===o?e:t;s.forEach((o,t)=>{l[t]&&(o.setAttribute("hx-post",l[t].post),o.textContent=l[t].label,htmx.process(o),console.log(`Updated button ${t}: ${l[t].label}`))}),o=1===o?2:1}"true"===localStorage.getItem("toggleButtonGroup")&&(s(),localStorage.removeItem("toggleButtonGroup"))});</script></body>
+            <script>document.addEventListener("DOMContentLoaded", () => { let t = 1, o = [{ post: "/downs/togo/set/0", label: "0" }, { post: "/downs/togo/set/10", label: "10" }, { post: "/downs/togo/set/20", label: "20" }, { post: "/downs/togo/set/30", label: "30" }, { post: "/downs/togo/set/40", label: "40" }, { post: "/downs/togo/set/50", label: "50" }], e = [{ post: "/downs/togo/set/0", label: "0" }, { post: "/downs/togo/set/3", label: "3" }, { post: "/downs/togo/set/6", label: "6" }, { post: "/downs/togo/set/9", label: "9" }, { post: "/downs/togo/set/13", label: "13" }, { post: "/downs/togo/set/17", label: "17" }], s = JSON.parse(localStorage.getItem("customDistances")); s && (e = s.map((t, o) => ({ post: `/downs/togo/set/${t}`, label: t.toString() }))); let l = localStorage.getItem("currentGroup"); function n() { console.log("Toggling button group"); let s = document.querySelectorAll(".button-preset-togo"), l = 1 === t ? e : o; s.forEach((t, o) => { l[o] && (t.setAttribute("hx-post", l[o].post), t.textContent = l[o].label, htmx.process(t), console.log(`Updated button ${o}: ${l[o].label}`)) }), t = 1 === t ? 2 : 1, localStorage.setItem("currentGroup", t.toString()) } l && (t = parseInt(l)), n(); let g = document.getElementById("toggle-mode"); g && g.addEventListener("click", n), "true" === localStorage.getItem("toggleButtonGroup") && (n(), localStorage.removeItem("toggleButtonGroup")) });</script>
+</body>
 
 </html>

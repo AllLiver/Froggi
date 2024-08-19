@@ -741,7 +741,7 @@ iframe {
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 2.22vh;
+    font-size: 1.5rem;
 }
 
 .button-increment-home,
@@ -1260,7 +1260,7 @@ iframe {
     margin-top: 10px;
 }
 
-.home-popup {
+.trigger-home-popup {
     background-color: var(--color-blue, #007BFF);
     color: white;
     border: none;
@@ -1273,7 +1273,7 @@ iframe {
     margin: 0.5vh;
 }
 
-.away-popup {
+.trigger-away-popup {
     background-color: var(--color-orange, #ff8601);
     color: white;
     border: none;
@@ -1307,7 +1307,7 @@ iframe {
     background-color: #161718;
 }
 
-.button.home-popup {
+.button.trigger-home-popup {
     border-color: blue;
 }
 
@@ -1341,7 +1341,6 @@ iframe {
     }
 
     .score-rectangle,
-    .preview-rectangle,
     .downs-rectangle,
     .netstats-rectangle,
     .countdown-rectangle,
@@ -1358,7 +1357,6 @@ iframe {
 @media (max-width: 768px) {
 
     .score-rectangle,
-    .preview-rectangle,
     .downs-rectangle,
     .netstats-rectangle,
     .countdown-rectangle,
@@ -1373,11 +1371,6 @@ iframe {
     }
 
     .score-title {
-        left: 50%;
-        transform: translateX(-50%);
-    }
-
-    .preview-title {
         left: 50%;
         transform: translateX(-50%);
     }
@@ -1738,6 +1731,7 @@ canvas {
     height: 100vh;
     position: relative;
     margin-right: 2vw;
+    bottom: 2.5vh;
 }
 
 #overlay-body {
@@ -1822,79 +1816,6 @@ canvas {
 
 /* Ol-Popups */
 
-.ol-away-popup {  
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    bottom: 9vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-away 2s ease-out infinite;
-}
-
-.ol-home-popup {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    font-size: large;
-    width: auto;
-    text-align: center;
-    border: 2px solid transparent;
-    box-sizing: border-box;
-    z-index: 999;
-    /* Make home appear above away :) */
-    pointer-events: none;
- }
-
-.popup-home {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    bottom: 9vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-home 2s ease-out infinite;
-}
-
-.ol-popup-home.show {
-    bottom: 9vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-away 2s ease-out infinite;
-}
-
-.popup-away {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    bottom: 9vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-away 2s ease-out infinite;
-}
-
 .popup-text {
     position: fixed;
     bottom: -100%;
@@ -1904,15 +1825,35 @@ canvas {
     color: #000;
     padding: 1.85vh;
     border-radius: 10px;
-    bottom: 9vh;
+    bottom: 9.5vh;
     opacity: 1;
     transition-delay: 0.2s;
     animation: borderPulse-home 2s ease-out infinite;
 }
 
-.ol-popup-home {
-    display: none;
+.ol-home-popup {  
+    position: fixed;
+    bottom: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #000;
+    padding: 1.85vh;
+    border-radius: 10px;
+    bottom: 9vh;
+    opacity: 1;
+    transition-delay: 0.2s;
+    animation: borderPulse-home 2s ease-out infinite;
+    z-index: 999;
 }
+
+.ol-popup-home.show {
+    bottom: 9.5vh;
+    opacity: 1;
+    transition-delay: 0.2s;
+    animation: borderPulse-home 2s ease-out infinite;
+}
+
 @keyframes borderPulse-home {
     0% {
         border-color: transparent;
@@ -1931,7 +1872,7 @@ canvas {
 }
 
 
-.ol-popup-away {
+.ol-popup-away, .ol-popup-home {
     position: fixed;
     bottom: -100%;
     left: 50%;
@@ -1950,11 +1891,26 @@ canvas {
     pointer-events: none;
 }
 
-.ol-popup-away.show {
-    bottom: 9vh;
+.ol-away-popup {  
+    position: fixed;
+    bottom: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ffffff;
+    color: #000;
+    padding: 1.85vh;
+    border-radius: 10px;
+    bottom: 9.5vh;
     opacity: 1;
     transition-delay: 0.2s;
-    animation: borderPulse-away 2s ease-out infinite;
+    animation: borderPulse-away 2s infinite;
+}
+
+.ol-popup-away.show {
+    bottom: 9.5vh;
+    opacity: 1;
+    transition-delay: 0.2s;
+    animation: borderPulse-away 2s infinite;
 }
 
 @keyframes borderPulse-away {
@@ -2149,7 +2105,14 @@ form input[type="submit"],
 .settings-container {
     max-width: 41.67vw;
     margin: 0 auto;
+}
+
+#settings-overlay-box {
     margin-top: 5vh;
+}
+
+#toggle-group {
+    margin-right: 1vw;
 }
 
 .settings-box {
@@ -2181,6 +2144,10 @@ form input[type="submit"],
     color: var(--font-color-italic, #e0e0e0);
     font-style: italic;
     text-wrap: balance;
+}
+
+.number-input {
+    width: 2vw;
 }
 
 .theme-active {

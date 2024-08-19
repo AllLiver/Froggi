@@ -1775,7 +1775,7 @@ async fn overlay_team_border_css_handler(State(state): State<AppState>) -> impl 
             return Html::from(format!(
                 "
             <style>
-                .ol-home-box {{
+                .ol-home-box, .button {{
                     border-color: {};
                     border-style: solid;
                 }}
@@ -2213,7 +2213,7 @@ async fn ocr_api_toggle_handler(jar: CookieJar) -> impl IntoResponse {
 
 async fn ocr_api_button_handler() -> impl IntoResponse {
     return Html::from(format!(
-        "<button hx-post=\"/ocr/api/toggle\">{} OCR API</button>",
+        "<button class=\"button-settings\" hx-post=\"/ocr/api/toggle\">{} OCR API</button>",
         if !*OCR_API.lock().await {
             "Enable"
         } else {
@@ -2240,7 +2240,11 @@ async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
         return Response::builder()
             .status(StatusCode::OK)
             .body(format!(
-                "<h6 id=\"api-key\">{}</h6><button class=\"copy-button\" onclick=\"apiCopy('{}')\">Copy</button>",
+            "<div class=\"your-container-class\">
+                <h6 id=\"api-key\">{}</h6>
+                <button class=\"copy-button\" onclick=\"apiCopy('{}')\">Copy</button>
+                <button class=\"button-settings\" hx-post=\"/api/key/reveal\" hx-target=\"#api-key\">Reveal Key</button>
+             </div>",
                 hidden_key, login.api_key
             ))
             .unwrap();
@@ -2299,7 +2303,6 @@ async fn popup_handler(
 
 async fn popup_home_ticker() {
     loop {
-
         let start_time = Instant::now();
         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
         let mut popups = POPUPS_HOME.lock().await;
