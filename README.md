@@ -20,7 +20,7 @@ If you would like to run Froggi as a standalone executable, then follow the guid
 Once you start Froggi it will prompt you to create a server username and password  
 Setting up match presets and sponsors is done through the "Sponsors & Teaminfo" tab in the burger menu  
 Other settings can be found in the "Settings" tab in the burger menu  
-Finally, there are some niche settings in "settings.json" located in the directory of Froggi's binary, these settings will only take effect on a restart of Froggi  
+Finally, there are some niche settings in "settings.json" located in the directory of Froggi's binary, these settings will only take effect upon a restart of Froggi  
 
 # Compilation 
 - Clone the main branch of Froggi by running
@@ -38,8 +38,8 @@ The compiled binary will be located in /target/release
 # Roadmap
 Froggi is an indev project so change is very likley.
 Here are some features/updates planned in no particular order
- - 🗺️ Options for more sports
- - 🗺️ Web acsessible logs
+ - 🗺️ Ability for more sports
+ - 🗺️ Pop-up animations
 
 # Tech Stack
  - Rust with Axum for the backend
