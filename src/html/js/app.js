@@ -315,7 +315,6 @@ function toggleButtonGroup() {
 
     applyCooldown(document.getElementById('toggle-mode'));
 }
-
 function loadDefaultDistances(mode) {
     let defaultDistances = {
         "High School": [0, 10, 20, 30, 40, 50],
@@ -323,7 +322,7 @@ function loadDefaultDistances(mode) {
         "Jason Mode": [0, 3, 6, 9, 13, 17],
         "Custom": JSON.parse(localStorage.getItem('customDistances')) || [0, 0, 0, 0, 0, 0]
     };
-    let distances = defaultDistances[mode];
+    let distances = defaultDistances[mode] || defaultDistances["High School"];
     updateToGoButtons(distances);
 }
 

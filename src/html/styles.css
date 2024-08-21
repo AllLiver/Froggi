@@ -2105,6 +2105,7 @@ form input[type="submit"],
 .settings-container {
     max-width: 41.67vw;
     margin: 0 auto;
+    margin-top: 2.22vh;
 }
 
 #settings-overlay-box {
@@ -2120,6 +2121,10 @@ form input[type="submit"],
     border-radius: 8px;
     padding: 2.22vh;
     margin-bottom: 2.22vh;
+}
+
+.button-settings-hidden {
+    display: none;
 }
 
 .settings-box-indev {
