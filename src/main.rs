@@ -144,6 +144,10 @@ async fn main() -> Result<()> {
         .await
         .expect("Could not create sponsors directory");
 
+    create_dir_all(format!("./team-presets"))
+        .await
+        .expect("Could not create sponsors directory");
+
     // Load sponsor img tags
     load_sponsors().await;
 
