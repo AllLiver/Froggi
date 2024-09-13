@@ -882,12 +882,12 @@ async fn uptime_display_handler() -> impl IntoResponse {
 async fn game_clock_ticker() {
     loop {
         let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
         let mut game_clock = GAME_CLOCK.lock().await;
         let mut game_clock_start = GAME_CLOCK_START.lock().await;
 
         if *game_clock_start && !*OCR_API.lock().await {
-            let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
+            let time_diff = -1 * (Instant::now() - call_time).as_millis() as isize;
             if *game_clock as isize + time_diff >= 0 {
                 *game_clock = (*game_clock as isize + time_diff) as usize;
             } else {
@@ -924,7 +924,7 @@ async fn game_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl I
 async fn game_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
     if verify_session(jar).await {
         let mut game_clock = GAME_CLOCK.lock().await;
-        *game_clock = mins * 60;
+        *game_clock = mins * 60 * 1000;
 
         printlg!("SET game_clock: {}", game_clock);
 
@@ -946,7 +946,7 @@ async fn game_clock_update_handler(
 ) -> impl IntoResponse {
     if verify_session(jar).await {
         let mut game_clock = GAME_CLOCK.lock().await;
-        let time_diff = mins * 60 + secs;
+        let time_diff = mins * 60 * 1000 + secs * 1000;
 
         if *game_clock as isize + time_diff >= 0 {
             *game_clock = (*game_clock as isize + time_diff) as usize;
@@ -971,11 +971,15 @@ async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse 
     let mut time_display = String::new();
 
     if o == "minutes" {
-        time_display = (*game_clock / 60).to_string();
+        time_display = (*game_clock / 1000 / 60).to_string();
     } else if o == "seconds" {
-        time_display = (*game_clock % 60).to_string();
+        time_display = (*game_clock / 1000 % 60).to_string();
     } else if o == "both" {
-        time_display = format!("{}:{:02}", *game_clock / 60, *game_clock % 60);
+        if *game_clock > 1000 * 60 {
+            time_display = format!("{}:{:02}", *game_clock / 1000 / 60, *game_clock / 1000 % 60);
+        } else {
+            time_display = format!("{}:{:02}:{:02}", *game_clock / 1000 / 60, *game_clock / 1000 % 60, *game_clock / 10 % 100);
+        }
     }
 
     Html::from(time_display)
@@ -1745,12 +1749,22 @@ async fn overlay_clock_handler(State(state): State<AppState>) -> impl IntoRespon
         _ => "OT",
     };
 
-    Html::from(format!(
-        "{}:{:02} - {}",
-        *game_clock / 60,
-        *game_clock % 60,
-        quarter_display
-    ))
+    if *game_clock >= 1000 * 60 {
+        Html::from(format!(
+            "{}:{:02} - {}",
+            *game_clock / 1000 / 60,
+            *game_clock / 1000 % 60,
+            quarter_display
+        ))
+    } else {
+        Html::from(format!(
+            "{}:{:02}:{:02} - {}",
+            *game_clock / 1000 / 60,
+            *game_clock / 1000 % 60,
+            *game_clock / 10 % 100,
+            quarter_display
+        ))
+    }
 }
 
 async fn countdown_display_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -1880,9 +1894,7 @@ async fn downs_togo_update_handler(
 ) -> impl IntoResponse {
     if verify_session(jar).await {
         let mut downs_togo = state.downs_togo.lock().await;
-        if (0..=99).contains(&(*downs_togo as i8 + y)) {
-            *downs_togo = (*downs_togo as i8 + y) as u8;
-        }
+        *downs_togo = (*downs_togo as i8 + y) as u8;
 
         printlg!("UPDATE togo: {}", *downs_togo);
 
@@ -1913,7 +1925,12 @@ async fn downs_display_handler(
             _ => Html::from(String::new()),
         };
     } else if t == "togo" {
-        return Html::from(state.downs_togo.lock().await.to_string());
+        let downs_togo = state.downs_togo.lock().await;
+
+        if *downs_togo == 255 {
+            return Html::from(String::from("Goal"));
+        }
+        return Html::from(downs_togo.to_string());
     } else if t == "both" {
         let down = state.down.lock().await;
 
@@ -1926,11 +1943,16 @@ async fn downs_display_handler(
         };
 
         drop(down);
+        let downs_togo = state.downs_togo.lock().await;
 
         return Html::from(format!(
             "{} & {}",
             down_display,
-            *state.downs_togo.lock().await
+            if *downs_togo == 255 {
+                String::from("Goal")
+            } else {
+                downs_togo.to_string()
+            }
         ));
     } else {
         return Html::from(String::new());
