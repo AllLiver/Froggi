@@ -2218,13 +2218,23 @@ async fn logs_handler() -> impl IntoResponse {
 
 async fn auth_session_layer(
     jar: CookieJar,
+    headers: HeaderMap,
     request: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
     if verify_session(jar).await {
         return Ok(next.run(request).await);
     } else {
-        return Err(StatusCode::UNAUTHORIZED);
+        if let Some(h) = headers.get("api-auth") {
+            let login: Login = serde_json::from_str(&tokio::fs::read_to_string("./login.json").await.expect("Failed to read login.json")).expect("Failed to deserialize login.json");
+            if h.to_str().expect("Failed to cast headervalue into a str") == login.api_key {
+                return Ok(next.run(request).await); 
+            } else {
+                return Err(StatusCode::UNAUTHORIZED);
+            }
+        } else {
+            return Err(StatusCode::UNAUTHORIZED);
+        }
     }
 }
 
