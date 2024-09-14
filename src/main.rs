@@ -5,15 +5,10 @@ use argon2::{
     Argon2,
 };
 use axum::{
-    body::Body,
-    extract::{DefaultBodyLimit, Multipart, Path, Query, State},
-    http::{
+    body::Body, extract::{DefaultBodyLimit, Multipart, Path, Query, Request, State}, http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
-        HeaderMap, HeaderName, HeaderValue, Response, StatusCode,
-    },
-    response::{Html, IntoResponse},
-    routing::{get, head, post, put},
-    Form, Router,
+        HeaderMap, HeaderName, HeaderValue, StatusCode,
+    }, middleware::{self, Next}, response::{Html, IntoResponse, Response}, routing::{get, head, post, put}, Form, Router
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
@@ -22,10 +17,7 @@ use lazy_static::lazy_static;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap,
-    path::PathBuf,
-    sync::Arc,
-    time::{Instant, UNIX_EPOCH},
+    collections::HashMap, path::PathBuf, sync::Arc, time::{Instant, UNIX_EPOCH}
 };
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, remove_file, File},
@@ -33,6 +25,7 @@ use tokio::{
     signal,
     sync::Mutex,
 };
+use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
 
@@ -164,10 +157,10 @@ async fn main() -> Result<()> {
 
     let app = Router::new()
         // Basic routes
-        .route("/", get(index_handler))
+        .route("/", get(index_handler).layer(middleware::from_fn(auth_give_session_layer)))
         .route("/", head(ping_handler))
         .route("/overlay", get(overlay_handler))
-        .route("/settings", get(settings_handler))
+        .route("/settings", get(settings_handler).layer(middleware::from_fn(auth_give_session_layer)))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
         .route("/app.js", get(app_js_handler))
@@ -180,51 +173,91 @@ async fn main() -> Result<()> {
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
         // Point routes
-        .route("/home-points/update/:a", post(home_points_update_handler))
+        .route(
+            "/home-points/update/:a",
+            post(home_points_update_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/home-points/display", put(home_points_display_handler))
-        .route("/away-points/update/:a", post(away_points_update_handler))
+        .route(
+            "/away-points/update/:a",
+            post(away_points_update_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/away-points/display", put(away_points_display_handler))
         // Game clock routes
         .route("/game-clock/display/:o", put(game_clock_display_handler))
-        .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
-        .route("/game-clock/set/:mins", post(game_clock_set_handler))
+        .route(
+            "/game-clock/ctl/:o",
+            post(game_clock_ctl_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/game-clock/set/:mins",
+            post(game_clock_set_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route(
             "/game-clock/update/:mins/:secs",
-            post(game_clock_update_handler),
+            post(game_clock_update_handler).layer(middleware::from_fn(auth_session_layer)),
         )
         // Countdown clock routes
         .route(
             "/countdown-clock/display/:o",
             put(countdown_clock_display_handler),
         )
-        .route("/countdown-clock/ctl/:o", post(countdown_clock_ctl_handler))
+        .route(
+            "/countdown-clock/ctl/:o",
+            post(countdown_clock_ctl_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route(
             "/countdown-clock/set/:mins",
-            post(countdown_clock_set_handler),
+            post(countdown_clock_set_handler).layer(middleware::from_fn(auth_session_layer)),
         )
         .route(
             "/countdown-clock/update/:mins/:secs",
-            post(countdown_clock_update_handler),
+            post(countdown_clock_update_handler).layer(middleware::from_fn(auth_session_layer)),
         )
-        .route("/countdown/text/set", post(countdown_text_set_handler))
+        .route(
+            "/countdown/text/set",
+            post(countdown_text_set_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         // Quarter routes
         .route("/quarter/display", put(quarter_display_handler))
-        .route("/quarter/set/:q", post(quarter_set_handler))
-        .route("/quarter/update/:a", post(quarter_update_handler))
+        .route(
+            "/quarter/set/:q",
+            post(quarter_set_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/quarter/update/:a",
+            post(quarter_update_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         // Teaminfo routes
-        .route("/teaminfo", get(teaminfo_handler))
-        .route("/teaminfo/create", post(teaminfo_preset_create_handler))
+        .route("/teaminfo", get(teaminfo_handler).layer(middleware::from_fn(auth_give_session_layer)))
+        .route(
+            "/teaminfo/create",
+            post(teaminfo_preset_create_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
-        .route("/teaminfo/select/:id", post(teaminfo_preset_select_handler))
-        .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
+        .route(
+            "/teaminfo/select/:id",
+            post(teaminfo_preset_select_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/teaminfo/remove/:id",
+            post(teaminfo_preset_remove_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/teaminfo/name/:t", put(team_name_display_handler))
         // Sponsor routes
         .route(
             "/sponsors/upload",
-            post(upload_sponsors_handler).layer(DefaultBodyLimit::max(2000000000)),
+            post(upload_sponsors_handler).layer(
+                ServiceBuilder::new()
+                    .layer(middleware::from_fn(auth_session_layer))
+                    .layer(DefaultBodyLimit::max(2000000000)),
+            ),
         )
         .route("/sponsors/manage", put(sponsors_management_handler))
-        .route("/sponsors/remove/:id", post(sponsor_remove_handler))
+        .route(
+            "/sponsors/remove/:id",
+            post(sponsor_remove_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/sponsors/display", put(sponsor_display_handler))
         // Overlay display routes
         .route("/points/overview", put(points_overview_handler))
@@ -236,28 +269,58 @@ async fn main() -> Result<()> {
             put(overlay_team_border_css_handler),
         )
         // Downs routes
-        .route("/downs/set/:d", post(downs_set_handler))
-        .route("/downs/update/:d", post(downs_update_handler))
-        .route("/downs/togo/set/:y", post(downs_togo_set_handler))
-        .route("/downs/togo/update/:y", post(downs_togo_update_handler))
+        .route(
+            "/downs/set/:d",
+            post(downs_set_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/downs/update/:d",
+            post(downs_update_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/downs/togo/set/:y",
+            post(downs_togo_set_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/downs/togo/update/:y",
+            post(downs_togo_update_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/downs/display/:t", put(downs_display_handler))
         // Visibility routes
         .route("/visibility/buttons", put(visibility_buttons_handler))
-        .route("/visibility/toggle/:v", post(visibility_toggle_handler))
+        .route(
+            "/visibility/toggle/:v",
+            post(visibility_toggle_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/visibility/css", put(visibility_css_handler))
         // OCR API
         .route("/ocr", post(ocr_handler))
-        .route("/ocr/api/toggle", post(ocr_api_toggle_handler))
+        .route(
+            "/ocr/api/toggle",
+            post(ocr_api_toggle_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/ocr/api/button", put(ocr_api_button_handler))
         // API
         .route("/api/key/check/:k", post(api_key_check_handler))
-        .route("/api/key/show", put(api_key_show_handler))
-        .route("/api/key/reveal", post(api_key_reveal_handler))
+        .route(
+            "/api/key/show",
+            put(api_key_show_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
+        .route(
+            "/api/key/reveal",
+            post(api_key_reveal_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         // Popups
-        .route("/popup/:t", post(popup_handler))
+        .route(
+            "/popup/:t",
+            post(popup_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/popup/show", put(popup_show_handler))
         // Misc Handlers
-        .route("/reset", post(reset_handler))
+        .route(
+            "/reset",
+            post(reset_handler).layer(middleware::from_fn(auth_session_layer)),
+        )
         .route("/logs", put(logs_handler))
         // Information routes, state, and fallback
         .route(
@@ -299,52 +362,12 @@ struct Config {
 
 // region: basic pages
 
-async fn index_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
-        const HTML: &'static str = include_str!("./html/index.html");
-        if verify_session(jar).await {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .body(String::from(HTML))
-                .unwrap();
-        } else {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header(SET_COOKIE, session_cookie_builder().await)
-                .body(String::from(HTML))
-                .unwrap();
-        }
-    } else {
-        return Response::builder()
-            .status(StatusCode::SEE_OTHER)
-            .header(LOCATION, HeaderValue::from_static("/login"))
-            .body(String::new())
-            .unwrap();
-    }
+async fn index_handler() -> impl IntoResponse {
+    Html::from(include_str!("./html/index.html"))
 }
 
-async fn teaminfo_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
-        const HTML: &'static str = include_str!("./html/teaminfo.html");
-        if verify_session(jar).await {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .body(String::from(HTML))
-                .unwrap();
-        } else {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header(SET_COOKIE, session_cookie_builder().await)
-                .body(String::from(HTML))
-                .unwrap();
-        }
-    } else {
-        return Response::builder()
-            .status(StatusCode::SEE_OTHER)
-            .header(LOCATION, HeaderValue::from_static("/login"))
-            .body(String::new())
-            .unwrap();
-    }
+async fn teaminfo_handler() -> impl IntoResponse {
+    Html::from(include_str!("./html/teaminfo.html"))
 }
 
 async fn overlay_handler() -> impl IntoResponse {
@@ -362,28 +385,8 @@ async fn overlay_handler() -> impl IntoResponse {
     }
 }
 
-async fn settings_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
-        const HTML: &'static str = include_str!("./html/settings.html");
-        if verify_session(jar).await {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .body(String::from(HTML))
-                .unwrap();
-        } else {
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header(SET_COOKIE, session_cookie_builder().await)
-                .body(String::from(HTML))
-                .unwrap();
-        }
-    } else {
-        return Response::builder()
-            .status(StatusCode::SEE_OTHER)
-            .header(LOCATION, HeaderValue::from_static("/login"))
-            .body(String::new())
-            .unwrap();
-    }
+async fn settings_handler() -> impl IntoResponse {
+    Html::from(include_str!("./html/settings.html"))
 }
 
 async fn css_handler() -> impl IntoResponse {
@@ -796,54 +799,32 @@ async fn ping_handler() -> impl IntoResponse {
 
 async fn home_points_update_handler(
     Path(a): Path<i32>,
-    jar: CookieJar,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut home_points = state.home_points.lock().await;
+    let mut home_points = state.home_points.lock().await;
 
-        if *home_points as i32 + a >= 0 {
-            *home_points = (*home_points as i32 + a) as u32;
-        }
-
-        printlg!("UPDATE home_points: {}", *home_points);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if *home_points as i32 + a >= 0 {
+        *home_points = (*home_points as i32 + a) as u32;
     }
+
+    printlg!("UPDATE home_points: {}", *home_points);
+
+    return StatusCode::OK;
 }
 
 async fn away_points_update_handler(
     Path(a): Path<i32>,
-    jar: CookieJar,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut away_points = state.away_points.lock().await;
+    let mut away_points = state.away_points.lock().await;
 
-        if *away_points as i32 + a >= 0 {
-            *away_points = (*away_points as i32 + a) as u32;
-        }
-
-        printlg!("UPDATE away_points: {}", *away_points);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if *away_points as i32 + a >= 0 {
+        *away_points = (*away_points as i32 + a) as u32;
     }
+
+    printlg!("UPDATE away_points: {}", *away_points);
+
+    return StatusCode::OK;
 }
 
 async fn home_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -897,73 +878,40 @@ async fn game_clock_ticker() {
     }
 }
 
-async fn game_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut game_clock_start = GAME_CLOCK_START.lock().await;
+async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse {
+    let mut game_clock_start = GAME_CLOCK_START.lock().await;
 
-        if a == "start" {
-            *game_clock_start = true;
-        } else if a == "stop" {
-            *game_clock_start = false;
-        }
-
-        printlg!("UPDATE game_clock_start: {}", *game_clock_start);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if a == "start" {
+        *game_clock_start = true;
+    } else if a == "stop" {
+        *game_clock_start = false;
     }
+
+    printlg!("UPDATE game_clock_start: {}", *game_clock_start);
+
+    return StatusCode::OK;
 }
 
-async fn game_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut game_clock = GAME_CLOCK.lock().await;
-        *game_clock = mins * 60 * 1000;
+async fn game_clock_set_handler(Path(mins): Path<usize>) -> impl IntoResponse {
+    let mut game_clock = GAME_CLOCK.lock().await;
+    *game_clock = mins * 60 * 1000;
 
-        printlg!("SET game_clock: {}", game_clock);
+    printlg!("SET game_clock: {}", game_clock);
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return StatusCode::OK;
 }
 
-async fn game_clock_update_handler(
-    jar: CookieJar,
-    Path((mins, secs)): Path<(isize, isize)>,
-) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut game_clock = GAME_CLOCK.lock().await;
-        let time_diff = mins * 60 * 1000 + secs * 1000;
+async fn game_clock_update_handler(Path((mins, secs)): Path<(isize, isize)>) -> impl IntoResponse {
+    let mut game_clock = GAME_CLOCK.lock().await;
+    let time_diff = mins * 60 * 1000 + secs * 1000;
 
-        if *game_clock as isize + time_diff >= 0 {
-            *game_clock = (*game_clock as isize + time_diff) as usize;
-        }
-
-        printlg!("UPDATE game_clock: {}", game_clock);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if *game_clock as isize + time_diff >= 0 {
+        *game_clock = (*game_clock as isize + time_diff) as usize;
     }
+
+    printlg!("UPDATE game_clock: {}", game_clock);
+
+    return StatusCode::OK;
 }
 
 async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse {
@@ -978,7 +926,12 @@ async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse 
         if *game_clock > 1000 * 60 {
             time_display = format!("{}:{:02}", *game_clock / 1000 / 60, *game_clock / 1000 % 60);
         } else {
-            time_display = format!("{}:{:02}:{:02}", *game_clock / 1000 / 60, *game_clock / 1000 % 60, *game_clock / 10 % 100);
+            time_display = format!(
+                "{}:{:02}:{:02}",
+                *game_clock / 1000 / 60,
+                *game_clock / 1000 % 60,
+                *game_clock / 10 % 100
+            );
         }
     }
 
@@ -1003,73 +956,42 @@ async fn countdown_clock_ticker() {
     }
 }
 
-async fn countdown_clock_ctl_handler(jar: CookieJar, Path(a): Path<String>) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
+async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse {
+    let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
 
-        if a == "start" {
-            *countdown_clock_start = true;
-        } else if a == "stop" {
-            *countdown_clock_start = false;
-        }
-
-        printlg!("UPDATE countdown_clock_start: {}", *countdown_clock_start);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if a == "start" {
+        *countdown_clock_start = true;
+    } else if a == "stop" {
+        *countdown_clock_start = false;
     }
+
+    printlg!("UPDATE countdown_clock_start: {}", *countdown_clock_start);
+
+    return StatusCode::OK;
 }
 
-async fn countdown_clock_set_handler(jar: CookieJar, Path(mins): Path<usize>) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-        *countdown_clock = mins * 60;
+async fn countdown_clock_set_handler(Path(mins): Path<usize>) -> impl IntoResponse {
+    let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
+    *countdown_clock = mins * 60;
 
-        printlg!("SET countdown_clock: {}", *countdown_clock);
+    printlg!("SET countdown_clock: {}", *countdown_clock);
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return StatusCode::OK;
 }
 
 async fn countdown_clock_update_handler(
-    jar: CookieJar,
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut coundown_clock = COUNTDOWN_CLOCK.lock().await;
-        let time_diff = mins * 60 + secs;
+    let mut coundown_clock = COUNTDOWN_CLOCK.lock().await;
+    let time_diff = mins * 60 + secs;
 
-        if *coundown_clock as isize + time_diff >= 0 {
-            *coundown_clock = (*coundown_clock as isize + time_diff) as usize;
-        }
-
-        printlg!("UPDATE countdown_clock: {}", *coundown_clock);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if *coundown_clock as isize + time_diff >= 0 {
+        *coundown_clock = (*coundown_clock as isize + time_diff) as usize;
     }
+
+    printlg!("UPDATE countdown_clock: {}", *coundown_clock);
+
+    return StatusCode::OK;
 }
 
 async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse {
@@ -1093,26 +1015,15 @@ struct TextPayload {
 }
 
 async fn countdown_text_set_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Form(payload): Form<TextPayload>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut countdown_text = state.countdown_text.lock().await;
-        *countdown_text = payload.text;
+    let mut countdown_text = state.countdown_text.lock().await;
+    *countdown_text = payload.text;
 
-        printlg!("SET countdown_text: {}", countdown_text);
+    printlg!("SET countdown_text: {}", countdown_text);
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return StatusCode::OK;
 }
 
 // endregion: time
@@ -1133,52 +1044,30 @@ async fn quarter_display_handler(State(state): State<AppState>) -> impl IntoResp
 }
 
 async fn quarter_set_handler(
-    jar: CookieJar,
     Path(q): Path<u8>,
     State(state): State<AppState>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut quarter = state.quarter.lock().await;
-        *quarter = q;
+    let mut quarter = state.quarter.lock().await;
+    *quarter = q;
 
-        printlg!("SET quarter: {}", *quarter);
+    printlg!("SET quarter: {}", *quarter);
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return StatusCode::OK;
 }
 
 async fn quarter_update_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(a): Path<i8>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut quarter = state.quarter.lock().await;
+    let mut quarter = state.quarter.lock().await;
 
-        if *quarter as i8 + a >= 1 && *quarter as i8 + a <= 5 {
-            *quarter = (*quarter as i8 + a) as u8;
-        }
-
-        printlg!("UPDATE quarter: {}", *quarter);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if *quarter as i8 + a >= 1 && *quarter as i8 + a <= 5 {
+        *quarter = (*quarter as i8 + a) as u8;
     }
+
+    printlg!("UPDATE quarter: {}", *quarter);
+
+    return StatusCode::OK;
 }
 
 // endregion: quarters
@@ -1202,104 +1091,96 @@ impl Teaminfo {
     }
 }
 
-async fn teaminfo_preset_create_handler(jar: CookieJar, mut form: Multipart) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut teaminfo = Teaminfo::new();
-        let id = id_create(12);
+async fn teaminfo_preset_create_handler(mut form: Multipart) -> impl IntoResponse {
+    let mut teaminfo = Teaminfo::new();
+    let id = id_create(12);
 
-        create_dir_all(format!("team-presets/{}", id))
-            .await
-            .expect("Could not create team preset directory");
+    create_dir_all(format!("team-presets/{}", id))
+        .await
+        .expect("Could not create team preset directory");
 
-        while let Some(field) = form
-            .next_field()
-            .await
-            .expect("Could not get next field of preset create multipart")
-        {
-            match field.name().unwrap() {
-                "home_name" => {
-                    teaminfo.home_name = field.text().await.unwrap();
-                }
-                "home_img" => {
-                    let mut f = File::create(format!(
-                        "team-presets/{}/home.{}",
-                        id,
-                        field
-                            .file_name()
-                            .unwrap()
-                            .to_string()
-                            .split(".")
-                            .collect::<Vec<&str>>()[1]
-                    ))
-                    .await
-                    .expect("Could not create home img");
-
-                    f.write_all(field.bytes().await.unwrap().as_ref())
-                        .await
-                        .expect("Could not write to home img");
-                }
-                "home_color" => {
-                    teaminfo.home_color = field.text().await.unwrap();
-                }
-                "away_name" => {
-                    teaminfo.away_name = field.text().await.unwrap();
-                }
-                "away_img" => {
-                    let mut f = File::create(format!(
-                        "team-presets/{}/away.{}",
-                        id,
-                        field
-                            .file_name()
-                            .unwrap()
-                            .to_string()
-                            .split(".")
-                            .collect::<Vec<&str>>()[1]
-                    ))
-                    .await
-                    .expect("Could not create away img");
-
-                    f.write_all(field.bytes().await.unwrap().as_ref())
-                        .await
-                        .expect("Could not write to away img");
-                }
-                "away_color" => {
-                    teaminfo.away_color = field.text().await.unwrap();
-                }
-                _ => {}
+    while let Some(field) = form
+        .next_field()
+        .await
+        .expect("Could not get next field of preset create multipart")
+    {
+        match field.name().unwrap() {
+            "home_name" => {
+                teaminfo.home_name = field.text().await.unwrap();
             }
+            "home_img" => {
+                let mut f = File::create(format!(
+                    "team-presets/{}/home.{}",
+                    id,
+                    field
+                        .file_name()
+                        .unwrap()
+                        .to_string()
+                        .split(".")
+                        .collect::<Vec<&str>>()[1]
+                ))
+                .await
+                .expect("Could not create home img");
+
+                f.write_all(field.bytes().await.unwrap().as_ref())
+                    .await
+                    .expect("Could not write to home img");
+            }
+            "home_color" => {
+                teaminfo.home_color = field.text().await.unwrap();
+            }
+            "away_name" => {
+                teaminfo.away_name = field.text().await.unwrap();
+            }
+            "away_img" => {
+                let mut f = File::create(format!(
+                    "team-presets/{}/away.{}",
+                    id,
+                    field
+                        .file_name()
+                        .unwrap()
+                        .to_string()
+                        .split(".")
+                        .collect::<Vec<&str>>()[1]
+                ))
+                .await
+                .expect("Could not create away img");
+
+                f.write_all(field.bytes().await.unwrap().as_ref())
+                    .await
+                    .expect("Could not write to away img");
+            }
+            "away_color" => {
+                teaminfo.away_color = field.text().await.unwrap();
+            }
+            _ => {}
         }
-
-        let write_json =
-            serde_json::to_string_pretty(&teaminfo).expect("Could not serialize teaminfo");
-
-        let mut f = File::create(format!("team-presets/{}/teams.json", id))
-            .await
-            .expect("Could not create teams.json");
-        f.write_all(write_json.as_bytes())
-            .await
-            .expect("Could not write to teams.json");
-
-        printlg!(
-            "CREATE teaminfo_preset: {} vs {} (id: {})",
-            teaminfo.home_name,
-            teaminfo.away_name,
-            id
-        );
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .header(
-                HeaderName::from_static("hx-trigger"),
-                HeaderValue::from_static("reload-selector"),
-            )
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
     }
+
+    let write_json = serde_json::to_string_pretty(&teaminfo).expect("Could not serialize teaminfo");
+
+    let mut f = File::create(format!("team-presets/{}/teams.json", id))
+        .await
+        .expect("Could not create teams.json");
+    f.write_all(write_json.as_bytes())
+        .await
+        .expect("Could not write to teams.json");
+
+    printlg!(
+        "CREATE teaminfo_preset: {} vs {} (id: {})",
+        teaminfo.home_name,
+        teaminfo.away_name,
+        id
+    );
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .header(
+            HeaderName::from_static("hx-trigger"),
+            HeaderValue::from_static("reload-selector"),
+        )
+        .body(String::new())
+        .unwrap();
 }
 
 async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
@@ -1395,92 +1276,73 @@ async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
 }
 
 async fn teaminfo_preset_select_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut dir = read_dir("./team-presets").await.unwrap();
+    let mut dir = read_dir("./team-presets").await.unwrap();
 
-        while let Ok(Some(a)) = dir.next_entry().await {
-            if a.file_type()
+    while let Ok(Some(a)) = dir.next_entry().await {
+        if a.file_type()
+            .await
+            .expect("Could not get file type of dir entry")
+            .is_dir()
+        {
+            if a.file_name().to_string_lossy().to_string() == id {
+                *state.preset_id.lock().await = id.clone();
+
+                let mut a_json = String::new();
+
+                let a_json_f = File::open(format!(
+                    "{}/teams.json",
+                    a.path().to_string_lossy().to_string()
+                ))
                 .await
-                .expect("Could not get file type of dir entry")
-                .is_dir()
-            {
-                if a.file_name().to_string_lossy().to_string() == id {
-                    *state.preset_id.lock().await = id.clone();
+                .expect("Could not open preset file");
+                let mut buf_reader = BufReader::new(a_json_f);
 
-                    let mut a_json = String::new();
-
-                    let a_json_f = File::open(format!(
-                        "{}/teams.json",
-                        a.path().to_string_lossy().to_string()
-                    ))
+                buf_reader
+                    .read_to_string(&mut a_json)
                     .await
-                    .expect("Could not open preset file");
-                    let mut buf_reader = BufReader::new(a_json_f);
+                    .expect("Could not read preset file");
 
-                    buf_reader
-                        .read_to_string(&mut a_json)
-                        .await
-                        .expect("Could not read preset file");
+                let team_info: Teaminfo =
+                    serde_json::from_str(&a_json).expect("Could not deserialize preset file");
 
-                    let team_info: Teaminfo =
-                        serde_json::from_str(&a_json).expect("Could not deserialize preset file");
+                printlg!(
+                    "SELECT teaminfo_preset: {} vs {} (id: {})",
+                    team_info.home_name,
+                    team_info.away_name,
+                    id
+                );
 
-                    printlg!(
-                        "SELECT teaminfo_preset: {} vs {} (id: {})",
-                        team_info.home_name,
-                        team_info.away_name,
-                        id
-                    );
+                *state.home_name.lock().await = team_info.home_name;
+                *state.away_name.lock().await = team_info.away_name;
 
-                    *state.home_name.lock().await = team_info.home_name;
-                    *state.away_name.lock().await = team_info.away_name;
-
-                    break;
-                }
+                break;
             }
         }
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
     }
+
+    return StatusCode::OK;
 }
 
 async fn teaminfo_preset_remove_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        if let Ok(_) = remove_dir_all(format!("./team-presets/{}", id)).await {
-            *state.preset_id.lock().await = String::new();
-            printlg!("REMOVE teaminfo_preset: {}", id);
-        }
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .header(
-                HeaderName::from_static("hx-trigger"),
-                HeaderValue::from_static("reload-selector"),
-            )
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    if let Ok(_) = remove_dir_all(format!("./team-presets/{}", id)).await {
+        *state.preset_id.lock().await = String::new();
+        printlg!("REMOVE teaminfo_preset: {}", id);
     }
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .header(
+            HeaderName::from_static("hx-trigger"),
+            HeaderValue::from_static("reload-selector"),
+        )
+        .body(String::new())
+        .unwrap();
 }
 
 async fn team_name_display_handler(
@@ -1499,49 +1361,42 @@ async fn team_name_display_handler(
 // endregion: teaminfo
 // region: sponsors
 
-async fn upload_sponsors_handler(jar: CookieJar, mut form: Multipart) -> impl IntoResponse {
-    if verify_session(jar).await {
-        create_dir_all(format!("./sponsors"))
+async fn upload_sponsors_handler(mut form: Multipart) -> impl IntoResponse {
+    create_dir_all(format!("./sponsors"))
+        .await
+        .expect("Could not create sponsors directory");
+
+    while let Some(field) = form
+        .next_field()
+        .await
+        .expect("Could not get next field of sponsor multipart")
+    {
+        let id = id_create(12);
+        let mut f = File::create(format!(
+            "./sponsors/{}.{}",
+            id,
+            field.file_name().unwrap().split(".").collect::<Vec<&str>>()[1]
+        ))
+        .await
+        .expect("Could not create sponsor file");
+
+        f.write_all(field.bytes().await.unwrap().as_ref())
             .await
-            .expect("Could not create sponsors directory");
+            .expect("Could not write to sponsor file");
 
-        while let Some(field) = form
-            .next_field()
-            .await
-            .expect("Could not get next field of sponsor multipart")
-        {
-            let id = id_create(12);
-            let mut f = File::create(format!(
-                "./sponsors/{}.{}",
-                id,
-                field.file_name().unwrap().split(".").collect::<Vec<&str>>()[1]
-            ))
-            .await
-            .expect("Could not create sponsor file");
-
-            f.write_all(field.bytes().await.unwrap().as_ref())
-                .await
-                .expect("Could not write to sponsor file");
-
-            println!("ADD sponsor: {}", id);
-        }
-
-        load_sponsors().await;
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .header(
-                HeaderName::from_static("hx-trigger"),
-                HeaderValue::from_static("reload-sponsor"),
-            )
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+        println!("ADD sponsor: {}", id);
     }
+
+    load_sponsors().await;
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .header(
+            HeaderName::from_static("hx-trigger"),
+            HeaderValue::from_static("reload-sponsor"),
+        )
+        .body(String::new())
+        .unwrap();
 }
 
 async fn sponsors_management_handler() -> impl IntoResponse {
@@ -1577,42 +1432,35 @@ async fn sponsors_management_handler() -> impl IntoResponse {
     return Html::from(html);
 }
 
-async fn sponsor_remove_handler(jar: CookieJar, Path(id): Path<String>) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut d = read_dir("./sponsors").await.unwrap();
-        let mut p = PathBuf::new();
+async fn sponsor_remove_handler(Path(id): Path<String>) -> impl IntoResponse {
+    let mut d = read_dir("./sponsors").await.unwrap();
+    let mut p = PathBuf::new();
 
-        while let Ok(Some(a)) = d.next_entry().await {
-            if a.file_name()
-                .to_string_lossy()
-                .to_string()
-                .split(".")
-                .collect::<Vec<&str>>()[0]
-                == id
-            {
-                p = a.path();
-                break;
-            }
+    while let Ok(Some(a)) = d.next_entry().await {
+        if a.file_name()
+            .to_string_lossy()
+            .to_string()
+            .split(".")
+            .collect::<Vec<&str>>()[0]
+            == id
+        {
+            p = a.path();
+            break;
         }
-
-        remove_file(p).await.expect("Could not remove sponsor file");
-
-        printlg!("REMOVE sponsor: {}", id);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .header(
-                HeaderName::from_static("hx-trigger"),
-                HeaderValue::from_static("reload-sponsor"),
-            )
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
     }
+
+    remove_file(p).await.expect("Could not remove sponsor file");
+
+    printlg!("REMOVE sponsor: {}", id);
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .header(
+            HeaderName::from_static("hx-trigger"),
+            HeaderValue::from_static("reload-sponsor"),
+        )
+        .body(String::new())
+        .unwrap();
 }
 
 async fn load_sponsors() {
@@ -1815,99 +1663,52 @@ async fn overlay_team_border_css_handler(State(state): State<AppState>) -> impl 
 // endregion: overlay
 // region: downs
 
-async fn downs_set_handler(
-    jar: CookieJar,
-    State(state): State<AppState>,
-    Path(d): Path<u8>,
-) -> impl IntoResponse {
-    if verify_session(jar).await {
-        if (1..=4).contains(&d) {
-            let mut down = state.down.lock().await;
-            *down = d;
+async fn downs_set_handler(State(state): State<AppState>, Path(d): Path<u8>) -> impl IntoResponse {
+    if (1..=4).contains(&d) {
+        let mut down = state.down.lock().await;
+        *down = d;
 
-            printlg!("SET down: {}", *down);
-        }
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+        printlg!("SET down: {}", *down);
     }
+
+    return StatusCode::OK;
 }
 
 async fn downs_update_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(y): Path<i8>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut down = state.down.lock().await;
-        if (1..=4).contains(&(*down as i8 + y)) {
-            *down = (*down as i8 + y) as u8;
-            printlg!("UPDATE down: {}", *down);
-        }
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    let mut down = state.down.lock().await;
+    if (1..=4).contains(&(*down as i8 + y)) {
+        *down = (*down as i8 + y) as u8;
+        printlg!("UPDATE down: {}", *down);
     }
+
+    return StatusCode::OK;
 }
 
 async fn downs_togo_set_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(y): Path<u8>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut togo = state.downs_togo.lock().await;
-        *togo = y;
+    let mut togo = state.downs_togo.lock().await;
+    *togo = y;
 
-        printlg!("SET togo: {}", *togo);
+    printlg!("SET togo: {}", *togo);
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return StatusCode::OK;
 }
 
 async fn downs_togo_update_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(y): Path<i8>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut downs_togo = state.downs_togo.lock().await;
-        *downs_togo = (*downs_togo as i8 + y) as u8;
+    let mut downs_togo = state.downs_togo.lock().await;
+    *downs_togo = (*downs_togo as i8 + y) as u8;
 
-        printlg!("UPDATE togo: {}", *downs_togo);
+    printlg!("UPDATE togo: {}", *downs_togo);
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::new())
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return StatusCode::OK;
 }
 
 async fn downs_display_handler(
@@ -1996,79 +1797,71 @@ async fn visibility_buttons_handler(State(state): State<AppState>) -> impl IntoR
 }
 
 async fn visibility_toggle_handler(
-    jar: CookieJar,
     State(state): State<AppState>,
     Path(v): Path<String>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut modified = ("", false);
+    let mut modified = ("", false);
 
-        match v.as_str() {
-            "countdown" => {
-                let mut countdown = state.show_countdown.lock().await;
+    match v.as_str() {
+        "countdown" => {
+            let mut countdown = state.show_countdown.lock().await;
 
-                if *countdown {
-                    *countdown = false;
-                } else {
-                    *countdown = true;
-                }
-                modified = ("Countdown", *countdown);
-
-                printlg!("SET {} visibility: {}", modified.0, *countdown);
+            if *countdown {
+                *countdown = false;
+            } else {
+                *countdown = true;
             }
-            "downs" => {
-                let mut downs = state.show_downs.lock().await;
+            modified = ("Countdown", *countdown);
 
-                if *downs {
-                    *downs = false;
-                } else {
-                    *downs = true;
-                }
-                modified = ("Downs/To Go", *downs);
-
-                printlg!("SET {} visibility: {}", modified.0, *downs);
-            }
-            "scoreboard" => {
-                let mut scoreboard = state.show_scoreboard.lock().await;
-
-                if *scoreboard {
-                    *scoreboard = false;
-                } else {
-                    *scoreboard = true;
-                }
-                modified = ("Scoreboard", *scoreboard);
-
-                printlg!("SET {} visibility: {}", modified.0, *scoreboard);
-            }
-            "sponsors" => {
-                let mut sponsors = SHOW_SPONSORS.lock().await;
-
-                if *sponsors {
-                    *sponsors = false;
-                } else {
-                    *sponsors = true;
-                }
-                modified = ("Sponsors", *sponsors);
-
-                printlg!("SET {} visibility: {}", modified.0, *sponsors);
-            }
-            _ => {}
+            printlg!("SET {} visibility: {}", modified.0, *countdown);
         }
+        "downs" => {
+            let mut downs = state.show_downs.lock().await;
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(format!(
-                "{} {}",
-                if !modified.1 { "Show" } else { "Hide" },
-                modified.0
-            ))
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+            if *downs {
+                *downs = false;
+            } else {
+                *downs = true;
+            }
+            modified = ("Downs/To Go", *downs);
+
+            printlg!("SET {} visibility: {}", modified.0, *downs);
+        }
+        "scoreboard" => {
+            let mut scoreboard = state.show_scoreboard.lock().await;
+
+            if *scoreboard {
+                *scoreboard = false;
+            } else {
+                *scoreboard = true;
+            }
+            modified = ("Scoreboard", *scoreboard);
+
+            printlg!("SET {} visibility: {}", modified.0, *scoreboard);
+        }
+        "sponsors" => {
+            let mut sponsors = SHOW_SPONSORS.lock().await;
+
+            if *sponsors {
+                *sponsors = false;
+            } else {
+                *sponsors = true;
+            }
+            modified = ("Sponsors", *sponsors);
+
+            printlg!("SET {} visibility: {}", modified.0, *sponsors);
+        }
+        _ => {}
     }
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .body(format!(
+            "{} {}",
+            if !modified.1 { "Show" } else { "Hide" },
+            modified.0
+        ))
+        .unwrap();
 }
 
 async fn visibility_css_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -2211,31 +2004,24 @@ async fn ocr_handler(
     }
 }
 
-async fn ocr_api_toggle_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let mut ocr_api = OCR_API.lock().await;
+async fn ocr_api_toggle_handler() -> impl IntoResponse {
+    let mut ocr_api = OCR_API.lock().await;
 
-        if !*ocr_api {
-            *ocr_api = true;
-        } else {
-            *ocr_api = false;
-        }
-
-        printlg!("SET ocr_api: {}", *ocr_api);
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(format!(
-                "{} OCR API",
-                if !*ocr_api { "Enable" } else { "Disable" }
-            ))
-            .unwrap();
+    if !*ocr_api {
+        *ocr_api = true;
     } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+        *ocr_api = false;
     }
+
+    printlg!("SET ocr_api: {}", *ocr_api);
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .body(format!(
+            "{} OCR API",
+            if !*ocr_api { "Enable" } else { "Disable" }
+        ))
+        .unwrap();
 }
 
 async fn ocr_api_button_handler() -> impl IntoResponse {
@@ -2249,83 +2035,64 @@ async fn ocr_api_button_handler() -> impl IntoResponse {
     ));
 }
 
-async fn api_key_show_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let login: Login = serde_json::from_str(
-            &tokio::fs::read_to_string("./login.json")
-                .await
-                .expect("Could not read login.json"),
-        )
-        .expect("Could not deserialize config.json");
+async fn api_key_show_handler() -> impl IntoResponse {
+    let login: Login = serde_json::from_str(
+        &tokio::fs::read_to_string("./login.json")
+            .await
+            .expect("Could not read login.json"),
+    )
+    .expect("Could not deserialize config.json");
 
-        let mut chars = login.api_key.chars();
-        let mut hidden_key = String::new();
-        while let Some(_) = chars.next() {
-            hidden_key.push('*');
-        }
-
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(format!(
-            "<div class=\"your-container-class\">
-                <h6 id=\"api-key\">{}</h6>
-                <button class=\"copy-button\" onclick=\"apiCopy('{}')\">Copy</button>
-                <button class=\"button-settings\" hx-post=\"/api/key/reveal\" hx-target=\"#api-key\">Reveal Key</button>
-             </div>",
-                hidden_key, login.api_key
-            ))
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
+    let mut chars = login.api_key.chars();
+    let mut hidden_key = String::new();
+    while let Some(_) = chars.next() {
+        hidden_key.push('*');
     }
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .body(format!(
+        "<div class=\"your-container-class\">
+            <h6 id=\"api-key\">{}</h6>
+            <button class=\"copy-button\" onclick=\"apiCopy('{}')\">Copy</button>
+            <button class=\"button-settings\" hx-post=\"/api/key/reveal\" hx-target=\"#api-key\">Reveal Key</button>
+            </div>",
+            hidden_key, login.api_key
+        ))
+        .unwrap();
 }
 
-async fn api_key_reveal_handler(jar: CookieJar) -> impl IntoResponse {
-    if verify_session(jar).await {
-        let login: Login = serde_json::from_str(
-            &tokio::fs::read_to_string("./login.json")
-                .await
-                .expect("Could not read login.json"),
-        )
-        .expect("Could not deserialize config.json");
+async fn api_key_reveal_handler() -> impl IntoResponse {
+    let login: Login = serde_json::from_str(
+        &tokio::fs::read_to_string("./login.json")
+            .await
+            .expect("Could not read login.json"),
+    )
+    .expect("Could not deserialize config.json");
 
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(format!("{}", login.api_key))
-            .unwrap();
-    } else {
-        return Response::builder()
-            .status(StatusCode::UNAUTHORIZED)
-            .body(String::new())
-            .unwrap();
-    }
+    return Response::builder()
+        .status(StatusCode::OK)
+        .body(format!("{}", login.api_key))
+        .unwrap();
 }
 
 // endregion: api
 // region: popups
 
 async fn popup_handler(
-    jar: CookieJar,
     Path(a): Path<String>,
     Query(params): Query<HashMap<String, String>>,
 ) -> impl IntoResponse {
-    if verify_session(jar).await {
-        if let Some(p) = params.get("text") {
-            if a == "home" {
-                POPUPS_HOME.lock().await.push((p.clone(), 7));
-            } else if a == "away" {
-                POPUPS_AWAY.lock().await.push((p.clone(), 7));
-            }
-            printlg!("POPUP: {}", p);
+    if let Some(p) = params.get("text") {
+        if a == "home" {
+            POPUPS_HOME.lock().await.push((p.clone(), 7));
+        } else if a == "away" {
+            POPUPS_AWAY.lock().await.push((p.clone(), 7));
         }
-
-        return StatusCode::OK;
-    } else {
-        return StatusCode::UNAUTHORIZED;
+        printlg!("POPUP: {}", p);
     }
+
+    return StatusCode::OK;
 }
 
 async fn popup_home_ticker() {
@@ -2409,34 +2176,30 @@ async fn popup_show_handler() -> impl IntoResponse {
 // endregion: popups
 // region: misc
 
-async fn reset_handler(jar: CookieJar, State(ref mut state): State<AppState>) -> impl IntoResponse {
-    if verify_session(jar).await {
-        *state.home_points.lock().await = 0;
-        *state.home_name.lock().await = String::from("Home");
-        *state.away_points.lock().await = 0;
-        *state.away_name.lock().await = String::from("Away");
-        *state.quarter.lock().await = 1;
-        *state.preset_id.lock().await = String::new();
-        *state.down.lock().await = 1;
-        *state.downs_togo.lock().await = 0;
-        *state.countdown_text.lock().await = String::from("Countdown");
-        *state.show_countdown.lock().await = false;
-        *state.show_downs.lock().await = true;
-        *state.show_scoreboard.lock().await = true;
+async fn reset_handler(State(ref mut state): State<AppState>) -> impl IntoResponse {
+    *state.home_points.lock().await = 0;
+    *state.home_name.lock().await = String::from("Home");
+    *state.away_points.lock().await = 0;
+    *state.away_name.lock().await = String::from("Away");
+    *state.quarter.lock().await = 1;
+    *state.preset_id.lock().await = String::new();
+    *state.down.lock().await = 1;
+    *state.downs_togo.lock().await = 0;
+    *state.countdown_text.lock().await = String::from("Countdown");
+    *state.show_countdown.lock().await = false;
+    *state.show_downs.lock().await = true;
+    *state.show_scoreboard.lock().await = true;
 
-        *GAME_CLOCK.lock().await = 0;
-        *GAME_CLOCK_START.lock().await = false;
-        *COUNTDOWN_CLOCK.lock().await = 0;
-        *COUNTDOWN_CLOCK_START.lock().await = false;
-        *SHOW_SPONSORS.lock().await = false;
-        *OCR_API.lock().await = false;
+    *GAME_CLOCK.lock().await = 0;
+    *GAME_CLOCK_START.lock().await = false;
+    *COUNTDOWN_CLOCK.lock().await = 0;
+    *COUNTDOWN_CLOCK_START.lock().await = false;
+    *SHOW_SPONSORS.lock().await = false;
+    *OCR_API.lock().await = false;
 
-        printlg!("SCOREBOARD REST");
+    printlg!("SCOREBOARD REST");
 
-        return StatusCode::OK;
-    } else {
-        return StatusCode::UNAUTHORIZED;
-    }
+    return StatusCode::OK;
 }
 
 async fn logs_handler() -> impl IntoResponse {
@@ -2451,6 +2214,46 @@ async fn logs_handler() -> impl IntoResponse {
 }
 
 // endregion: misc
+// region: middleware
+
+async fn auth_session_layer(
+    jar: CookieJar,
+    request: Request,
+    next: Next,
+) -> Result<Response, StatusCode> {
+    if verify_session(jar).await {
+        return Ok(next.run(request).await);
+    } else {
+        return Err(StatusCode::UNAUTHORIZED);
+    }
+}
+
+async fn auth_give_session_layer(
+    jar: CookieJar,
+    request: Request,
+    next: Next,
+) -> Result<Response, Response> {
+    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
+        if verify_session(jar).await {
+            return Ok(next.run(request).await);
+        } else {
+            let mut response = next.run(request).await;
+            let cookie = session_cookie_builder().await;
+
+            response.headers_mut().append(SET_COOKIE, HeaderValue::from_str(&cookie).expect("Failed to get headervalue from session cookie!"));
+            
+            return Ok(response);
+        }
+    } else {
+        return Err(Response::builder()
+            .status(StatusCode::SEE_OTHER)
+            .header(LOCATION, HeaderValue::from_static("/login"))
+            .body(Body::empty())
+            .unwrap());
+    }
+}
+
+// endregion: middleware
 
 fn id_create(l: u8) -> String {
     const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
