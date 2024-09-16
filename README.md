@@ -6,8 +6,9 @@ Is a self-hosted portable scoreboard solution that aims to provide a free and in
 
 # Features
 - ✨ Optical character recognition (OCR) using [froggi-ocr](https://github.com/AllLiver/froggi-ocr) and [scoresight-ocr](https://github.com/locaal-ai/scoresight), using a video source, OCR can be automatic
-- ✨ An optional sponsor logo slideshow on overlay
-- ✨ Match presets
+- ✨ Elegato Streamdeck (Bitfocus Companion) support
+- ✨ An optional sponsor logo slideshow
+- ✨ Game presets
 - ✨ Ui optimized for iPad like devices
 
 # Installation
@@ -17,7 +18,7 @@ Alternatively, docker image archives can be found under [releases](https://githu
 If you would like to run Froggi as a standalone executable, then follow the guide on how to [compile](https://github.com/AllLiver/Froggi/edit/dev/README.md#compilation)
 
 # Usage
-Once you start Froggi it will prompt you to create a server username and password  
+On froggis first run, you will be prompted to create a login at localhost:3000 (unless the port is changed), and will be needed to login on every new device. 
 Setting up match presets and sponsors is done through the "Sponsors & Teaminfo" tab in the burger menu  
 Other settings can be found in the "Settings" tab in the burger menu  
 Finally, there are some niche settings in "settings.json" located in the directory of Froggi's binary, these settings will only take effect upon a restart of Froggi  
@@ -36,10 +37,11 @@ cargo build --release
 The compiled binary will be located in /target/release
 
 # Roadmap
-Froggi is an indev project so change is very likley.
+Froggi is an indev project so changes are very likley.
 Here are some features/updates planned in no particular order
  - 🗺️ Ability for more sports
  - 🗺️ Pop-up animations
+ - 🗺️ Devices connected counter
 
 # Tech Stack
  - Rust with Axum for the backend
