@@ -783,7 +783,7 @@ async fn uptime_display_handler() -> impl IntoResponse {
     let uptime = UPTIME_SECS.lock().await;
 
     Html::from(format!(
-        "{}:{}:{}",
+        "{:02}:{:02}:{:02}",
         *uptime / 3600,
         (*uptime % 3600) / 60,
         *uptime % 60
