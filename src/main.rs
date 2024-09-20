@@ -5,10 +5,16 @@ use argon2::{
     Argon2,
 };
 use axum::{
-    body::Body, extract::{DefaultBodyLimit, Multipart, Path, Query, Request, State}, http::{
+    body::Body,
+    extract::{DefaultBodyLimit, Multipart, Path, Query, Request, State},
+    http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderMap, HeaderName, HeaderValue, StatusCode,
-    }, middleware::{self, Next}, response::{Html, IntoResponse, Response}, routing::{get, head, post, put}, Form, Router
+    },
+    middleware::{self, Next},
+    response::{Html, IntoResponse, Response},
+    routing::{get, head, post, put},
+    Form, Router,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use base64::prelude::*;
@@ -17,7 +23,10 @@ use lazy_static::lazy_static;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashMap, path::PathBuf, sync::Arc, time::{Instant, UNIX_EPOCH}
+    collections::HashMap,
+    path::PathBuf,
+    sync::Arc,
+    time::{Instant, UNIX_EPOCH},
 };
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, remove_file, File},
@@ -25,7 +34,6 @@ use tokio::{
     signal,
     sync::Mutex,
 };
-use tower::ServiceBuilder;
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
 
@@ -155,111 +163,78 @@ async fn main() -> Result<()> {
         .allow_headers(tower_http::cors::Any)
         .allow_private_network(true);
 
+    let auth_session_routes = Router::new()
+        .route("/home-points/update/:a", post(home_points_update_handler))
+        .route("/away-points/update/:a", post(away_points_update_handler))
+        .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
+        .route("/game-clock/set/:mins", post(game_clock_set_handler))
+        .route(
+            "/game-clock/update/:mins/:secs",
+            post(game_clock_update_handler),
+        )
+        .route("/countdown-clock/ctl/:o", post(countdown_clock_ctl_handler))
+        .route(
+            "/countdown-clock/set/:mins",
+            post(countdown_clock_set_handler),
+        )
+        .route(
+            "/countdown-clock/update/:mins/:secs",
+            post(countdown_clock_update_handler),
+        )
+        .route("/countdown/text/set", post(countdown_text_set_handler))
+        .route("/quarter/set/:q", post(quarter_set_handler))
+        .route("/quarter/update/:a", post(quarter_update_handler))
+        .route("/teaminfo/create", post(teaminfo_preset_create_handler))
+        .route("/teaminfo/select/:id", post(teaminfo_preset_select_handler))
+        .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
+        .route(
+            "/sponsors/upload",
+            post(upload_sponsors_handler).layer(DefaultBodyLimit::max(2000000000)),
+        )
+        .route("/sponsors/remove/:id", post(sponsor_remove_handler))
+        .route("/downs/set/:d", post(downs_set_handler))
+        .route("/downs/update/:d", post(downs_update_handler))
+        .route("/downs/togo/set/:y", post(downs_togo_set_handler))
+        .route("/downs/togo/update/:y", post(downs_togo_update_handler))
+        .route("/visibility/toggle/:v", post(visibility_toggle_handler))
+        .route("/ocr/api/toggle", post(ocr_api_toggle_handler))
+        .route("/api/key/show", put(api_key_show_handler))
+        .route("/api/key/reveal", post(api_key_reveal_handler))
+        .route("/popup/:t", post(popup_handler))
+        .route("/reset", post(reset_handler))
+        .layer(middleware::from_fn(auth_session_layer));
+
+    let auth_give_session_routes = Router::new()
+        .route("/", get(index_handler))
+        .route("/teaminfo", get(teaminfo_handler))
+        .route("/settings", get(settings_handler))
+        .layer(middleware::from_fn(auth_give_session_layer));
+
     let app = Router::new()
-        // Basic routes
-        .route("/", get(index_handler).layer(middleware::from_fn(auth_give_session_layer)))
         .route("/", head(ping_handler))
         .route("/overlay", get(overlay_handler))
-        .route("/settings", get(settings_handler).layer(middleware::from_fn(auth_give_session_layer)))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
         .route("/app.js", get(app_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
-        // Login routes
         .route("/login", get(login_page_handler))
         .route("/login/", get(login_page_handler))
         .route("/login", post(login_handler))
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
-        // Point routes
-        .route(
-            "/home-points/update/:a",
-            post(home_points_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/home-points/display", put(home_points_display_handler))
-        .route(
-            "/away-points/update/:a",
-            post(away_points_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/away-points/display", put(away_points_display_handler))
-        // Game clock routes
         .route("/game-clock/display/:o", put(game_clock_display_handler))
-        .route(
-            "/game-clock/ctl/:o",
-            post(game_clock_ctl_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/game-clock/set/:mins",
-            post(game_clock_set_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/game-clock/update/:mins/:secs",
-            post(game_clock_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        // Countdown clock routes
         .route(
             "/countdown-clock/display/:o",
             put(countdown_clock_display_handler),
         )
-        .route(
-            "/countdown-clock/ctl/:o",
-            post(countdown_clock_ctl_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/countdown-clock/set/:mins",
-            post(countdown_clock_set_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/countdown-clock/update/:mins/:secs",
-            post(countdown_clock_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/countdown/text/set",
-            post(countdown_text_set_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        // Quarter routes
         .route("/quarter/display", put(quarter_display_handler))
-        .route(
-            "/quarter/set/:q",
-            post(quarter_set_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/quarter/update/:a",
-            post(quarter_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        // Teaminfo routes
-        .route("/teaminfo", get(teaminfo_handler).layer(middleware::from_fn(auth_give_session_layer)))
-        .route(
-            "/teaminfo/create",
-            post(teaminfo_preset_create_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
-        .route(
-            "/teaminfo/select/:id",
-            post(teaminfo_preset_select_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/teaminfo/remove/:id",
-            post(teaminfo_preset_remove_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/teaminfo/name/:t", put(team_name_display_handler))
-        // Sponsor routes
-        .route(
-            "/sponsors/upload",
-            post(upload_sponsors_handler).layer(
-                ServiceBuilder::new()
-                    .layer(middleware::from_fn(auth_session_layer))
-                    .layer(DefaultBodyLimit::max(2000000000)),
-            ),
-        )
         .route("/sponsors/manage", put(sponsors_management_handler))
-        .route(
-            "/sponsors/remove/:id",
-            post(sponsor_remove_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/sponsors/display", put(sponsor_display_handler))
-        // Overlay display routes
         .route("/points/overview", put(points_overview_handler))
         .route("/icon/:t", put(icon_handler))
         .route("/overlay/clock", put(overlay_clock_handler))
@@ -268,66 +243,21 @@ async fn main() -> Result<()> {
             "/overlay/team-border-css",
             put(overlay_team_border_css_handler),
         )
-        // Downs routes
-        .route(
-            "/downs/set/:d",
-            post(downs_set_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/downs/update/:d",
-            post(downs_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/downs/togo/set/:y",
-            post(downs_togo_set_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/downs/togo/update/:y",
-            post(downs_togo_update_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/downs/display/:t", put(downs_display_handler))
-        // Visibility routes
         .route("/visibility/buttons", put(visibility_buttons_handler))
-        .route(
-            "/visibility/toggle/:v",
-            post(visibility_toggle_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/visibility/css", put(visibility_css_handler))
-        // OCR API
         .route("/ocr", post(ocr_handler))
-        .route(
-            "/ocr/api/toggle",
-            post(ocr_api_toggle_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/ocr/api/button", put(ocr_api_button_handler))
-        // API
         .route("/api/key/check/:k", post(api_key_check_handler))
-        .route(
-            "/api/key/show",
-            put(api_key_show_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        .route(
-            "/api/key/reveal",
-            post(api_key_reveal_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
-        // Popups
-        .route(
-            "/popup/:t",
-            post(popup_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/popup/show", put(popup_show_handler))
-        // Misc Handlers
-        .route(
-            "/reset",
-            post(reset_handler).layer(middleware::from_fn(auth_session_layer)),
-        )
         .route("/logs", put(logs_handler))
-        // Information routes, state, and fallback
         .route(
             "/version",
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
         )
         .route("/uptime-display", put(uptime_display_handler))
+        .nest("/", auth_session_routes)
+        .nest("/", auth_give_session_routes)
         .with_state(state)
         .fallback(get(not_found_handler))
         .layer(cors);
@@ -2226,9 +2156,14 @@ async fn auth_session_layer(
         return Ok(next.run(request).await);
     } else {
         if let Some(h) = headers.get("api-auth") {
-            let login: Login = serde_json::from_str(&tokio::fs::read_to_string("./login.json").await.expect("Failed to read login.json")).expect("Failed to deserialize login.json");
+            let login: Login = serde_json::from_str(
+                &tokio::fs::read_to_string("./login.json")
+                    .await
+                    .expect("Failed to read login.json"),
+            )
+            .expect("Failed to deserialize login.json");
             if h.to_str().expect("Failed to cast headervalue into a str") == login.api_key {
-                return Ok(next.run(request).await); 
+                return Ok(next.run(request).await);
             } else {
                 return Err(StatusCode::UNAUTHORIZED);
             }
@@ -2250,8 +2185,12 @@ async fn auth_give_session_layer(
             let mut response = next.run(request).await;
             let cookie = session_cookie_builder().await;
 
-            response.headers_mut().append(SET_COOKIE, HeaderValue::from_str(&cookie).expect("Failed to get headervalue from session cookie!"));
-            
+            response.headers_mut().append(
+                SET_COOKIE,
+                HeaderValue::from_str(&cookie)
+                    .expect("Failed to get headervalue from session cookie!"),
+            );
+
             return Ok(response);
         }
     } else {
