@@ -1621,11 +1621,13 @@ async fn downs_togo_set_handler(
     State(state): State<AppState>,
     Path(y): Path<u8>,
 ) -> impl IntoResponse {
-    let mut togo = state.downs_togo.lock().await;
-    *togo = y;
+    if (0..=101).contains(&y) {
+        let mut togo = state.downs_togo.lock().await;
+        *togo = y;
 
-    printlg!("SET togo: {}", *togo);
-
+        printlg!("SET togo: {}", *togo);
+    }
+    
     return StatusCode::OK;
 }
 
@@ -1634,9 +1636,22 @@ async fn downs_togo_update_handler(
     Path(y): Path<i8>,
 ) -> impl IntoResponse {
     let mut downs_togo = state.downs_togo.lock().await;
-    *downs_togo = (*downs_togo as i8 + y) as u8;
 
-    printlg!("UPDATE togo: {}", *downs_togo);
+    let new_val = *downs_togo as i8 + y;
+
+    if (0..=101).contains(&new_val) {
+        *downs_togo = new_val as u8;
+
+        printlg!("UPDATE togo: {}", *downs_togo);
+    } else if new_val > 101 {
+        *downs_togo = 0;
+
+        printlg!("UPDATE togo: {}", *downs_togo);
+    } else if new_val < 0 {
+        *downs_togo = 101;
+
+        printlg!("UPDATE togo: {}", *downs_togo);
+    }
 
     return StatusCode::OK;
 }
@@ -1658,7 +1673,7 @@ async fn downs_display_handler(
     } else if t == "togo" {
         let downs_togo = state.downs_togo.lock().await;
 
-        if *downs_togo == 255 {
+        if *downs_togo == 101 {
             return Html::from(String::from("Goal"));
         }
         return Html::from(downs_togo.to_string());
@@ -1679,7 +1694,7 @@ async fn downs_display_handler(
         return Html::from(format!(
             "{} & {}",
             down_display,
-            if *downs_togo == 255 {
+            if *downs_togo == 101 {
                 String::from("Goal")
             } else {
                 downs_togo.to_string()
