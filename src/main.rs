@@ -6,7 +6,10 @@ use argon2::{
 };
 use axum::{
     body::Body,
-    extract::{DefaultBodyLimit, Multipart, Path, Query, Request, State},
+    extract::{
+        ws::{Message, WebSocket},
+        DefaultBodyLimit, Multipart, Path, Query, Request, State, WebSocketUpgrade,
+    },
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
         HeaderMap, HeaderName, HeaderValue, StatusCode,
@@ -36,6 +39,8 @@ use tokio::{
 };
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
+
+const WEBSOCKET_UPDATE_MILLIS: u64 = 100;
 
 lazy_static! {
     static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
@@ -163,9 +168,18 @@ async fn main() -> Result<()> {
         .allow_headers(tower_http::cors::Any)
         .allow_private_network(true);
 
+    let auth_give_session_routes = Router::new()
+        .route("/", get(index_handler))
+        .route("/teaminfo", get(teaminfo_handler))
+        .route("/settings", get(settings_handler))
+        .layer(middleware::from_fn(auth_give_session_layer));
+
     let auth_session_routes = Router::new()
+        .route("/dashboard-websocket", get(dashboard_websocket_handler))
         .route("/home-points/update/:a", post(home_points_update_handler))
+        .route("/home-points/set/:a", post(home_points_set_handler))
         .route("/away-points/update/:a", post(away_points_update_handler))
+        .route("/away-points/set/:a", post(away_points_set_handler))
         .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
         .route("/game-clock/set/:mins", post(game_clock_set_handler))
         .route(
@@ -204,18 +218,13 @@ async fn main() -> Result<()> {
         .route("/reset", post(reset_handler))
         .layer(middleware::from_fn(auth_session_layer));
 
-    let auth_give_session_routes = Router::new()
-        .route("/", get(index_handler))
-        .route("/teaminfo", get(teaminfo_handler))
-        .route("/settings", get(settings_handler))
-        .layer(middleware::from_fn(auth_give_session_layer));
-
     let app = Router::new()
         .route("/", head(ping_handler))
         .route("/overlay", get(overlay_handler))
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
         .route("/app.js", get(app_js_handler))
+        .route("/ws.js", get(ws_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
         .route("/login", get(login_page_handler))
@@ -223,8 +232,8 @@ async fn main() -> Result<()> {
         .route("/login", post(login_handler))
         .route("/login/create", get(create_login_page_handler))
         .route("/login/create", post(create_login_handler))
-        .route("/home-points/display", put(home_points_display_handler))
-        .route("/away-points/display", put(away_points_display_handler))
+        .route("/home-points/display", get(home_points_display_handler))
+        .route("/away-points/display", get(away_points_display_handler))
         .route("/game-clock/display/:o", put(game_clock_display_handler))
         .route(
             "/countdown-clock/display/:o",
@@ -233,6 +242,7 @@ async fn main() -> Result<()> {
         .route("/quarter/display", put(quarter_display_handler))
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
         .route("/teaminfo/name/:t", put(team_name_display_handler))
+        .route("/teaminfo/button-css", put(teaminfo_button_css_handler))
         .route("/sponsors/manage", put(sponsors_management_handler))
         .route("/sponsors/display", put(sponsor_display_handler))
         .route("/points/overview", put(points_overview_handler))
@@ -335,6 +345,93 @@ async fn not_found_handler() -> impl IntoResponse {
 }
 
 // endregion: basic pages
+// region: page websockets
+
+async fn dashboard_websocket_handler(
+    State(state): State<AppState>,
+    ws: WebSocketUpgrade,
+) -> impl IntoResponse {
+    ws.on_upgrade(|mut socket| async move {
+        let mut interval =
+            tokio::time::interval(std::time::Duration::from_millis(WEBSOCKET_UPDATE_MILLIS));
+        loop {
+            interval.tick().await;
+
+            let game_clock = GAME_CLOCK.lock().await;
+            let countdown_clock = COUNTDOWN_CLOCK.lock().await;
+            let downs_togo = state.downs_togo.lock().await;
+            let uptime = UPTIME_SECS.lock().await;
+
+            let message = format!(
+                "
+            <div id=\"home-counter\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"away-counter\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"clock-counter-minutes\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"clock-counter-seconds\" hx-swap-oob=\"innerHTML\">{:02}</div>
+            <div id=\"countdown-counter-minutes\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"countdown-counter-seconds\" hx-swap-oob=\"innerHTML\">{:02}</div>
+            <div id=\"downs-counter\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"togo-counter\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"quarter-counter\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"uptime-value\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"backend-css-index\" hx-swap-oob=\"innerHTML\">{}</div>
+            ",
+                *state.home_points.lock().await,
+                *state.away_points.lock().await,
+                *game_clock / 1000 / 60,
+                *game_clock / 1000 % 60,
+                *countdown_clock / 60,
+                *countdown_clock % 60,
+                match *state.down.lock().await {
+                    1 => "1st",
+                    2 => "2nd",
+                    3 => "3rd",
+                    4 => "4th",
+                    _ => "",
+                },
+                if *downs_togo == 0 {
+                    String::from("Hidden")
+                } else if *downs_togo == 101 {
+                    String::from("Goal")
+                } else {
+                    downs_togo.to_string()
+                },
+                match *state.quarter.lock().await {
+                    1 => "1st",
+                    2 => "2nd",
+                    3 => "3rd",
+                    4 => "4th",
+                    _ => "OT",
+                },
+                format!(
+                    "{:02}:{:02}:{:02}",
+                    *uptime / 3600,
+                    (*uptime % 3600) / 60,
+                    *uptime % 60
+                ),
+                format!(
+                    "
+            <style>
+                {}
+            </style>",
+                    if !*state.show_downs.lock().await {
+                        ".downs { 
+                        display: none; 
+                    }"
+                    } else {
+                        ""
+                    },
+                )
+            );
+
+            if socket.send(Message::Text(message)).await.is_err() {
+                return;
+            }
+        }
+    })
+}
+
+// endregion: page websockets
 // region: js routing
 
 async fn htmx_js_handler() -> impl IntoResponse {
@@ -342,6 +439,14 @@ async fn htmx_js_handler() -> impl IntoResponse {
         .status(StatusCode::OK)
         .header(CONTENT_TYPE, "application/javascript")
         .body(String::from(include_str!("./html/js/htmx.js")))
+        .unwrap()
+}
+
+async fn ws_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("./html/js/ws.js")))
         .unwrap()
 }
 
@@ -474,14 +579,16 @@ async fn create_login_handler(Form(data): Form<CreateLogin>) -> impl IntoRespons
         } else {
             return Response::builder()
                 .status(StatusCode::OK)
-                .body(String::from("<p>Passwords do not match</p>"))
+                .body(String::from(
+                    "<div class=\"login-error\"><p>Passwords do not match</p></div>",
+                ))
                 .unwrap();
         }
     } else {
         return Response::builder()
             .status(StatusCode::OK)
             .body(String::from(
-                "<p>Username and password cannot be empty or contain spaces</p>",
+                "<div class=\"login-error\"><p>Username and password cannot be empty or contain spaces</p></div>",
             ))
             .unwrap();
     }
@@ -545,20 +652,24 @@ async fn login_handler(Form(data): Form<LoginForm>) -> impl IntoResponse {
                 } else {
                     return Response::builder()
                         .status(StatusCode::OK)
-                        .body(String::from("Invalid login"))
+                        .body(String::from(
+                            "<div class=\"login-error\"><p>Invalid login</p></div>",
+                        ))
                         .unwrap();
                 }
             } else {
                 return Response::builder()
                     .status(StatusCode::OK)
-                    .body(String::from("Invalid login"))
+                    .body(String::from(
+                        "<div class=\"login-error\"><p>Invalid login</p></div>",
+                    ))
                     .unwrap();
             }
         } else {
             return Response::builder()
                 .status(StatusCode::OK)
                 .body(String::from(
-                    "<p>Username and password cannot be empty or contain spaces</p>",
+                    "<div class=\"login-error\"><p>Username and password cannot be empty or contain spaces</p></div>",
                 ))
                 .unwrap();
         }
@@ -742,6 +853,18 @@ async fn home_points_update_handler(
     return StatusCode::OK;
 }
 
+async fn home_points_set_handler(
+    Path(a): Path<u32>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    let mut home_points = state.home_points.lock().await;
+    *home_points = a;
+
+    printlg!("SET home_points: {}", *home_points);
+
+    return StatusCode::OK;
+}
+
 async fn away_points_update_handler(
     Path(a): Path<i32>,
     State(state): State<AppState>,
@@ -757,12 +880,30 @@ async fn away_points_update_handler(
     return StatusCode::OK;
 }
 
-async fn home_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
-    Html::from(state.home_points.lock().await.to_string())
+async fn away_points_set_handler(
+    Path(a): Path<u32>,
+    State(state): State<AppState>,
+) -> impl IntoResponse {
+    let mut away_points = state.away_points.lock().await;
+    *away_points = a;
+
+    printlg!("SET home_points: {}", *away_points);
+
+    return StatusCode::OK;
 }
 
-async fn away_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
-    Html::from(state.away_points.lock().await.to_string())
+async fn home_points_display_handler(
+    State(state): State<AppState>,
+    ws: WebSocketUpgrade,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| send_websocket_message(socket, state.home_points.clone()))
+}
+
+async fn away_points_display_handler(
+    State(state): State<AppState>,
+    ws: WebSocketUpgrade,
+) -> impl IntoResponse {
+    ws.on_upgrade(move |socket| send_websocket_message(socket, state.away_points.clone()))
 }
 
 // endregion: team routing
@@ -963,10 +1104,10 @@ async fn quarter_display_handler(State(state): State<AppState>) -> impl IntoResp
     let quarter = state.quarter.lock().await;
 
     let event_body = match *quarter {
-        1 => "1",
-        2 => "2",
-        3 => "3",
-        4 => "4",
+        1 => "1st",
+        2 => "2nd",
+        3 => "3rd",
+        4 => "4th",
         _ => "OT",
     };
 
@@ -1285,6 +1426,52 @@ async fn team_name_display_handler(
         return Html::from(state.away_name.lock().await.clone());
     } else {
         return Html::from(String::new());
+    }
+}
+
+async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl IntoResponse {
+    let preset_id = state.preset_id.lock().await;
+    if preset_id.is_empty() {
+        return Html::from(String::new());
+    } else {
+        if let Ok(teaminfo) = serde_json::from_str::<Teaminfo>(
+            &tokio::fs::read_to_string(format!("./team-presets/{}/teams.json", *preset_id))
+                .await
+                .unwrap(),
+        ) {
+            return Html::from(format!(
+                "
+            <style>
+                .button-decrement-home {{
+                    background-color: {};
+                }}
+                .button-increment-home {{
+                    background-color: {};
+                }}
+                .button-preset-score-home {{
+                    background-color: {};
+                }}
+                .button-decrement-away {{
+                    background-color: {};
+                }}
+                .button-increment-away {{
+                    background-color: {};
+                }}
+                .button-preset-score-away {{
+                    background-color: {};
+                }}
+            </style>
+            ",
+                teaminfo.home_color,
+                teaminfo.home_color,
+                teaminfo.home_color,
+                teaminfo.away_color,
+                teaminfo.away_color,
+                teaminfo.away_color,
+            ));
+        } else {
+            return Html::from(String::new());
+        }
     }
 }
 
@@ -1609,8 +1796,17 @@ async fn downs_update_handler(
     Path(y): Path<i8>,
 ) -> impl IntoResponse {
     let mut down = state.down.lock().await;
-    if (1..=4).contains(&(*down as i8 + y)) {
+
+    let new_val = *down as i8 + y;
+
+    if (1..=4).contains(&new_val) {
         *down = (*down as i8 + y) as u8;
+        printlg!("UPDATE down: {}", *down);
+    } else if new_val < 1 {
+        *down = 4;
+        printlg!("UPDATE down: {}", *down);
+    } else if new_val > 4 {
+        *down = 1;
         printlg!("UPDATE down: {}", *down);
     }
 
@@ -1627,7 +1823,7 @@ async fn downs_togo_set_handler(
 
         printlg!("SET togo: {}", *togo);
     }
-    
+
     return StatusCode::OK;
 }
 
@@ -1675,8 +1871,11 @@ async fn downs_display_handler(
 
         if *downs_togo == 101 {
             return Html::from(String::from("Goal"));
+        } else if *downs_togo == 0 {
+            return Html::from(String::from("Hidden"));
+        } else {
+            return Html::from(downs_togo.to_string());
         }
-        return Html::from(downs_togo.to_string());
     } else if t == "both" {
         let down = state.down.lock().await;
 
@@ -1691,15 +1890,19 @@ async fn downs_display_handler(
         drop(down);
         let downs_togo = state.downs_togo.lock().await;
 
-        return Html::from(format!(
-            "{} & {}",
-            down_display,
-            if *downs_togo == 101 {
-                String::from("Goal")
-            } else {
-                downs_togo.to_string()
-            }
-        ));
+        if *downs_togo != 0 {
+            return Html::from(format!(
+                "{} & {}",
+                down_display,
+                if *downs_togo == 101 {
+                    String::from("Goal")
+                } else {
+                    downs_togo.to_string()
+                }
+            ));
+        } else {
+            return Html::from(format!("{}", down_display,));
+        }
     } else {
         return Html::from(String::new());
     }
@@ -2156,6 +2359,23 @@ async fn logs_handler() -> impl IntoResponse {
     }
 
     Html::from(logs_display.join("<br>"))
+}
+
+async fn send_websocket_message<T: ToString>(mut socket: WebSocket, send_msg: Arc<Mutex<T>>) {
+    let mut interval = tokio::time::interval(std::time::Duration::from_millis(100));
+    loop {
+        interval.tick().await;
+
+        let message = Message::Text(format!(
+            "<span id=\"ws-target\" hx-swap-oob=\"innerHTML\">{}</span>",
+            (*send_msg.lock().await).to_string()
+        ));
+
+        if socket.send(message).await.is_err() {
+            // client disconnected
+            return;
+        }
+    }
 }
 
 // endregion: misc

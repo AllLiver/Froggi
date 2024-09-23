@@ -13,12 +13,14 @@
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
+    <script src="/ws.js"></script>
     <link rel="icon" href="/favicon.png">
 </head>
 
-<body>
+<body hx-ext="ws" ws-connect="/dashboard-websocket">
     <!--TODO: Raise ol off the popup cooldown, look into copy, E008 + W001-3+3-->
-    <div hx-put="/visibility/css" hx-trigger="every 100ms"></div>
+    <div id="backend-css-index"></div>
+    <div hx-put="/teaminfo/button-css" hx-trigger="load"></div>
     <nav>
         <button class="hamburger-menu" onclick="toggle_menu()">
             <span class="line"></span>
@@ -53,8 +55,7 @@
                             <button class="button-decrement-home" hx-post="/home-points/update/-1"
                                 hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="countdown-counter-minutes" class="countdown" hx-put="/home-points/display"
-                                    hx-trigger="every 100ms">0</div>
+                                <div id="home-counter" class="counter-value">0</div>
                                 <div class="counter-subtext">Home</div>
                             </div>
                             <button class="button-increment-home" hx-post="/home-points/update/1"
@@ -72,8 +73,7 @@
                             <button class="button-decrement-away" hx-post="/away-points/update/-1"
                                 hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="away-counter" class="counter-value" hx-put="/away-points/display"
-                                    hx-trigger="every 100ms">0</div>
+                                <div id="away-counter" class="counter-value">0</div>
                                 <div class="counter-subtext">Away</div>
                             </div>
                             <button class="button-increment-away" hx-post="/away-points/update/1"
@@ -95,7 +95,7 @@
                         <div class="counter-container">
                             <button class="button-decrement-downs" hx-post="/downs/update/-1" hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="downs-counter" hx-put="/downs/display/down" hx-trigger="every 100ms">0</div>
+                                <div id="downs-counter">0</div>
                                 <div class="counter-subtext">Down</div>
                             </div>
                             <button class="button-increment-downs" hx-post="/downs/update/1" hx-swap="none">+</button>
@@ -110,8 +110,7 @@
                             <button class="button-decrement-togo" hx-post="/downs/togo/update/-1"
                                 hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="togo-counter" class="counter-value" hx-put="/downs/display/togo"
-                                    hx-trigger="every 100ms">0</div>
+                                <div id="togo-counter" class="counter-value">1</div>
                                 <div class="counter-subtext">TO-GO</div>
                             </div>
                             <button class="button-increment-togo" hx-post="/downs/togo/update/1"
@@ -149,7 +148,7 @@
                         </div>
                         <div class="stat-item">
                             <label>Uptime:</label>
-                            <span id="uptime-value" hx-put="/uptime-display" hx-trigger="every 100ms">00:00:00</span>
+                            <span id="uptime-value">00:00:00</span>
                         </div>
                         <button class="button-lock-interface" id="lockInterfaceBtn"><strong>Lock
                                 Interface</strong></button>
@@ -179,8 +178,7 @@
                                                 <button class="button-decrement-clock" hx-post="/game-clock/update/-1/0"
                                                     hx-swap="none">-</button>
                                                 <div class="counter">
-                                                    <div id="clock-counter-minutes" hx-put="/game-clock/display/minutes"
-                                                        hx-trigger="every 100ms">0</div>
+                                                    <div id="clock-counter-minutes">0</div>
                                                     <div class="counter-subtext">Minutes</div>
                                                 </div>
                                                 <button class="button-increment-clock" hx-post="/game-clock/update/1/0"
@@ -191,8 +189,7 @@
                                                 <button class="button-decrement-clock" hx-post="/game-clock/update/0/-1"
                                                     hx-swap="none">-</button>
                                                 <div class="counter">
-                                                    <div id="clock-counter-seconds" hx-put="/game-clock/display/seconds"
-                                                        hx-trigger="every 100ms">0</div>
+                                                    <div id="clock-counter-seconds">0</div>
                                                     <div class="counter-subtext">Seconds</div>
                                                 </div>
                                                 <button class="button-increment-clock" hx-post="/game-clock/update/0/1"
@@ -227,9 +224,7 @@
                                             <button class="button-decrement-countdown"
                                                 hx-post="/countdown-clock/update/-1/0" hx-swap="none">-</button>
                                             <div class="counter">
-                                                <div id="countdown-counter-minutes" class="countdown"
-                                                    hx-put="/countdown-clock/display/minutes" hx-trigger="every 100ms">0
-                                                </div>
+                                                <div id="countdown-counter-minutes" class="countdown">0</div>
                                                 <div class="counter-subtext">Minutes</div>
                                             </div>
                                             <button class="button-increment-countdown"
@@ -240,9 +235,7 @@
                                             <button class="button-decrement-countdown"
                                                 hx-post="/countdown-clock/update/0/-1" hx-swap="none">-</button>
                                             <div class="counter">
-                                                <div id="countdown-counter-seconds" class="countdown"
-                                                    hx-put="/countdown-clock/display/seconds" hx-trigger="every 100ms">0
-                                                </div>
+                                                <div id="countdown-counter-seconds" class="countdown">0</div>
                                                 <div class="counter-subtext">Seconds</div>
                                             </div>
                                             <button class="button-increment-countdown"
@@ -288,8 +281,7 @@
                             <button class="button-decrement-quarter" hx-post="/quarter/update/-1"
                                 hx-swap="none">-</button>
                             <div class="counter">
-                                <div id="quarter-counter" class="counter-value" hx-put="/quarter/display"
-                                    hx-trigger="every 100ms">1</div>
+                                <div id="quarter-counter" class="counter-value">1st</div>
                                 <div class="counter-subtext">Quarter</div>
                             </div>
                             <button class="button-increment-quarter" hx-post="/quarter/update/1"
