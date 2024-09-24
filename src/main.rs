@@ -7,7 +7,7 @@ use argon2::{
 use axum::{
     body::Body,
     extract::{
-        ws::{Message, WebSocket},
+        ws::Message,
         DefaultBodyLimit, Multipart, Path, Query, Request, State, WebSocketUpgrade,
     },
     http::{
@@ -235,38 +235,31 @@ async fn main() -> Result<()> {
         .route("/login/create", post(create_login_handler))
         .route("/home-points/display", get(home_points_display_handler))
         .route("/away-points/display", get(away_points_display_handler))
-        .route("/game-clock/display/:o", put(game_clock_display_handler))
+        .route("/game-clock/display/:o", get(game_clock_display_handler))
         .route(
             "/countdown-clock/display/:o",
-            put(countdown_clock_display_handler),
+            get(countdown_clock_display_handler),
         )
-        .route("/quarter/display", put(quarter_display_handler))
+        .route("/quarter/display", get(quarter_display_handler))
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
-        .route("/teaminfo/name/:t", put(team_name_display_handler))
+        .route("/teaminfo/name/:t", get(team_name_display_handler))
         .route("/teaminfo/button-css", put(teaminfo_button_css_handler))
         .route("/sponsors/manage", put(sponsors_management_handler))
-        .route("/sponsors/display", put(sponsor_display_handler))
-        .route("/points/overview", put(points_overview_handler))
         .route("/icon/:t", put(icon_handler))
-        .route("/overlay/clock", put(overlay_clock_handler))
-        .route("/countdown/display", put(countdown_display_handler))
         .route(
             "/overlay/team-border-css",
             put(overlay_team_border_css_handler),
         )
-        .route("/downs/display/:t", put(downs_display_handler))
+        .route("/downs/display/:t", get(downs_display_handler))
         .route("/visibility/buttons", put(visibility_buttons_handler))
-        .route("/visibility/css", put(visibility_css_handler))
         .route("/ocr", post(ocr_handler))
         .route("/ocr/api/button", put(ocr_api_button_handler))
         .route("/api/key/check/:k", post(api_key_check_handler))
-        .route("/popup/show", put(popup_show_handler))
         .route("/logs", put(logs_handler))
         .route(
             "/version",
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
         )
-        .route("/uptime-display", put(uptime_display_handler))
         .nest("/", auth_session_routes)
         .nest("/", auth_give_session_routes)
         .with_state(state)
@@ -1065,16 +1058,14 @@ async fn away_points_set_handler(
 
 async fn home_points_display_handler(
     State(state): State<AppState>,
-    ws: WebSocketUpgrade,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| send_websocket_message(socket, state.home_points.clone()))
+    state.home_points.lock().await.to_string()
 }
 
 async fn away_points_display_handler(
     State(state): State<AppState>,
-    ws: WebSocketUpgrade,
 ) -> impl IntoResponse {
-    ws.on_upgrade(move |socket| send_websocket_message(socket, state.away_points.clone()))
+    state.away_points.lock().await.to_string()
 }
 
 // endregion: team routing
@@ -1089,17 +1080,6 @@ async fn uptime_ticker() {
 
         *uptime_secs = (Instant::now() - start_time).as_secs() as usize;
     }
-}
-
-async fn uptime_display_handler() -> impl IntoResponse {
-    let uptime = UPTIME_SECS.lock().await;
-
-    Html::from(format!(
-        "{:02}:{:02}:{:02}",
-        *uptime / 3600,
-        (*uptime % 3600) / 60,
-        *uptime % 60
-    ))
 }
 
 async fn game_clock_ticker() {
@@ -1177,7 +1157,7 @@ async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoResponse 
         }
     }
 
-    Html::from(time_display)
+    time_display
 }
 
 async fn countdown_clock_ticker() {
@@ -1248,7 +1228,7 @@ async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl IntoResp
         time_display = format!("{}:{:02}", *countdown_clock / 60, *countdown_clock % 60);
     }
 
-    return Html::from(time_display);
+    time_display
 }
 
 #[derive(Deserialize)]
@@ -1282,7 +1262,7 @@ async fn quarter_display_handler(State(state): State<AppState>) -> impl IntoResp
         _ => "OT",
     };
 
-    Html::from(event_body)
+    event_body
 }
 
 async fn quarter_set_handler(
@@ -1592,11 +1572,11 @@ async fn team_name_display_handler(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     if t == "home" {
-        return Html::from(state.home_name.lock().await.clone());
+        return state.home_name.lock().await.clone();
     } else if t == "away" {
-        return Html::from(state.away_name.lock().await.clone());
+        return state.away_name.lock().await.clone();
     } else {
-        return Html::from(String::new());
+        return String::new();
     }
 }
 
@@ -1804,31 +1784,8 @@ async fn sponsor_ticker() {
     }
 }
 
-async fn sponsor_display_handler() -> impl IntoResponse {
-    let sponsor_tags = SPONSOR_TAGS.lock().await;
-    if *SHOW_SPONSORS.lock().await && sponsor_tags.len() > 0 {
-        let sponsor_img = sponsor_tags[*SPONSOR_IDX.lock().await].clone();
-        return Html::from(format!(
-            "<div class=\"ol-sponsor-parent\">{}</div>",
-            sponsor_img
-        ));
-    } else {
-        return Html::from(String::new());
-    }
-}
-
 // endregion: sponsors
 // region: overlay
-
-async fn points_overview_handler(State(state): State<AppState>) -> impl IntoResponse {
-    Html::from(format!(
-        "<h3>{}-{}</h3>",
-        state.home_points.lock().await,
-        state.away_points.lock().await
-    ))
-}
-
-// "<img class=\"ol-team-logo\" src=\"data:image/{};base64,{}\" height=\"30px\" width=\"auto\" alt=\"team-icon\">"
 
 async fn icon_handler(Path(t): Path<String>, State(state): State<AppState>) -> impl IntoResponse {
     let mut d = read_dir(format!("./team-presets/{}", state.preset_id.lock().await))
@@ -1870,51 +1827,6 @@ async fn icon_handler(Path(t): Path<String>, State(state): State<AppState>) -> i
     }
 
     return Html::from(String::new());
-}
-
-async fn overlay_clock_handler(State(state): State<AppState>) -> impl IntoResponse {
-    let game_clock = GAME_CLOCK.lock().await;
-
-    let quarter = state.quarter.lock().await;
-
-    let quarter_display = match *quarter {
-        1 => "1st",
-        2 => "2nd",
-        3 => "3rd",
-        4 => "4th",
-        _ => "OT",
-    };
-
-    if *game_clock >= 1000 * 60 {
-        Html::from(format!(
-            "{}:{:02} - {}",
-            *game_clock / 1000 / 60,
-            *game_clock / 1000 % 60,
-            quarter_display
-        ))
-    } else {
-        Html::from(format!(
-            "{}:{:02}:{:02} - {}",
-            *game_clock / 1000 / 60,
-            *game_clock / 1000 % 60,
-            *game_clock / 10 % 100,
-            quarter_display
-        ))
-    }
-}
-
-async fn countdown_display_handler(State(state): State<AppState>) -> impl IntoResponse {
-    if *state.show_countdown.lock().await {
-        let countdown_clock = COUNTDOWN_CLOCK.lock().await;
-        return Html::from(format!(
-            "<div id=\"ol-countdown\" class=\"countdown-container\"><h2 class=\"countdown-title\">{}:</h2>{}:{:02}</div>",
-            state.countdown_text.lock().await,
-            *countdown_clock / 60,
-            *countdown_clock % 60
-        ));
-    } else {
-        return Html::from(String::new());
-    }
 }
 
 async fn overlay_team_border_css_handler(State(state): State<AppState>) -> impl IntoResponse {
@@ -2031,21 +1943,21 @@ async fn downs_display_handler(
         let down = state.down.lock().await;
 
         return match *down {
-            1 => Html::from(String::from("1st")),
-            2 => Html::from(String::from("2nd")),
-            3 => Html::from(String::from("3rd")),
-            4 => Html::from(String::from("4th")),
-            _ => Html::from(String::new()),
+            1 => String::from("1st"),
+            2 => String::from("2nd"),
+            3 => String::from("3rd"),
+            4 => String::from("4th"),
+            _ => String::new(),
         };
     } else if t == "togo" {
         let downs_togo = state.downs_togo.lock().await;
 
         if *downs_togo == 101 {
-            return Html::from(String::from("Goal"));
+            return String::from("Goal");
         } else if *downs_togo == 0 {
-            return Html::from(String::from("Hidden"));
+            return String::from("Hidden");
         } else {
-            return Html::from(downs_togo.to_string());
+            return downs_togo.to_string();
         }
     } else if t == "both" {
         let down = state.down.lock().await;
@@ -2062,7 +1974,7 @@ async fn downs_display_handler(
         let downs_togo = state.downs_togo.lock().await;
 
         if *downs_togo != 0 {
-            return Html::from(format!(
+            return format!(
                 "{} & {}",
                 down_display,
                 if *downs_togo == 101 {
@@ -2070,12 +1982,12 @@ async fn downs_display_handler(
                 } else {
                     downs_togo.to_string()
                 }
-            ));
+            );
         } else {
-            return Html::from(format!("{}", down_display,));
+            return format!("{}", down_display);
         }
     } else {
-        return Html::from(String::new());
+        return String::new();
     }
 }
 
@@ -2181,31 +2093,6 @@ async fn visibility_toggle_handler(
             modified.0
         ))
         .unwrap();
-}
-
-async fn visibility_css_handler(State(state): State<AppState>) -> impl IntoResponse {
-    return Html::from(format!(
-        "
-    <style>
-        {}
-        {}
-    </style>",
-        if !*state.show_downs.lock().await {
-            ".downs { 
-            display: none; 
-        } 
-        .ol-down-box { 
-            display: none; 
-        }"
-        } else {
-            ""
-        },
-        if !*state.show_scoreboard.lock().await {
-            ".ol-parent-container { display: none; }"
-        } else {
-            ""
-        }
-    ));
 }
 
 // endregion: visibility
@@ -2460,38 +2347,6 @@ async fn popup_away_ticker() {
     }
 }
 
-async fn popup_show_handler() -> impl IntoResponse {
-    let mut html = String::new();
-
-    let popups_home = POPUPS_HOME.lock().await;
-    let mut h_vec = Vec::new();
-
-    for i in 0..popups_home.len() {
-        h_vec.push(format!("<span>{}</span>", popups_home[i].0));
-    }
-
-    if h_vec.len() > 0 {
-        html += &format!("<div class=\"ol-home-popup\">{}</div>", h_vec.join("<br>"));
-    }
-
-    drop(h_vec);
-
-    let popups_away = POPUPS_AWAY.lock().await;
-    let mut a_vec = Vec::new();
-
-    for i in 0..popups_away.len() {
-        a_vec.push(format!("<span>{}</span>", popups_away[i].0));
-    }
-
-    if a_vec.len() > 0 {
-        html += &format!("<div class=\"ol-away-popup\">{}</div>", a_vec.join("<br>"));
-    }
-
-    drop(a_vec);
-
-    return Html::from(html);
-}
-
 // endregion: popups
 // region: misc
 
@@ -2530,23 +2385,6 @@ async fn logs_handler() -> impl IntoResponse {
     }
 
     Html::from(logs_display.join("<br>"))
-}
-
-async fn send_websocket_message<T: ToString>(mut socket: WebSocket, send_msg: Arc<Mutex<T>>) {
-    let mut interval = tokio::time::interval(std::time::Duration::from_millis(100));
-    loop {
-        interval.tick().await;
-
-        let message = Message::Text(format!(
-            "<span id=\"ws-target\" hx-swap-oob=\"innerHTML\">{}</span>",
-            (*send_msg.lock().await).to_string()
-        ));
-
-        if socket.send(message).await.is_err() {
-            // client disconnected
-            return;
-        }
-    }
 }
 
 // endregion: misc
