@@ -242,7 +242,7 @@ async fn main() -> Result<()> {
         )
         .route("/quarter/display", get(quarter_display_handler))
         .route("/teaminfo/selector", put(teaminfo_preset_selector_handler))
-        .route("/teaminfo/name/:t", get(team_name_display_handler))
+        .route("/teaminfo/name/:t", put(team_name_display_handler))
         .route("/teaminfo/button-css", put(teaminfo_button_css_handler))
         .route("/sponsors/manage", put(sponsors_management_handler))
         .route("/icon/:t", put(icon_handler))
@@ -1572,11 +1572,11 @@ async fn team_name_display_handler(
     State(state): State<AppState>,
 ) -> impl IntoResponse {
     if t == "home" {
-        return state.home_name.lock().await.clone();
+        return Html::from(state.home_name.lock().await.clone());
     } else if t == "away" {
-        return state.away_name.lock().await.clone();
+        return Html::from(state.away_name.lock().await.clone());
     } else {
-        return String::new();
+        return Html::from(String::new());
     }
 }
 
