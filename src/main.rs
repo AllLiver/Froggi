@@ -106,7 +106,7 @@ impl AppState {
     }
 }
 
-#[tokio::main]
+#[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() -> Result<()> {
     // Initialize the application state
     let state = AppState::default();
@@ -227,6 +227,7 @@ async fn main() -> Result<()> {
         .route("/ws.js", get(ws_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/spinner.svg", get(spinner_handler))
+        .route("/overlay-websocket", get(overlay_websocket_handler))
         .route("/login", get(login_page_handler))
         .route("/login/", get(login_page_handler))
         .route("/login", post(login_handler))
@@ -352,15 +353,14 @@ async fn dashboard_websocket_handler(
     ws: WebSocketUpgrade,
 ) -> impl IntoResponse {
     ws.on_upgrade(|mut socket| async move {
-        let mut interval =
-            tokio::time::interval(std::time::Duration::from_millis(WEBSOCKET_UPDATE_MILLIS));
+        let mut interval = tokio::time::interval(std::time::Duration::from_millis(
+            WEBSOCKET_UPDATE_MILLIS + thread_rng().gen_range(5..=20),
+        ));
         loop {
             interval.tick().await;
 
             let game_clock = GAME_CLOCK.lock().await;
             let countdown_clock = COUNTDOWN_CLOCK.lock().await;
-            let downs_togo = state.downs_togo.lock().await;
-            let uptime = UPTIME_SECS.lock().await;
 
             let message = format!(
                 "
@@ -389,12 +389,16 @@ async fn dashboard_websocket_handler(
                     4 => "4th",
                     _ => "",
                 },
-                if *downs_togo == 0 {
-                    String::from("Hidden")
-                } else if *downs_togo == 101 {
-                    String::from("Goal")
-                } else {
-                    downs_togo.to_string()
+                {
+                    let downs_togo = state.downs_togo.lock().await;
+
+                    if *downs_togo == 0 {
+                        String::from("Hidden")
+                    } else if *downs_togo == 101 {
+                        String::from("Goal")
+                    } else {
+                        downs_togo.to_string()
+                    }
                 },
                 match *state.quarter.lock().await {
                     1 => "1st",
@@ -403,12 +407,16 @@ async fn dashboard_websocket_handler(
                     4 => "4th",
                     _ => "OT",
                 },
-                format!(
-                    "{:02}:{:02}:{:02}",
-                    *uptime / 3600,
-                    (*uptime % 3600) / 60,
-                    *uptime % 60
-                ),
+                {
+                    let uptime = UPTIME_SECS.lock().await;
+
+                    format!(
+                        "{:02}:{:02}:{:02}",
+                        *uptime / 3600,
+                        (*uptime % 3600) / 60,
+                        *uptime % 60
+                    )
+                },
                 format!(
                     "
             <style>
@@ -422,6 +430,169 @@ async fn dashboard_websocket_handler(
                         ""
                     },
                 )
+            );
+
+            if socket.send(Message::Text(message)).await.is_err() {
+                return;
+            }
+        }
+    })
+}
+
+async fn overlay_websocket_handler(
+    State(state): State<AppState>,
+    ws: WebSocketUpgrade,
+) -> impl IntoResponse {
+    ws.on_upgrade(|mut socket| async move {
+        let mut interval =
+            tokio::time::interval(std::time::Duration::from_millis(WEBSOCKET_UPDATE_MILLIS - thread_rng().gen_range(5..=20)));
+        loop {
+            interval.tick().await;
+
+            let game_clock = GAME_CLOCK.lock().await;
+
+            let message = format!(
+            "
+            <div id=\"ol-score\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"ol-time\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"ol-down\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"countdown-box\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"sponsor-roll\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"backend-css-overlay\" hx-swap-oob=\"innerHTML\">{}</div>
+            <div id=\"ol-popupContainer\" hx-swap-oob=\"innerHTML\">{}</div>
+            ",
+            format!("{}-{}", *state.home_points.lock().await, *state.away_points.lock().await),
+            {
+                let quarter_display = match *state.quarter.lock().await {
+                    1 => "1st",
+                    2 => "2nd",
+                    3 => "3rd",
+                    4 => "4th",
+                    _ => "OT",
+                };
+                if *game_clock >= 1000 * 60 {
+                    format!(
+                        "{}:{:02} - {}",
+                        *game_clock / 1000 / 60,
+                        *game_clock / 1000 % 60,
+                        quarter_display
+                    )
+                } else {
+                    format!(
+                        "{}:{:02}:{:02} - {}",
+                        *game_clock / 1000 / 60,
+                        *game_clock / 1000 % 60,
+                        *game_clock / 10 % 100,
+                        quarter_display
+                    )
+                }
+            },
+            {
+                let down = state.down.lock().await;
+
+                let down_display = match *down {
+                    1 => String::from("1st"),
+                    2 => String::from("2nd"),
+                    3 => String::from("3rd"),
+                    4 => String::from("4th"),
+                    _ => String::new(),
+                };
+
+                drop(down);
+                let downs_togo = state.downs_togo.lock().await;
+
+                if *downs_togo != 0 {
+                    format!(
+                        "{} & {}",
+                        down_display,
+                        if *downs_togo == 101 {
+                            String::from("Goal")
+                        } else {
+                            downs_togo.to_string()
+                        }
+                    )
+                } else {
+                    format!("{}", down_display,)
+                }
+            },
+            {
+                if *state.show_countdown.lock().await {
+                    let countdown_clock = COUNTDOWN_CLOCK.lock().await;
+                    format!(
+                        "<div id=\"ol-countdown\" class=\"countdown-container\"><h2 class=\"countdown-title\">{}:</h2>{}:{:02}</div>",
+                        state.countdown_text.lock().await,
+                        *countdown_clock / 60,
+                        *countdown_clock % 60
+                    )
+                } else {
+                    String::new()
+                }
+            },
+            {
+                let sponsor_tags = SPONSOR_TAGS.lock().await;
+                if *SHOW_SPONSORS.lock().await && sponsor_tags.len() > 0 {
+                    let sponsor_img = sponsor_tags[*SPONSOR_IDX.lock().await].clone();
+                    format!(
+                        "<div class=\"ol-sponsor-parent\">{}</div>",
+                        sponsor_img
+                    )
+                } else {
+                    String::new()
+                }
+            },
+            {
+                format!(
+                    "
+                <style>
+                    {}
+                    {}
+                </style>",
+                    if !*state.show_downs.lock().await {
+                    "
+                    .ol-down-box { 
+                        display: none; 
+                    }"
+                    } else {
+                        ""
+                    },
+                    if !*state.show_scoreboard.lock().await {
+                        ".ol-parent-container { display: none; }"
+                    } else {
+                        ""
+                    }
+                )
+            },
+            {
+                let mut html = String::new();
+
+                let popups_home = POPUPS_HOME.lock().await;
+                let mut h_vec = Vec::new();
+
+                for i in 0..popups_home.len() {
+                    h_vec.push(format!("<span>{}</span>", popups_home[i].0));
+                }
+
+                if h_vec.len() > 0 {
+                    html += &format!("<div class=\"ol-home-popup\">{}</div>", h_vec.join("<br>"));
+                }
+
+                drop(h_vec);
+
+                let popups_away = POPUPS_AWAY.lock().await;
+                let mut a_vec = Vec::new();
+
+                for i in 0..popups_away.len() {
+                    a_vec.push(format!("<span>{}</span>", popups_away[i].0));
+                }
+
+                if a_vec.len() > 0 {
+                    html += &format!("<div class=\"ol-away-popup\">{}</div>", a_vec.join("<br>"));
+                }
+
+                drop(a_vec);
+
+                html
+            }
             );
 
             if socket.send(Message::Text(message)).await.is_err() {

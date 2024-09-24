@@ -17,6 +17,7 @@
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
+    <script src="/ws.js"></script>
     <link rel="icon" href="/favicon.png">
     <script>
         // Auto Fullscreen
@@ -40,8 +41,8 @@
     </script>
 </head>
 
-<body class="overlay" id="overlay-body">
-    <div hx-put="/visibility/css" hx-trigger="every 100ms"></div>
+<body class="overlay" id="overlay-body" hx-ext="ws" ws-connect="/overlay-websocket">
+    <div id="backend-css-overlay"></div>
     <div hx-put="/overlay/team-border-css" hx-trigger="load"></div>
     <div class="ol-parent-container">
         <div class="ol-container">
@@ -49,26 +50,22 @@
                 <div hx-put="/icon/home" hx-trigger="load"></div>
                 <div class="ol-team-name" hx-put="/teaminfo/name/home" hx-trigger="load"></div>
             </div>
-            <div class="ol-score-box" hx-put="/points/overview" hx-trigger="every 10ms">0-0</div>
+            <div id="ol-score" class="ol-score-box">0-0</div>
             <div class="ol-away-box">
                 <div hx-put="/icon/away" hx-trigger="load"></div>
                 <div class="ol-team-name" hx-put="/teaminfo/name/away" hx-trigger="load"></div>
             </div>
             <div class="ol-quarter-box">
-                <div class="ol-time-quarter" hx-put="/overlay/clock" hx-trigger="every 10ms">0:00 - 1st</div>
+                <div id="ol-time" class="ol-time-quarter">0:00 - 1st</div>
             </div>
-            <div class="ol-down-box" hx-put="/downs/display/both" hx-trigger="every 10ms">
-                <h3>1st & 0</h3>
-            </div>
+            <div id="ol-down" class="ol-down-box">1st & 0</div>
         </div>
     </div>
 
     <!-- <div class="ol-sponsor-container" id="ol-sponsorContainer" hx-put="/sponsor_roll" hx-trigger="every 5000ms"></div> -->
-    <div hx-put="/countdown/display" hx-trigger="every 10ms"></div>
-    <div class="ol-popup-container" id="ol-popupContainer" hx-put="/popup/show" hx-trigger="every 10ms">
-        <p id="ol-popupText"></p>
-    </div>
-    <div hx-put="/sponsors/display" hx-trigger="every 500ms"></div>
+    <div id="countdown-box"></div>
+    <div class="ol-popup-container" id="ol-popupContainer"></div>
+    <div id="sponsor-roll"></div>
 
     <div id="flag-home" class="ol-popup-home">Flag home</div>
     <div id="timeout-home" class="ol-popup-home">Timeout home</div>
