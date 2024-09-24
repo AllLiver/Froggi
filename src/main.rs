@@ -7,8 +7,7 @@ use argon2::{
 use axum::{
     body::Body,
     extract::{
-        ws::Message,
-        DefaultBodyLimit, Multipart, Path, Query, Request, State, WebSocketUpgrade,
+        ws::Message, DefaultBodyLimit, Multipart, Path, Query, Request, State, WebSocketUpgrade,
     },
     http::{
         header::{CONTENT_TYPE, LOCATION, SET_COOKIE},
@@ -1056,15 +1055,11 @@ async fn away_points_set_handler(
     return StatusCode::OK;
 }
 
-async fn home_points_display_handler(
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+async fn home_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
     state.home_points.lock().await.to_string()
 }
 
-async fn away_points_display_handler(
-    State(state): State<AppState>,
-) -> impl IntoResponse {
+async fn away_points_display_handler(State(state): State<AppState>) -> impl IntoResponse {
     state.away_points.lock().await.to_string()
 }
 
