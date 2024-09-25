@@ -54,6 +54,7 @@ lazy_static! {
     static ref OCR_API: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
     static ref POPUPS_HOME: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
     static ref POPUPS_AWAY: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
+    static ref COUNTDOWN_OPACITY: Arc<Mutex<f32>> = Arc::new(Mutex::new(1.0));
 }
 
 #[macro_export]
@@ -101,6 +102,7 @@ impl AppState {
             show_countdown: Arc::new(Mutex::new(false)),
             show_downs: Arc::new(Mutex::new(true)),
             show_scoreboard: Arc::new(Mutex::new(true)),
+            
         }
     }
 }
@@ -134,6 +136,7 @@ async fn main() -> Result<()> {
         let default_config = Config {
             secure_auth_cookie: true,
             sponsor_wait_time: 5,
+            countdown_opacity: 0.5
         };
 
         f.write_all(
@@ -155,6 +158,7 @@ async fn main() -> Result<()> {
 
     // Load sponsor img tags
     load_sponsors().await;
+    load_config().await;
 
     // Set up CORS
     let cors = CorsLayer::new()
@@ -291,6 +295,7 @@ async fn main() -> Result<()> {
 struct Config {
     secure_auth_cookie: bool,
     sponsor_wait_time: u64,
+    countdown_opacity: f32
 }
 
 // region: basic pages
@@ -438,6 +443,9 @@ async fn overlay_websocket_handler(
     ws.on_upgrade(|mut socket| async move {
         let mut interval =
             tokio::time::interval(std::time::Duration::from_millis(WEBSOCKET_UPDATE_MILLIS - thread_rng().gen_range(5..=20)));
+
+        let countdown_opacity = COUNTDOWN_OPACITY.lock().await.clone();
+
         loop {
             interval.tick().await;
 
@@ -511,7 +519,8 @@ async fn overlay_websocket_handler(
                 if *state.show_countdown.lock().await {
                     let countdown_clock = COUNTDOWN_CLOCK.lock().await;
                     format!(
-                        "<div id=\"ol-countdown\" class=\"countdown-container\"><h2 class=\"countdown-title\">{}:</h2>{}:{:02}</div>",
+                        "<div id=\"ol-countdown\" class=\"countdown-container\" style=\"opacity: {};\"><h2 class=\"countdown-title\">{}:</h2>{}:{:02}</div>",
+                        countdown_opacity,
                         state.countdown_text.lock().await,
                         *countdown_clock / 60,
                         *countdown_clock % 60
@@ -2380,6 +2389,12 @@ async fn logs_handler() -> impl IntoResponse {
     }
 
     Html::from(logs_display.join("<br>"))
+}
+
+async fn load_config() {
+    let config: Config = serde_json::from_str(&tokio::fs::read_to_string("./config.json").await.expect("Failed to read config.json")).expect("Failed to deserialize config.json");
+
+    *COUNTDOWN_OPACITY.lock().await = config.countdown_opacity;
 }
 
 // endregion: misc
