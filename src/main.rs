@@ -2001,7 +2001,7 @@ async fn downs_display_handler(
 async fn visibility_buttons_handler(State(state): State<AppState>) -> impl IntoResponse {
     return Html::from(format!(
         "
-    <div class=\"visibility-buttons\">
+    <div class=\"display-buttons\">
         <button class=\"show-countdown\" hx-post=\"/visibility/toggle/countdown\">{}</button>
         <button class=\"show-downs\" hx-post=\"/visibility/toggle/downs\">{}</button>
         <button class=\"show-scoreboard\" hx-post=\"/visibility/toggle/scoreboard\">{}</button>
@@ -2260,16 +2260,17 @@ async fn api_key_show_handler() -> impl IntoResponse {
     }
 
     return Response::builder()
-        .status(StatusCode::OK)
-        .body(format!(
-        "<div class=\"your-container-class\">
-            <h6 id=\"api-key\">{}</h6>
-            <button class=\"copy-button\" onclick=\"apiCopy('{}')\">Copy</button>
-            <button class=\"button-settings\" hx-post=\"/api/key/reveal\" hx-target=\"#api-key\">Reveal Key</button>
-            </div>",
-            hidden_key, login.api_key
-        ))
-        .unwrap();
+    .status(StatusCode::OK)
+    .body(format!(
+    "<div class=\"settings-box-api\">
+        <h6 id=\"api-key\">{}</h6>
+        <button class=\"copy-button\" onclick=\"apiCopy(this, '{}')\">Copy</button>
+        <button class=\"button-settings\" hx-post=\"/api/key/reveal\" hx-target=\"#api-key\">Reveal Key</button>
+        </div>",
+        hidden_key, login.api_key
+    ))
+    .unwrap();
+
 }
 
 async fn api_key_reveal_handler() -> impl IntoResponse {
