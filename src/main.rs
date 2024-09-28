@@ -97,7 +97,7 @@ impl AppState {
             quarter: Arc::new(Mutex::new(1)),
             preset_id: Arc::new(Mutex::new(String::new())),
             down: Arc::new(Mutex::new(1)),
-            downs_togo: Arc::new(Mutex::new(0)),
+            downs_togo: Arc::new(Mutex::new(1)),
             countdown_text: Arc::new(Mutex::new(String::from("Countdown"))),
             show_countdown: Arc::new(Mutex::new(false)),
             show_downs: Arc::new(Mutex::new(true)),
@@ -2502,7 +2502,7 @@ async fn reset_handler(State(ref mut state): State<AppState>) -> impl IntoRespon
     *state.quarter.lock().await = 1;
     *state.preset_id.lock().await = String::new();
     *state.down.lock().await = 1;
-    *state.downs_togo.lock().await = 0;
+    *state.downs_togo.lock().await = 1;
     *state.countdown_text.lock().await = String::from("Countdown");
     *state.show_countdown.lock().await = false;
     *state.show_downs.lock().await = true;
