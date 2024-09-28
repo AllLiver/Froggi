@@ -1,6 +1,5 @@
-use anyhow::anyhow;
 #[forbid(unsafe_code)]
-use anyhow::{Context, Result, Error};
+use anyhow::{anyhow, Context, Error, Result};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
@@ -103,7 +102,6 @@ impl AppState {
             show_countdown: Arc::new(Mutex::new(false)),
             show_downs: Arc::new(Mutex::new(true)),
             show_scoreboard: Arc::new(Mutex::new(true)),
-            
         }
     }
     async fn load_saved_state() -> Result<AppState, Error> {
@@ -124,7 +122,7 @@ impl AppState {
                     countdown_text: Arc::new(Mutex::new(saved_state.countdown_text)),
                     show_countdown: Arc::new(Mutex::new(saved_state.show_countdown)),
                     show_downs: Arc::new(Mutex::new(saved_state.show_downs)),
-                    show_scoreboard: Arc::new(Mutex::new(saved_state.show_scoreboard))
+                    show_scoreboard: Arc::new(Mutex::new(saved_state.show_scoreboard)),
                 });
             } else {
                 return Err(anyhow!("Failed to deserialize appstate.json"));
@@ -150,7 +148,7 @@ struct AppStateSerde {
     show_downs: bool,
     show_scoreboard: bool,
     show_sponsors: bool,
-    ocr_api: bool
+    ocr_api: bool,
 }
 
 impl AppStateSerde {
@@ -169,7 +167,7 @@ impl AppStateSerde {
             show_downs: *state.show_downs.lock().await,
             show_scoreboard: *state.show_scoreboard.lock().await,
             show_sponsors: *SHOW_SPONSORS.lock().await,
-            ocr_api: *OCR_API.lock().await
+            ocr_api: *OCR_API.lock().await,
         }
     }
 }
@@ -186,8 +184,11 @@ async fn main() -> Result<()> {
         loop {
             if std::path::Path::new("./tmp/froggi.lock").exists() {
                 let lock_timestamp = tokio::fs::read_to_string("./tmp/froggi.lock").await?;
-                let current_time = std::time::SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_secs();
-                
+                let current_time = std::time::SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .expect("Time went backwards")
+                    .as_secs();
+
                 if current_time - lock_timestamp.trim().parse::<u64>()? >= 30 {
                     printlg!("Lock not updated for 30 seconds, old lock assumed to have crashed.");
                     break;
@@ -232,7 +233,7 @@ async fn main() -> Result<()> {
         let default_config = Config {
             secure_auth_cookie: true,
             sponsor_wait_time: 5,
-            countdown_opacity: 0.5
+            countdown_opacity: 0.5,
         };
 
         f.write_all(
@@ -385,7 +386,9 @@ async fn main() -> Result<()> {
 
     printlg!("Saving app state...");
 
-    if let Ok(save_app_state) = serde_json::to_string(&AppStateSerde::consume_app_state(state).await) {
+    if let Ok(save_app_state) =
+        serde_json::to_string(&AppStateSerde::consume_app_state(state).await)
+    {
         if let Ok(_) = tokio::fs::write("./appstate.json", save_app_state).await {
             printlg!("Saved app state!");
         } else {
@@ -406,7 +409,7 @@ async fn main() -> Result<()> {
 struct Config {
     secure_auth_cookie: bool,
     sponsor_wait_time: u64,
-    countdown_opacity: f32
+    countdown_opacity: f32,
 }
 
 // region: basic pages
@@ -1706,10 +1709,18 @@ async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl Into
                 .unwrap(),
         ) {
             let home_rgb = hex_to_rgb(&teaminfo.home_color);
-            let home_text_color = rgb_to_hex(&(255 - home_rgb.0, 255 - home_rgb.1, 255 - home_rgb.2));
+            let home_grayscale = (((255 - home_rgb.0 as u32)
+                + (255 - home_rgb.1 as u32)
+                + (255 - home_rgb.2 as u32))
+                / 3) as u8;
+            let home_text_color = rgb_to_hex(&(home_grayscale, home_grayscale, home_grayscale));
 
             let away_rgb = hex_to_rgb(&teaminfo.away_color);
-            let away_text_color = rgb_to_hex(&(255 - away_rgb.0, 255 - away_rgb.1, 255 - away_rgb.2));
+            let away_grayscale = (((255 - away_rgb.0 as u32)
+                + (255 - away_rgb.1 as u32)
+                + (255 - away_rgb.2 as u32))
+                / 3) as u8;
+            let away_text_color = rgb_to_hex(&(away_grayscale, away_grayscale, away_grayscale));
 
             return Html::from(format!(
                 "
@@ -2399,7 +2410,6 @@ async fn api_key_show_handler() -> impl IntoResponse {
         hidden_key, login.api_key
     ))
     .unwrap();
-
 }
 
 async fn api_key_reveal_handler() -> impl IntoResponse {
@@ -2522,7 +2532,12 @@ async fn logs_handler() -> impl IntoResponse {
 }
 
 async fn load_config() {
-    let config: Config = serde_json::from_str(&tokio::fs::read_to_string("./config.json").await.expect("Failed to read config.json")).expect("Failed to deserialize config.json");
+    let config: Config = serde_json::from_str(
+        &tokio::fs::read_to_string("./config.json")
+            .await
+            .expect("Failed to read config.json"),
+    )
+    .expect("Failed to deserialize config.json");
 
     *COUNTDOWN_OPACITY.lock().await = config.countdown_opacity;
 }
@@ -2561,12 +2576,20 @@ fn hex_char_to_u8(c: char) -> u8 {
         'd' => 13,
         'e' => 14,
         'f' => 15,
-        _ => 15
+        _ => 15,
     }
 }
 
 fn rgb_to_hex(rgb: &(u8, u8, u8)) -> String {
-    format!("#{}{}{}{}{}{}", u8_to_hex_char((rgb.0 - (rgb.0 % 16)) / 16), u8_to_hex_char(rgb.0 % 16), u8_to_hex_char((rgb.1 - (rgb.1 % 16)) / 16), u8_to_hex_char(rgb.1 % 16), u8_to_hex_char((rgb.2 - (rgb.2 % 16)) / 16), u8_to_hex_char(rgb.2 % 16))
+    format!(
+        "#{}{}{}{}{}{}",
+        u8_to_hex_char((rgb.0 - (rgb.0 % 16)) / 16),
+        u8_to_hex_char(rgb.0 % 16),
+        u8_to_hex_char((rgb.1 - (rgb.1 % 16)) / 16),
+        u8_to_hex_char(rgb.1 % 16),
+        u8_to_hex_char((rgb.2 - (rgb.2 % 16)) / 16),
+        u8_to_hex_char(rgb.2 % 16)
+    )
 }
 
 fn u8_to_hex_char(u: u8) -> char {
@@ -2587,7 +2610,7 @@ fn u8_to_hex_char(u: u8) -> char {
         13 => 'D',
         14 => 'E',
         15 => 'F',
-        _ => 'F'
+        _ => 'F',
     }
 }
 
@@ -2674,7 +2697,10 @@ fn key_create(l: usize) -> String {
 }
 
 async fn program_lock() -> Result<(), std::io::Error> {
-    let time = std::time::SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_secs();
+    let time = std::time::SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("Time went backwards")
+        .as_secs();
 
     tokio::fs::write("./tmp/froggi.lock", time.to_string()).await
 }
@@ -2686,9 +2712,14 @@ async fn release_program_lock() -> Result<(), std::io::Error> {
 async fn update_program_lock() {
     loop {
         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-        let time = std::time::SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_secs();
+        let time = std::time::SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("Time went backwards")
+            .as_secs();
 
-        tokio::fs::write("./tmp/froggi.lock", time.to_string()).await.expect("Failed to update froggi.lock");
+        tokio::fs::write("./tmp/froggi.lock", time.to_string())
+            .await
+            .expect("Failed to update froggi.lock");
     }
 }
 
