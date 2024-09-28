@@ -109,6 +109,8 @@ impl AppState {
             if let Ok(saved_state) = serde_json::from_str::<AppStateSerde>(&contents) {
                 *SHOW_SPONSORS.lock().await = saved_state.show_sponsors;
                 *OCR_API.lock().await = saved_state.ocr_api;
+                *GAME_CLOCK.lock().await = saved_state.game_clock;
+                *COUNTDOWN_CLOCK.lock().await = saved_state.countdown_clock;
 
                 return Ok(AppState {
                     home_points: Arc::new(Mutex::new(saved_state.home_points)),
@@ -149,6 +151,8 @@ struct AppStateSerde {
     show_scoreboard: bool,
     show_sponsors: bool,
     ocr_api: bool,
+    game_clock: usize,
+    countdown_clock: usize,
 }
 
 impl AppStateSerde {
@@ -168,6 +172,8 @@ impl AppStateSerde {
             show_scoreboard: *state.show_scoreboard.lock().await,
             show_sponsors: *SHOW_SPONSORS.lock().await,
             ocr_api: *OCR_API.lock().await,
+            game_clock: *GAME_CLOCK.lock().await,
+            countdown_clock: *COUNTDOWN_CLOCK.lock().await,
         }
     }
 }
