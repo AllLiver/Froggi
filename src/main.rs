@@ -1,5 +1,6 @@
+use anyhow::anyhow;
 #[forbid(unsafe_code)]
-use anyhow::{Context, Result};
+use anyhow::{Context, Result, Error};
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString},
     Argon2,
@@ -105,12 +106,82 @@ impl AppState {
             
         }
     }
+    async fn load_saved_state() -> Result<AppState, Error> {
+        if let Ok(contents) = tokio::fs::read_to_string("./appstate.json").await {
+            if let Ok(saved_state) = serde_json::from_str::<AppStateSerde>(&contents) {
+                *SHOW_SPONSORS.lock().await = saved_state.show_sponsors;
+                *OCR_API.lock().await = saved_state.ocr_api;
+
+                return Ok(AppState {
+                    home_points: Arc::new(Mutex::new(saved_state.home_points)),
+                    home_name: Arc::new(Mutex::new(saved_state.home_name)),
+                    away_points: Arc::new(Mutex::new(saved_state.away_points)),
+                    away_name: Arc::new(Mutex::new(saved_state.away_name)),
+                    quarter: Arc::new(Mutex::new(saved_state.quarter)),
+                    preset_id: Arc::new(Mutex::new(saved_state.preset_id)),
+                    down: Arc::new(Mutex::new(saved_state.down)),
+                    downs_togo: Arc::new(Mutex::new(saved_state.downs_togo)),
+                    countdown_text: Arc::new(Mutex::new(saved_state.countdown_text)),
+                    show_countdown: Arc::new(Mutex::new(saved_state.show_countdown)),
+                    show_downs: Arc::new(Mutex::new(saved_state.show_downs)),
+                    show_scoreboard: Arc::new(Mutex::new(saved_state.show_scoreboard))
+                });
+            } else {
+                return Err(anyhow!("Failed to deserialize appstate.json"));
+            }
+        } else {
+            return Err(anyhow!("Failed to open appstate.json"));
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct AppStateSerde {
+    home_points: u32,
+    home_name: String,
+    away_points: u32,
+    away_name: String,
+    quarter: u8,
+    preset_id: String,
+    down: u8,
+    downs_togo: u8,
+    countdown_text: String,
+    show_countdown: bool,
+    show_downs: bool,
+    show_scoreboard: bool,
+    show_sponsors: bool,
+    ocr_api: bool
+}
+
+impl AppStateSerde {
+    async fn consume_app_state(state: AppState) -> AppStateSerde {
+        AppStateSerde {
+            home_points: *state.home_points.lock().await,
+            home_name: state.home_name.lock().await.clone(),
+            away_points: *state.away_points.lock().await,
+            away_name: state.away_name.lock().await.clone(),
+            quarter: *state.quarter.lock().await,
+            preset_id: state.preset_id.lock().await.clone(),
+            down: *state.down.lock().await,
+            downs_togo: *state.downs_togo.lock().await,
+            countdown_text: state.countdown_text.lock().await.clone(),
+            show_countdown: *state.show_countdown.lock().await,
+            show_downs: *state.show_downs.lock().await,
+            show_scoreboard: *state.show_scoreboard.lock().await,
+            show_sponsors: *SHOW_SPONSORS.lock().await,
+            ocr_api: *OCR_API.lock().await
+        }
+    }
 }
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() -> Result<()> {
     // Initialize the application state
-    let state = AppState::default();
+    let mut state = AppState::default();
+
+    if let Ok(s) = AppState::load_saved_state().await {
+        state = s;
+    }
 
     // Validate required files and directories
     if let Err(_) = File::open("secret.key").await {
@@ -265,7 +336,7 @@ async fn main() -> Result<()> {
         )
         .nest("/", auth_session_routes)
         .nest("/", auth_give_session_routes)
-        .with_state(state)
+        .with_state(state.clone())
         .fallback(get(not_found_handler))
         .layer(cors);
 
@@ -284,6 +355,18 @@ async fn main() -> Result<()> {
             .context("Could not serve app")?;
     } else {
         panic!("Could not bind tcp listener!");
+    }
+
+    printlg!("Saving app state...");
+
+    if let Ok(save_app_state) = serde_json::to_string(&AppStateSerde::consume_app_state(state).await) {
+        if let Ok(_) = tokio::fs::write("./appstate.json", save_app_state).await {
+            printlg!("Saved app state!");
+        } else {
+            printlg!("Failed to save app state!");
+        }
+    } else {
+        printlg!("Failed to save app state!");
     }
 
     printlg!("Shut down gracefully");
