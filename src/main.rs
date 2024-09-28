@@ -1721,7 +1721,6 @@ async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl Into
                 / 3) as u8;
             let home_grayscale_nudge =
                 ((255.0 - home_grayscale as f32) * (home_grayscale as f32 / 255.0)) as u8;
-            println!("{}", home_grayscale_nudge);
             let home_text_color = rgb_to_hex(&(
                 home_grayscale + home_grayscale_nudge,
                 home_grayscale + home_grayscale_nudge,
