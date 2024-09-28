@@ -176,6 +176,31 @@ impl AppStateSerde {
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 async fn main() -> Result<()> {
+    // Verify tmp directory exists
+    create_dir_all("./tmp").await?;
+
+    // Wait for program lock to release
+    if std::path::Path::new("./tmp/froggi.lock").exists() {
+        printlg!("Waiting on program lock to release...");
+
+        loop {
+            if std::path::Path::new("./tmp/froggi.lock").exists() {
+                let lock_timestamp = tokio::fs::read_to_string("./tmp/froggi.lock").await?;
+                let current_time = std::time::SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_secs();
+                
+                if current_time - lock_timestamp.trim().parse::<u64>()? >= 30 {
+                    printlg!("Lock not updated for 30 seconds, old lock assumed to have crashed.");
+                    break;
+                }
+            } else {
+                break;
+            }
+            tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+        }
+    }
+
+    program_lock().await?;
+
     // Initialize the application state
     let mut state = AppState::default();
 
@@ -342,6 +367,7 @@ async fn main() -> Result<()> {
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
         tokio::spawn(uptime_ticker());
+        tokio::spawn(update_program_lock());
         tokio::spawn(game_clock_ticker());
         tokio::spawn(countdown_clock_ticker());
         tokio::spawn(sponsor_ticker());
@@ -368,6 +394,8 @@ async fn main() -> Result<()> {
     } else {
         printlg!("Failed to save app state!");
     }
+
+    release_program_lock().await?;
 
     printlg!("Shut down gracefully");
 
@@ -1677,35 +1705,53 @@ async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl Into
                 .await
                 .unwrap(),
         ) {
+            let home_rgb = hex_to_rgb(&teaminfo.home_color);
+            let home_text_color = rgb_to_hex(&(255 - home_rgb.0, 255 - home_rgb.1, 255 - home_rgb.2));
+
+            let away_rgb = hex_to_rgb(&teaminfo.away_color);
+            let away_text_color = rgb_to_hex(&(255 - away_rgb.0, 255 - away_rgb.1, 255 - away_rgb.2));
+
             return Html::from(format!(
                 "
             <style>
                 .button-decrement-home {{
                     background-color: {};
+                    color: {};
                 }}
                 .button-increment-home {{
                     background-color: {};
+                    color: {};
                 }}
                 .button-preset-score-home {{
                     background-color: {};
+                    color: {};
                 }}
                 .button-decrement-away {{
                     background-color: {};
+                    color: {};
                 }}
                 .button-increment-away {{
                     background-color: {};
+                    color: {};
                 }}
                 .button-preset-score-away {{
                     background-color: {};
+                    color: {};
                 }}
             </style>
             ",
                 teaminfo.home_color,
+                home_text_color,
                 teaminfo.home_color,
+                home_text_color,
                 teaminfo.home_color,
+                home_text_color,
                 teaminfo.away_color,
+                away_text_color,
                 teaminfo.away_color,
+                away_text_color,
                 teaminfo.away_color,
+                away_text_color,
             ));
         } else {
             return Html::from(String::new());
@@ -2481,6 +2527,70 @@ async fn load_config() {
     *COUNTDOWN_OPACITY.lock().await = config.countdown_opacity;
 }
 
+fn hex_to_rgb(hex: &String) -> (u8, u8, u8) {
+    let hex_chars: Vec<char> = hex.trim_start_matches("#").to_string().chars().collect();
+
+    let r = hex_char_to_u8(hex_chars[0]) * 16 + hex_char_to_u8(hex_chars[1]);
+    let g = hex_char_to_u8(hex_chars[2]) * 16 + hex_char_to_u8(hex_chars[3]);
+    let b = hex_char_to_u8(hex_chars[4]) * 16 + hex_char_to_u8(hex_chars[5]);
+
+    (r, g, b)
+}
+
+fn hex_char_to_u8(c: char) -> u8 {
+    match c {
+        '0' => 0,
+        '1' => 1,
+        '2' => 2,
+        '3' => 3,
+        '4' => 4,
+        '5' => 5,
+        '6' => 6,
+        '7' => 7,
+        '8' => 8,
+        '9' => 9,
+        'A' => 10,
+        'B' => 11,
+        'C' => 12,
+        'D' => 13,
+        'E' => 14,
+        'F' => 15,
+        'a' => 10,
+        'b' => 11,
+        'c' => 12,
+        'd' => 13,
+        'e' => 14,
+        'f' => 15,
+        _ => 15
+    }
+}
+
+fn rgb_to_hex(rgb: &(u8, u8, u8)) -> String {
+    format!("#{}{}{}{}{}{}", u8_to_hex_char((rgb.0 - (rgb.0 % 16)) / 16), u8_to_hex_char(rgb.0 % 16), u8_to_hex_char((rgb.1 - (rgb.1 % 16)) / 16), u8_to_hex_char(rgb.1 % 16), u8_to_hex_char((rgb.2 - (rgb.2 % 16)) / 16), u8_to_hex_char(rgb.2 % 16))
+}
+
+fn u8_to_hex_char(u: u8) -> char {
+    match u {
+        0 => '0',
+        1 => '1',
+        2 => '2',
+        3 => '3',
+        4 => '4',
+        5 => '5',
+        6 => '6',
+        7 => '7',
+        8 => '8',
+        9 => '9',
+        10 => 'A',
+        11 => 'B',
+        12 => 'C',
+        13 => 'D',
+        14 => 'E',
+        15 => 'F',
+        _ => 'F'
+    }
+}
+
 // endregion: misc
 // region: middleware
 
@@ -2561,6 +2671,25 @@ fn key_create(l: usize) -> String {
         .take(l)
         .map(char::from)
         .collect()
+}
+
+async fn program_lock() -> Result<(), std::io::Error> {
+    let time = std::time::SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_secs();
+
+    tokio::fs::write("./tmp/froggi.lock", time.to_string()).await
+}
+
+async fn release_program_lock() -> Result<(), std::io::Error> {
+    tokio::fs::remove_file("./tmp/froggi.lock").await
+}
+
+async fn update_program_lock() {
+    loop {
+        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+        let time = std::time::SystemTime::now().duration_since(UNIX_EPOCH).expect("Time went backwards").as_secs();
+
+        tokio::fs::write("./tmp/froggi.lock", time.to_string()).await.expect("Failed to update froggi.lock");
+    }
 }
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
