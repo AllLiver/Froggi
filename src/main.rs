@@ -1719,14 +1719,27 @@ async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl Into
                 + (255 - home_rgb.1 as u32)
                 + (255 - home_rgb.2 as u32))
                 / 3) as u8;
-            let home_text_color = rgb_to_hex(&(home_grayscale, home_grayscale, home_grayscale));
+            let home_grayscale_nudge =
+                ((255.0 - home_grayscale as f32) * (home_grayscale as f32 / 255.0)) as u8;
+            println!("{}", home_grayscale_nudge);
+            let home_text_color = rgb_to_hex(&(
+                home_grayscale + home_grayscale_nudge,
+                home_grayscale + home_grayscale_nudge,
+                home_grayscale + home_grayscale_nudge,
+            ));
 
             let away_rgb = hex_to_rgb(&teaminfo.away_color);
             let away_grayscale = (((255 - away_rgb.0 as u32)
                 + (255 - away_rgb.1 as u32)
                 + (255 - away_rgb.2 as u32))
                 / 3) as u8;
-            let away_text_color = rgb_to_hex(&(away_grayscale, away_grayscale, away_grayscale));
+            let away_grayscale_nudge =
+                ((255.0 - away_grayscale as f32) * (away_grayscale as f32 / 255.0)) as u8;
+            let away_text_color = rgb_to_hex(&(
+                away_grayscale + away_grayscale_nudge,
+                away_grayscale + away_grayscale_nudge,
+                away_grayscale + away_grayscale_nudge,
+            ));
 
             return Html::from(format!(
                 "
