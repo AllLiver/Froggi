@@ -2,11 +2,11 @@
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
-Is a self-hosted portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.
+Is a self-hosted portable scoreboard solution that aims to provide an intuitive sports broadcasting overlay.
 
 # Features
 - ✨ Optical character recognition (OCR) using [froggi-ocr](https://github.com/AllLiver/froggi-ocr) and [scoresight-ocr](https://github.com/locaal-ai/scoresight), using a video source, OCR can be automatic
-- ✨ Elegato Streamdeck (Bitfocus Companion) support
+- ✨ The reasonably priced Elegato Streamdeck support via Bitfocus Companion
 - ✨ An optional sponsor logo slideshow
 - ✨ Game presets
 - ✨ Ui optimized for iPad like devices
