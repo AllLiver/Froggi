@@ -26,6 +26,7 @@ use rand::{distributions::Alphanumeric, thread_rng, Rng};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
+    env,
     path::PathBuf,
     sync::Arc,
     time::{Instant, UNIX_EPOCH},
@@ -34,7 +35,7 @@ use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, remove_file, File},
     io::{AsyncReadExt, AsyncWriteExt, BufReader},
     signal,
-    sync::Mutex,
+    sync::{oneshot, Mutex},
 };
 use tower_http::cors::CorsLayer;
 use uuid::Uuid;
@@ -55,6 +56,7 @@ lazy_static! {
     static ref POPUPS_HOME: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
     static ref POPUPS_AWAY: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
     static ref COUNTDOWN_OPACITY: Arc<Mutex<f32>> = Arc::new(Mutex::new(1.0));
+    static ref EXIT_CODE: Arc<Mutex<Option<i32>>> = Arc::new(Mutex::new(None));
 }
 
 #[macro_export]
@@ -85,6 +87,7 @@ struct AppState {
     show_countdown: Arc<Mutex<bool>>,
     show_downs: Arc<Mutex<bool>>,
     show_scoreboard: Arc<Mutex<bool>>,
+    restart_signal: Arc<Mutex<Option<oneshot::Sender<()>>>>,
 }
 
 impl AppState {
@@ -102,6 +105,7 @@ impl AppState {
             show_countdown: Arc::new(Mutex::new(false)),
             show_downs: Arc::new(Mutex::new(true)),
             show_scoreboard: Arc::new(Mutex::new(true)),
+            restart_signal: Arc::new(Mutex::new(None)),
         }
     }
     async fn load_saved_state() -> Result<AppState, Error> {
@@ -125,6 +129,7 @@ impl AppState {
                     show_countdown: Arc::new(Mutex::new(saved_state.show_countdown)),
                     show_downs: Arc::new(Mutex::new(saved_state.show_downs)),
                     show_scoreboard: Arc::new(Mutex::new(saved_state.show_scoreboard)),
+                    restart_signal: Arc::new(Mutex::new(None)),
                 });
             } else {
                 return Err(anyhow!("Failed to deserialize appstate.json"));
@@ -208,12 +213,16 @@ async fn main() -> Result<()> {
 
     program_lock().await?;
 
+    let (tx, rx) = oneshot::channel();
+
     // Initialize the application state
     let mut state = AppState::default();
 
     if let Ok(s) = AppState::load_saved_state().await {
         state = s;
     }
+
+    state.restart_signal = Arc::new(Mutex::new(Some(tx)));
 
     // Validate required files and directories
     if let Err(_) = File::open("secret.key").await {
@@ -322,6 +331,7 @@ async fn main() -> Result<()> {
         .route("/api/key/reveal", post(api_key_reveal_handler))
         .route("/popup/:t", post(popup_handler))
         .route("/reset", post(reset_handler))
+        .route("/restart", post(restart_handler))
         .layer(middleware::from_fn(auth_session_layer));
 
     let app = Router::new()
@@ -383,7 +393,7 @@ async fn main() -> Result<()> {
         printlg!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
-            .with_graceful_shutdown(shutdown_signal())
+            .with_graceful_shutdown(shutdown_signal(rx))
             .await
             .context("Could not serve app")?;
     } else {
@@ -405,6 +415,15 @@ async fn main() -> Result<()> {
     }
 
     release_program_lock().await?;
+
+    if let Some(code) = EXIT_CODE.lock().await.take() {
+        if code == 10 {
+            printlg!("Shut down gracefully\n");
+        } else {
+            printlg!("Shut down gracefully");
+        }
+        std::process::exit(code);
+    }
 
     printlg!("Shut down gracefully");
 
@@ -1715,29 +1734,43 @@ async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl Into
                 .unwrap(),
         ) {
             let home_rgb = hex_to_rgb(&teaminfo.home_color);
-            let home_grayscale = (((255 - home_rgb.0 as u32)
-                + (255 - home_rgb.1 as u32)
-                + (255 - home_rgb.2 as u32))
+            let home_rgb_complimentary =
+                ((255 - home_rgb.0), (255 - home_rgb.1), (255 - home_rgb.2));
+            let home_rgb_grayscale_nudge = (((255.0 - home_rgb_complimentary.0 as f32)
+                * (home_rgb_complimentary.0 as f32 / 255.0)
+                + (255.0 - home_rgb_complimentary.1 as f32)
+                    * (home_rgb_complimentary.1 as f32 / 255.0)
+                + (255.0 - home_rgb_complimentary.2 as f32)
+                    * (home_rgb_complimentary.2 as f32 / 255.0))
+                / 3.0) as u8;
+            let home_rgb_grayscale_value = ((home_rgb_complimentary.0 as u32
+                + home_rgb_complimentary.1 as u32
+                + home_rgb_complimentary.2 as u32)
                 / 3) as u8;
-            let home_grayscale_nudge =
-                ((255.0 - home_grayscale as f32) * (home_grayscale as f32 / 255.0)) as u8;
             let home_text_color = rgb_to_hex(&(
-                home_grayscale + home_grayscale_nudge,
-                home_grayscale + home_grayscale_nudge,
-                home_grayscale + home_grayscale_nudge,
+                home_rgb_grayscale_value + home_rgb_grayscale_nudge,
+                home_rgb_grayscale_value + home_rgb_grayscale_nudge,
+                home_rgb_grayscale_value + home_rgb_grayscale_nudge,
             ));
 
             let away_rgb = hex_to_rgb(&teaminfo.away_color);
-            let away_grayscale = (((255 - away_rgb.0 as u32)
-                + (255 - away_rgb.1 as u32)
-                + (255 - away_rgb.2 as u32))
+            let away_rgb_complimentary =
+                ((255 - away_rgb.0), (255 - away_rgb.1), (255 - away_rgb.2));
+            let away_rgb_grayscale_nudge = (((255.0 - away_rgb_complimentary.0 as f32)
+                * (away_rgb_complimentary.0 as f32 / 255.0)
+                + (255.0 - away_rgb_complimentary.1 as f32)
+                    * (away_rgb_complimentary.1 as f32 / 255.0)
+                + (255.0 - away_rgb_complimentary.2 as f32)
+                    * (away_rgb_complimentary.2 as f32 / 255.0))
+                / 3.0) as u8;
+            let away_rgb_grayscale_value = ((away_rgb_complimentary.0 as u32
+                + away_rgb_complimentary.1 as u32
+                + away_rgb_complimentary.2 as u32)
                 / 3) as u8;
-            let away_grayscale_nudge =
-                ((255.0 - away_grayscale as f32) * (away_grayscale as f32 / 255.0)) as u8;
             let away_text_color = rgb_to_hex(&(
-                away_grayscale + away_grayscale_nudge,
-                away_grayscale + away_grayscale_nudge,
-                away_grayscale + away_grayscale_nudge,
+                away_rgb_grayscale_value + away_rgb_grayscale_nudge,
+                away_rgb_grayscale_value + away_rgb_grayscale_nudge,
+                away_rgb_grayscale_value + away_rgb_grayscale_nudge,
             ));
 
             return Html::from(format!(
@@ -2632,6 +2665,16 @@ fn u8_to_hex_char(u: u8) -> char {
     }
 }
 
+async fn restart_handler(State(state): State<AppState>) {
+    printlg!("Restarting...");
+
+    if let Some(tx) = state.restart_signal.lock().await.take() {
+        let _ = tx.send(());
+    } else {
+        printlg!("Shutdown signal already sent");
+    }
+}
+
 // endregion: misc
 // region: middleware
 
@@ -2742,7 +2785,7 @@ async fn update_program_lock() {
 }
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
-async fn shutdown_signal() {
+async fn shutdown_signal(mut restart_rx: oneshot::Receiver<()>) {
     let ctrl_c = async {
         signal::ctrl_c()
             .await
@@ -2765,5 +2808,8 @@ async fn shutdown_signal() {
     tokio::select! {
         _ = ctrl_c => {},
         _ = terminate => {},
+        _ = &mut restart_rx => {
+            *EXIT_CODE.lock().await = Some(10);
+        }
     }
 }
