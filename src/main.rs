@@ -56,6 +56,8 @@ lazy_static! {
     static ref POPUPS_HOME: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
     static ref POPUPS_AWAY: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
     static ref COUNTDOWN_OPACITY: Arc<Mutex<f32>> = Arc::new(Mutex::new(1.0));
+    static ref RESTART_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> = Arc::new(Mutex::new(None));
+    static ref SHUTDOWN_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> = Arc::new(Mutex::new(None));
     static ref EXIT_CODE: Arc<Mutex<Option<i32>>> = Arc::new(Mutex::new(None));
 }
 
@@ -87,7 +89,6 @@ struct AppState {
     show_countdown: Arc<Mutex<bool>>,
     show_downs: Arc<Mutex<bool>>,
     show_scoreboard: Arc<Mutex<bool>>,
-    restart_signal: Arc<Mutex<Option<oneshot::Sender<()>>>>,
 }
 
 impl AppState {
@@ -105,7 +106,6 @@ impl AppState {
             show_countdown: Arc::new(Mutex::new(false)),
             show_downs: Arc::new(Mutex::new(true)),
             show_scoreboard: Arc::new(Mutex::new(true)),
-            restart_signal: Arc::new(Mutex::new(None)),
         }
     }
     async fn load_saved_state() -> Result<AppState, Error> {
@@ -129,7 +129,6 @@ impl AppState {
                     show_countdown: Arc::new(Mutex::new(saved_state.show_countdown)),
                     show_downs: Arc::new(Mutex::new(saved_state.show_downs)),
                     show_scoreboard: Arc::new(Mutex::new(saved_state.show_scoreboard)),
-                    restart_signal: Arc::new(Mutex::new(None)),
                 });
             } else {
                 return Err(anyhow!("Failed to deserialize appstate.json"));
@@ -213,7 +212,8 @@ async fn main() -> Result<()> {
 
     program_lock().await?;
 
-    let (tx, rx) = oneshot::channel();
+    let (restart_tx, restart_rx) = oneshot::channel();
+    let (shutdown_tx, shutdown_rx) = oneshot::channel();
 
     // Initialize the application state
     let mut state = AppState::default();
@@ -222,7 +222,8 @@ async fn main() -> Result<()> {
         state = s;
     }
 
-    state.restart_signal = Arc::new(Mutex::new(Some(tx)));
+    *RESTART_SIGNAL.lock().await = Some(restart_tx);
+    *SHUTDOWN_SIGNAL.lock().await = Some(shutdown_tx);
 
     // Validate required files and directories
     if let Err(_) = File::open("secret.key").await {
@@ -332,6 +333,7 @@ async fn main() -> Result<()> {
         .route("/popup/:t", post(popup_handler))
         .route("/reset", post(reset_handler))
         .route("/restart", post(restart_handler))
+        .route("/shutdown", post(shutdown_handler))
         .layer(middleware::from_fn(auth_session_layer));
 
     let app = Router::new()
@@ -393,7 +395,7 @@ async fn main() -> Result<()> {
         printlg!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
-            .with_graceful_shutdown(shutdown_signal(rx))
+            .with_graceful_shutdown(shutdown_signal(restart_rx, shutdown_rx))
             .await
             .context("Could not serve app")?;
     } else {
@@ -2665,13 +2667,39 @@ fn u8_to_hex_char(u: u8) -> char {
     }
 }
 
-async fn restart_handler(State(state): State<AppState>) {
+async fn restart_handler() -> impl IntoResponse {
     printlg!("Restarting...");
 
-    if let Some(tx) = state.restart_signal.lock().await.take() {
+    if let Some(tx) = RESTART_SIGNAL.lock().await.take() {
         let _ = tx.send(());
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::from("Restarting..."))
+            .unwrap();
+    } else {
+        printlg!("Restart signal already sent");
+        return Response::builder()
+            .status(StatusCode::METHOD_NOT_ALLOWED)
+            .body(String::from("Restart already sent!"))
+            .unwrap();
+    }
+}
+
+async fn shutdown_handler() -> impl IntoResponse {
+    printlg!("Shutting down...");
+
+    if let Some(tx) = SHUTDOWN_SIGNAL.lock().await.take() {
+        let _ = tx.send(());
+        return Response::builder()
+            .status(StatusCode::OK)
+            .body(String::from("Shutting down..."))
+            .unwrap();
     } else {
         printlg!("Shutdown signal already sent");
+        return Response::builder()
+            .status(StatusCode::METHOD_NOT_ALLOWED)
+            .body(String::from("Shutdown already sent!"))
+            .unwrap();
     }
 }
 
@@ -2785,7 +2813,7 @@ async fn update_program_lock() {
 }
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
-async fn shutdown_signal(mut restart_rx: oneshot::Receiver<()>) {
+async fn shutdown_signal(mut restart_rx: oneshot::Receiver<()>, mut shutdown_rx: oneshot::Receiver<()>) {
     let ctrl_c = async {
         signal::ctrl_c()
             .await
@@ -2810,6 +2838,9 @@ async fn shutdown_signal(mut restart_rx: oneshot::Receiver<()>) {
         _ = terminate => {},
         _ = &mut restart_rx => {
             *EXIT_CODE.lock().await = Some(10);
+        }
+        _ = &mut shutdown_rx => {
+            *EXIT_CODE.lock().await = Some(0);
         }
     }
 }

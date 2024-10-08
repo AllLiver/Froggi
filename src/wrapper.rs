@@ -1,3 +1,4 @@
+#[cfg(unix)]
 use nix::{sys::signal::Signal::SIGTERM, unistd::Pid};
 use tokio::{process::Command, signal};
 
@@ -34,14 +35,10 @@ async fn main() {
             // If the wrapper recieves a shutdown signal, send a shutdown signal to the child process
             _ = shutdown_signal() => {
                 #[cfg(unix)]
-                {
-                    nix::sys::signal::kill(Pid::from_raw(froggi_process.id().expect("Failed to get froggi-worker pid") as i32), SIGTERM).expect("Failed to terminate froggi-worker");
-                }
+                nix::sys::signal::kill(Pid::from_raw(froggi_process.id().expect("Failed to get froggi-worker pid") as i32), SIGTERM).expect("Failed to terminate froggi-worker");
 
                 #[cfg(not(unix))]
-                {
-                    froggi_process.kill();
-                }
+                froggi_process.kill();
 
                 break 0;
             }
