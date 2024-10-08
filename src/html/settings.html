@@ -3,39 +3,92 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
     <title>Settings</title>
+    <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preload" href="/app.js" as="script">
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="/htmx.js"></script>
+    <script src="/app.js" defer></script>
+    <script src="/ws.js" defer></script>
 </head>
 
+<!--TODO: Masonry Layout, make slider smaller, set :visited psuedo, Regenerate API Key-->
 <body id="settings-body">
     <nav>
-        <button class="hamburger-menu" onclick="toggle_menu()">
+        <button class="hamburger-menu">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
         </button>
         <ul class="sidenavbar">
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/teaminfo">Sponsors & Teaminfo</a></li>
-            <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
-            <li><a href="/settings" class="nav-active">Settings</a></li>
-            <li><a href="/" id="open-logs">Open Logs</a></li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon type='solid' name='dashboard' class="ico-white"></box-icon>
+                <a href="/" class="nav-text">Dashboard</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='group' class="ico-white"></box-icon>
+                <a href="/teaminfo" class="nav-text">Sponsors & Teaminfo</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='layer' class="ico-white"></box-icon>
+                <a href="/overlay" target="_blank" rel="noopener noreferrer" class="nav-text">Overlay</a>
+            </div></div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='cog' class="ico-white"></box-icon>
+                <a href="/settings" class="nav-text nav-active">Settings</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                    <box-icon name='align-justify' class="ico-white"></box-icon>
+                <a href="/" id="open-logs" class="nav-text">Open Logs</a>
+            </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                    <box-icon name='log-out' class="ico-logout"></box-icon>
+                    <a href="/" id="log-out" class="nav-text">Logout</a>
+                </div>
+            </li>
         </ul>
     </nav>
+
+    
     <div class="settings-container" id="settings-overlay-box">
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Additional Settings</h2>
+                <div class="subtext-settings">
+                    <h6>  "secure_auth_cookie": false,
+                        "sponsor_wait_time": 5,
+                        "sponsor_img_width": 50
+                    Secure_auth_cookie, sponsor_wait_time, sponsor_img_width, countdown_opacity are controlled in the config.json file, changes will require a restart to take affect. To disable feaatures such as the lock interface button, or to change the url of the preview on the dashboard, the constants at the top of "app.js" will have to be changed and then recompiled.</h6>
+                </div>
+            </div>
+        </div>
         <div class="settings-box">
             <div class="settings-title">
                 <h2>Overlay background color</h2>
                 <div class="subtext-settings">
-                    <h6>The background color is determined by this color picker, additionally you can set the alpha channel with the slider.</h6>
+                    <h6>The background color is determined by this color picker, additionally you can set the alpha
+                        channel with the slider.</h6>
                 </div>
             </div>
             <div class="setting">
@@ -43,14 +96,14 @@
                 <h3 class="alpha-range-title" id="color-value">#00b140</h3>
                 <input type="range" id="overlay-alpha" min="0" max="100" value="100">
                 <h3 class="alpha-range-title" id="alpha-value">100</h3>
-                <button id="reset-color">Reset to Default</button>
+                <button id="reset-color">Default</button>
             </div>
         </div>
         <div class="settings-box">
             <div class="settings-title">
                 <h2>Theme</h2>
                 <div class="subtext-settings">
-                    <h6>Changing themes can be helpful in different scenarios, and for those who benefit from WCAG AAA (not certified).</h6>
+                    <h6>Changing themes can be helpful for different levels of lights, and for more contrast when neccesary.</h6>
                 </div>
             </div>
             <div class="setting">
@@ -61,11 +114,35 @@
         </div>
         <div class="settings-box">
             <div class="settings-title">
+                <h2>Professional Mode</h2>
+                <div class="subtext-settings">
+                    <h6>Toggling this on will make the frontend more professional.</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <label class="switch">
+                    <input type="checkbox" id="professional-mode-toggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
                 <h2>Optical Character Recognition (OCR)</h2>
                 <div class="subtext-settings">
-                    <h6>Froggi has support for ScoreSight OCR, an open-source program developed by locaal-ai, through froggi-ocr. To set up OCR, download both ScoreSight (<a href="https://github.com/locaal-ai/scoresight" target="_blank">https://github.com/locaal-ai/scoresight</a>) and froggi-ocr (<a href="https://github.com/AllLiver/froggi-ocr" target="_blank">https://github.com/AllLiver/froggi-ocr</a>), then launch both of them and set them up.</h6>
-                    <h6>Froggi should automatically use the default name and format of all of ScoreSight's default fields that Froggi also supports. Although if you would like to add downs and to go for American Football, you have to name them "Down" and "To Go" respectively, in ScoreSight. Then make sure froggi-ocr is getting StatusCode 200 OK from both ScoreSight and Froggi.</h6>
-                    <h6>You also need to make sure to enable the OCR API in Froggi, or else Froggi will return StatusCode 409 CONFLICT to froggi-ocr.</h6>
+                    <h6>Froggi has support for ScoreSight OCR, an open-source program developed by locaal-ai,
+                        through froggi-ocr. To set up OCR, download both ScoreSight (<a
+                            href="https://github.com/locaal-ai/scoresight"
+                            target="_blank">https://github.com/locaal-ai/scoresight</a>) and froggi-ocr (<a
+                            href="https://github.com/AllLiver/froggi-ocr"
+                            target="_blank">https://github.com/AllLiver/froggi-ocr</a>), then launch both of them
+                        and set them up.</h6>
+                    <h6>Froggi will automatically use the default name and format of all of ScoreSight's default
+                        fields that Froggi also supports. Although if you would like to add downs and to go for
+                        American Football, you have to name them "Down" and "To Go" respectively, in ScoreSight.
+                        Then make sure froggi-ocr is getting StatusCode 200 OK from both ScoreSight and Froggi.</h6>
+                    <h6>Make sure to enable the OCR API in Froggi, or else Froggi will return StatusCode 409
+                        CONFLICT to froggi-ocr.</h6>
                 </div>
                 <div class="setting" hx-put="/ocr/api/button" hx-trigger="load">
                     <button class="ocr-button" hx-post="/ocr/api/toggle">OCR API</button>
@@ -76,16 +153,25 @@
         <div class="settings-box">
             <div class="settings-title">
                 <h2>API Key</h2>
+                <div class="subtext-settings">
+                    <h6>The api key is used for OCR & Streamdeck companion, <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
+                            TRAFFIC</u></h6>
+                </div>
                 <div hx-put="/api/key/show" hx-trigger="load">
                     <!--Copy&Reveal buttons are handled in the backend-->
+                    <button hx-post="/update" hx-swap="none" class="button-settings">Regenerate Api</button>
                 </div>
             </div>
         </div>
         <div class="settings-box">
             <div class="settings-title">
                 <h2>Reset Scoreboard</h2>
+                <div class="subtext-settings">
+                    <h6>Resets the scoreboard to its original startup state, no data is erased.</u></h6>
+                </div>
                 <div class="setting">
-                    <button class="reset-button" hx-post="/reset" hx-swap="none" hx-confirm="⚠️Are You Sure?⚠️">⚠️Reset⚠️</button>
+                    <button class="reset-button" id="reset-button" hx-post="/reset" hx-swap="none"
+                             hx-confirm ="Resetting scoreboard will clear the currently used preset, score, and clock. Do you wish to proceed?">⚠️Reset⚠️</button>
                 </div>
             </div>
         </div>
@@ -94,6 +180,7 @@
                 <h2>To-Go Distances</h2>
                 <div class="subtext-settings">
                     <h6>Choose between different modes and customize the distances for the to-go presets.</h6>
+                    <h6>⚠️This will be deprecated in the near future</h6>
                 </div>
             </div>
             <div class="setting">
@@ -109,19 +196,26 @@
                 <button class="button-settings" onclick="saveDistances()">Save Distances</button>
             </div>
         </div>
-        <div id="log-popup" class="popup" style="display: none;">
-            <div class="popup-header">
-                <h2>Logs</h2>
-                <span class="popup-close">&times;</span>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Program Controls</h2>
+                <div class="subtext-settings">
+                    <h6>Manage system restart, shutdown, and updates</h6>
+                </div>
+                <button hx-post="/restart" hx-swap="none" class="button-settings" hx-confirm="You are trying to restart Froggi, are you sure?">Restart</button>
+                <button hx-post="/shutdown" hx-swap="none" class="button-settings" hx-confirm="You are trying to shutdown Froggi, are you sure?">Shutdown</button>
+                <button hx-post="/update" hx-swap="none" class="button-settings" hx-confirm="You are trying to update Froggi, are you sure?">Check For Updates</button>
             </div>
-            <div id="popup-content" class="popup-content">
-                <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
-            </div>
+    </div>
+    <div id="log-popup" class="popup">
+        <div class="popup-header">
+            <h2>Logs</h2>
+            <span class="popup-close">&times;</span>
+        </div>
+        <div id="popup-content" class="popup-content">
+            <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
         </div>
     </div>
-    <button hx-post="/restart">Restart</button>
-    <button hx-post="/shutdown">Shutdown</button>
-    <script src="/app.js"></script>
 </body>
 
 </html>
