@@ -57,7 +57,9 @@ lazy_static! {
     static ref POPUPS_AWAY: Arc<Mutex<Vec<(String, u64)>>> = Arc::new(Mutex::new(Vec::new()));
     static ref COUNTDOWN_OPACITY: Arc<Mutex<f32>> = Arc::new(Mutex::new(1.0));
     static ref RESTART_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> = Arc::new(Mutex::new(None));
-    static ref SHUTDOWN_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> = Arc::new(Mutex::new(None));
+    static ref SHUTDOWN_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> =
+        Arc::new(Mutex::new(None));
+    static ref UPDATE_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> = Arc::new(Mutex::new(None));
     static ref EXIT_CODE: Arc<Mutex<Option<i32>>> = Arc::new(Mutex::new(None));
 }
 
@@ -214,6 +216,7 @@ async fn main() -> Result<()> {
 
     let (restart_tx, restart_rx) = oneshot::channel();
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
+    let (update_tx, update_rx) = oneshot::channel();
 
     // Initialize the application state
     let mut state = AppState::default();
@@ -224,6 +227,7 @@ async fn main() -> Result<()> {
 
     *RESTART_SIGNAL.lock().await = Some(restart_tx);
     *SHUTDOWN_SIGNAL.lock().await = Some(shutdown_tx);
+    *UPDATE_SIGNAL.lock().await = Some(update_tx);
 
     // Validate required files and directories
     if let Err(_) = File::open("secret.key").await {
@@ -334,6 +338,7 @@ async fn main() -> Result<()> {
         .route("/reset", post(reset_handler))
         .route("/restart", post(restart_handler))
         .route("/shutdown", post(shutdown_handler))
+        .route("/update", post(update_handler))
         .layer(middleware::from_fn(auth_session_layer));
 
     let app = Router::new()
@@ -395,7 +400,7 @@ async fn main() -> Result<()> {
         printlg!(" -> LISTENING ON: 0.0.0.0:3000");
 
         axum::serve(listener, app)
-            .with_graceful_shutdown(shutdown_signal(restart_rx, shutdown_rx))
+            .with_graceful_shutdown(shutdown_signal(restart_rx, shutdown_rx, update_rx))
             .await
             .context("Could not serve app")?;
     } else {
@@ -2703,6 +2708,79 @@ async fn shutdown_handler() -> impl IntoResponse {
     }
 }
 
+const REMOTE_CARGO_TOML_URL: &'static str =
+    "https://github.com/AllLiver/Froggi/blob/main/Cargo.toml";
+
+async fn update_handler() -> impl IntoResponse {
+    printlg!("Checking if an update is availible...");
+
+    if let Ok(response) = reqwest::get(REMOTE_CARGO_TOML_URL).await {
+        let remote_version_str_raw = response.text().await.expect("Failed to get response text");
+        let remote_version_str = remote_version_str_raw
+            .split("\n")
+            .collect::<Vec<&str>>()
+            .iter()
+            .find(|x| x.starts_with("version = "))
+            .expect("Failed to get remote version")
+            .trim_start_matches("version = \"")
+            .trim_end_matches("\"");
+
+        let local_version_str = env!("CARGO_PKG_VERSION");
+
+        let remote_version: Vec<u8> = remote_version_str
+            .split(".")
+            .map(|x| x.parse::<u8>().expect("Failed to parse remote version"))
+            .collect();
+        let local_version: Vec<u8> = local_version_str
+            .split(".")
+            .map(|x| x.parse::<u8>().expect("Failed to parse remote version"))
+            .collect();
+
+        let mut out_of_date = false;
+
+        for i in 0..local_version.len() {
+            if remote_version[i] > local_version[i] {
+                out_of_date = true;
+                break;
+            } else if remote_version[i] < local_version[i] {
+                break;
+            }
+        }
+
+        if out_of_date {
+            if let Some(tx) = UPDATE_SIGNAL.lock().await.take() {
+                printlg!("Starting update...");
+                let _ = tx.send(());
+                return Response::builder()
+                    .status(StatusCode::OK)
+                    .body(String::from("Starting update..."))
+                    .unwrap();
+            } else {
+                printlg!("Update signal already sent");
+                return Response::builder()
+                    .status(StatusCode::CONFLICT)
+                    .body(String::from("Update already sent!"))
+                    .unwrap();
+            }
+        } else {
+            printlg!("Already up to date!");
+            return Response::builder()
+                .status(StatusCode::METHOD_NOT_ALLOWED)
+                .body(String::from("Already up to date!"))
+                .unwrap();
+        }
+    } else {
+        printlg!("Failed to make request to {}", REMOTE_CARGO_TOML_URL);
+        return Response::builder()
+            .status(StatusCode::SERVICE_UNAVAILABLE)
+            .body(format!(
+                "Failed to make request to {}",
+                REMOTE_CARGO_TOML_URL
+            ))
+            .unwrap();
+    }
+}
+
 // endregion: misc
 // region: middleware
 
@@ -2813,7 +2891,11 @@ async fn update_program_lock() {
 }
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
-async fn shutdown_signal(mut restart_rx: oneshot::Receiver<()>, mut shutdown_rx: oneshot::Receiver<()>) {
+async fn shutdown_signal(
+    mut restart_rx: oneshot::Receiver<()>,
+    mut shutdown_rx: oneshot::Receiver<()>,
+    mut update_rx: oneshot::Receiver<()>,
+) {
     let ctrl_c = async {
         signal::ctrl_c()
             .await
@@ -2841,6 +2923,9 @@ async fn shutdown_signal(mut restart_rx: oneshot::Receiver<()>, mut shutdown_rx:
         }
         _ = &mut shutdown_rx => {
             *EXIT_CODE.lock().await = Some(0);
+        }
+        _ = &mut update_rx => {
+            *EXIT_CODE.lock().await = Some(11);
         }
     }
 }
