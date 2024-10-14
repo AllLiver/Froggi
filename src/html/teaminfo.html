@@ -3,67 +3,109 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-    <title>Teaminfo & Sponsors</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
+    <title>Sponsors & Teaminfo</title>
+    <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <script src="/htmx.js"></script>
     <link rel="icon" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preload" href="/app.js" as="script">
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="/htmx.js"></script>
+    <script src="/app.js" defer></script>
+    <script src="/ws.js" defer></script>
 </head>
 
-<body id="teaminfo-body">
+
+<body id="ti-body">
     <nav>
-        <button class="hamburger-menu" onclick="toggle_menu()">
+        <button class="hamburger-menu">
             <span class="line"></span>
             <span class="line"></span>
             <span class="line"></span>
         </button>
         <ul class="sidenavbar">
-            <li><a href="/">Dashboard</a></li>
-            <li><a href="/teaminfo" class="nav-active">Sponsors & Teaminfo</a></li>
-            <li><a href="/overlay" target="_blank" rel="noopener noreferrer">Overlay</a></li>
-            <li><a href="/settings">Settings</a></li>
-            <li><a href="/" id="open-logs">Open Logs</a></li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon type='solid' name='dashboard' class="ico-white"></box-icon>
+                <a href="/" class="nav-text">Dashboard</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='group' class="ico-white"></box-icon>
+                <a href="/teaminfo" class="nav-text nav-active">Sponsors & Teaminfo</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='layer' class="ico-white"></box-icon>
+                <a href="/overlay" target="_blank" rel="noopener noreferrer" class="nav-text">Overlay</a>
+            </div></div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='cog' class="ico-white"></box-icon>
+                <a href="/settings" class="nav-text">Settings</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                    <box-icon name='align-justify' class="ico-white"></box-icon>
+                <a href="/" id="open-logs" class="nav-text">Open Logs</a>
+            </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                    <box-icon name='log-out' class="ico-logout"></box-icon>
+                    <a href="/" id="log-out" class="nav-text">Logout</a>
+                </div>
+            </li>
         </ul>
     </nav>
-    <div class="teaminfo-container">
-        <div class="teaminfo-rectangle">
+
+    <div class="ti-container">
+        <div class="ti-rectangle">
             <h1>Team Preset Creation</h1>
             <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data"
-                onsubmit="return sanitize(this);">
+                onsubmit="return handleInput(event);">
                 <div class="ti-home-section">
                     <label for="home_name">Home name:</label> <br>
-                    <input type="text" id="home_name" name="home_name" required maxlength="25"><br>
-
+                    <input type="text" id="home_name" name="home_name" required maxlength="25"
+                        oninput="handleInput(event)"><br>
+                    <div class="icon-container"></div>
                     <label for="home_img">Home icon:</label> <br>
                     <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" required><br>
-
                     <label for="home_color">Home jersey color:</label><br>
                     <input type="color" id="home_color" name="home_color" value="#007BFF" required><br>
                 </div>
+
                 <div class="ti-away-section">
                     <label for="away_name">Away name:</label> <br>
-                    <input type="text" id="away_name" name="away_name" required maxlength="25"><br>
-
+                    <input type="text" id="away_name" name="away_name" required maxlength="25" oninput="handleInput(event)"><br>
+                    <div class="icon-container"></div>
                     <label for="away_img">Away icon:</label> <br>
                     <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" required><br>
-
                     <label for="away_color">Away jersey color:</label> <br>
                     <input type="color" id="away_color" name="away_color" value="#ff8601" required><br>
                 </div>
 
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit" class="ti-submit">
                 <img class="htmx-indicator" src="/spinner.svg">
             </form>
         </div>
-        <div class="teaminfo-presets-rectangle">
+
+        <div class="ti-presets-rectangle">
             <h2>Team Presets</h2>
             <div class="team-selector" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body"></div>
         </div>
+
         <div class="sponsor-rectangle">
             <h1>Sponsors</h1>
             <form hx-post="/sponsors/upload" hx-swap="none" enctype="multipart/form-data">
@@ -72,12 +114,12 @@
                     <i id="subtext-multiple">You can upload multiple images at once</i>
                 </div>
                 <input type="file" id="sponsor-img" name="sponsor-img" accept=".png,.jpeg,.jpg" multiple required>
-                <input type="submit" value="Submit">
+                <input type="submit" value="Submit" class="ti-sponsor-submit">
                 <img class="htmx-indicator" src="/spinner.svg">
             </form>
-            <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body">
-            </div>
+            <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body"></div>
         </div>
+
         <div id="log-popup" class="popup">
             <div class="popup-header">
                 <h2>Logs</h2>
@@ -87,9 +129,8 @@
                 <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
             </div>
         </div>
-        <script> document.addEventListener("DOMContentLoaded", function () { let e = document.getElementById("log-popup"), t = document.querySelector(".popup-close"), n = document.getElementById("open-logs"); function l() { e.style.display = "none" } function o() { let e = document.getElementById("popup-content"); e && (e.scrollTop = e.scrollHeight) } document.addEventListener("keydown", function (t) { ("`" === t.key || "~" === t.key) && (e.style.display = "none" === e.style.display || "" === e.style.display ? "block" : "none") }), t && t.addEventListener("click", l), n && n.addEventListener("click", function (t) { t.preventDefault(), e.style.display = "block" }), l(), document.body.addEventListener("htmx:afterOnLoad", function (e) { "log-content" === e.detail.elt.id && o() }); let d = document.getElementById("popup-content"); d && d.addEventListener("DOMSubtreeModified", o) });
-        </script>
         <script src="/app.js"></script>
+    </div>
 </body>
 
 </html>
