@@ -1,27 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles.css">
-    <script src="/htmx.js"></script>
-    <script src="/app.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
+    <title>Create Login</title>
+    <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
+    <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link rel="preload" href="styles.css" as="style">
+    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap" rel="stylesheet" crossorigin="anonymous">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
+    <meta http-equiv="Referrer-Policy" content="no-referrer">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="/htmx.js"></script>
+    <script src="/app.js" defer></script>
+    <script src="/ws.js" defer></script>
 </head>
-<body id="login-body">
+
+
+<body hx-history="false" id="login-body">
     <canvas id="background"></canvas>
     <div class="create-login-rectangle">
-        <h1>Create Login</h1>
+        <h1>Create Froggi Login</h1>
         <form id="create-login-form" hx-post="/login/create" hx-swap="innerHTML" hx-target="#message_create_login" onsubmit="return validateForm()">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" oninput="this.value = sanitizeInput(this.value)">
+            <input type="text" id="username" name="username" oninput="handleInput(event)">
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" oninput="this.value = sanitizeInput(this.value)">
+            <input type="password" id="password" name="password"  oninput="handleInput(event)">
 
             <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password" oninput="this.value = sanitizeInput(this.value)">
+            <input type="password" id="confirm_password" name="confirm_password"  oninput="handleInput(event)">
             <div id="password_error" class="error"></div>
 
             <input type="submit" value="Create">
@@ -31,26 +44,31 @@
     </div>
 
     <script>
-        const canvas = document.getElementById('background');
-        const ctx = canvas.getContext('2d');
+        const createLoginBackground = document.getElementById('background');
+        const ctx = createLoginBackground.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        createLoginBackground.width = window.innerWidth;
+        createLoginBackground.height = window.innerHeight;
 
-        const circles = [];
-        for (let i = 0; i < 50; i++) {
-            circles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 20 + 10,
-                color: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`, 
-                vx: Math.random() * 4 - 2,
-                vy: Math.random() * 4 - 2
-            });
+        const circles = createCircles(50);
+
+        function createCircles(num) {
+            const circles = [];
+            for (let i = 0; i < num; i++) {
+                circles.push({
+                    x: Math.random() * createLoginBackground.width,
+                    y: Math.random() * createLoginBackground.height,
+                    radius: Math.random() * 20 + 10,
+                    color: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`,
+                    vx: Math.random() * 4 - 2,
+                    vy: Math.random() * 4 - 2
+                });
+            }
+            return circles;
         }
 
         function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.clearRect(0, 0, createLoginBackground.width, createLoginBackground.height);
             circles.forEach(circle => {
                 ctx.beginPath();
                 ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
@@ -61,10 +79,10 @@
                 circle.x += circle.vx;
                 circle.y += circle.vy;
 
-                if (circle.x - circle.radius < 0 || circle.x + circle.radius > canvas.width) {
+                if (circle.x - circle.radius < 0 || circle.x + circle.radius > createLoginBackground.width) {
                     circle.vx *= -1;
                 }
-                if (circle.y - circle.radius < 0 || circle.y + circle.radius > canvas.height) {
+                if (circle.y - circle.radius < 0 || circle.y + circle.radius > createLoginBackground.height) {
                     circle.vy *= -1;
                 }
             });
@@ -74,7 +92,12 @@
 
         draw();
 
-        canvas.addEventListener('mousemove', function(event) {
+        let lastMouseMove = 0;
+        createLoginBackground.addEventListener('mousemove', function(event) {
+            const now = Date.now();
+            if (now - lastMouseMove < 100) return; // Throttle mouse movement
+            lastMouseMove = now;
+
             circles.forEach(circle => {
                 const dx = event.clientX - circle.x;
                 const dy = event.clientY - circle.y;
