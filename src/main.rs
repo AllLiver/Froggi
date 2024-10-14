@@ -343,6 +343,7 @@ async fn main() -> Result<()> {
         .route("/restart", post(restart_handler))
         .route("/shutdown", post(shutdown_handler))
         .route("/update", post(update_handler))
+        .route("/logout", post(logout_handler))
         .layer(middleware::from_fn(auth_session_layer));
 
     let app = Router::new()
@@ -1155,8 +1156,17 @@ async fn verify_session(jar: CookieJar) -> bool {
     }
 }
 
-async fn ping_handler() -> impl IntoResponse {
-    return StatusCode::OK;
+async fn logout_handler() -> impl IntoResponse {
+    return Response::builder()
+        .status(StatusCode::OK)
+        .header(SET_COOKIE, Cookie::build(("AuthToken", "0")).to_string())
+        .header(SET_COOKIE, Cookie::build(("SessionToken", "0")).to_string())
+        .header(
+            HeaderName::from_static("hx-redirect"),
+            HeaderValue::from_static("/"),
+        )
+        .body(String::new())
+        .unwrap();
 }
 
 // endregion: login
@@ -2512,7 +2522,10 @@ async fn api_key_regen_handler() -> impl IntoResponse {
 
     return Response::builder()
         .status(StatusCode::OK)
-        .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("hide-api-key"))
+        .header(
+            HeaderName::from_static("hx-trigger"),
+            HeaderValue::from_static("hide-api-key"),
+        )
         .body(String::new())
         .unwrap();
 }
@@ -2862,6 +2875,10 @@ async fn shutdown_handler() -> impl IntoResponse {
             .body(String::from("Shutdown already sent!"))
             .unwrap();
     }
+}
+
+async fn ping_handler() -> impl IntoResponse {
+    return StatusCode::OK;
 }
 
 // endregion: misc
