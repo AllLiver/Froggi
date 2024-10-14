@@ -206,7 +206,8 @@
                 <button hx-post="/shutdown" hx-swap="none" class="button-settings" hx-confirm="You are trying to shutdown Froggi, are you sure?">Shutdown</button>
                 <button hx-post="/update" hx-swap="none" class="button-settings" hx-confirm="You are trying to update Froggi, are you sure?">Check For Updates</button>
             </div>
-    </div>
+        </div>
+        <div hx-put="/update/menu" hx-trigger="load"></div>
     <div id="log-popup" class="popup">
         <div class="popup-header">
             <h2>Logs</h2>
