@@ -696,7 +696,7 @@ async fn overlay_websocket_handler(
                 </style>",
                     if !*state.show_downs.lock().await {
                     "
-                    .ol-down-box { 
+                    .ol-down-togo-box { 
                         display: none; 
                     }"
                     } else {
