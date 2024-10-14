@@ -41,6 +41,7 @@ use tower_http::cors::CorsLayer;
 use uuid::Uuid;
 
 const WEBSOCKET_UPDATE_MILLIS: u64 = 100;
+const API_KEY_LEN: usize = 32;
 
 lazy_static! {
     static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
@@ -336,6 +337,7 @@ async fn main() -> Result<()> {
         .route("/ocr/api/toggle", post(ocr_api_toggle_handler))
         .route("/api/key/show", put(api_key_show_handler))
         .route("/api/key/reveal", post(api_key_reveal_handler))
+        .route("/api/key/regen", post(api_key_regen_handler))
         .route("/popup/:t", post(popup_handler))
         .route("/reset", post(reset_handler))
         .route("/restart", post(restart_handler))
@@ -882,7 +884,7 @@ async fn create_login_handler(Form(data): Form<CreateLogin>) -> impl IntoRespons
             let new_login = Login {
                 username: data.username,
                 password: password_hash,
-                api_key: key_create(32),
+                api_key: key_create(API_KEY_LEN),
             };
 
             f.write_all(serde_json::to_string(&new_login).unwrap().as_bytes())
@@ -2485,6 +2487,33 @@ async fn api_key_reveal_handler() -> impl IntoResponse {
     return Response::builder()
         .status(StatusCode::OK)
         .body(format!("{}", login.api_key))
+        .unwrap();
+}
+
+async fn api_key_regen_handler() -> impl IntoResponse {
+    let current_login: Login = serde_json::from_str(
+        &tokio::fs::read_to_string("./login.json")
+            .await
+            .expect("Failed to read login.json"),
+    )
+    .expect("Failed to deserialize login.json");
+
+    tokio::fs::write(
+        "./login.json",
+        serde_json::to_string(&Login {
+            api_key: key_create(API_KEY_LEN),
+            ..current_login
+        })
+        .expect("Failed to serialize login.json")
+        .as_bytes(),
+    )
+    .await
+    .expect("Failed to write to login.json");
+
+    return Response::builder()
+        .status(StatusCode::OK)
+        .header(HeaderName::from_static("hx-trigger"), HeaderValue::from_static("hide-api-key"))
+        .body(String::new())
         .unwrap();
 }
 

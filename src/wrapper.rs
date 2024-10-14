@@ -1,7 +1,7 @@
 use git2::Repository;
-use tokio::{process::Command, signal};
 #[cfg(unix)]
 use nix::{sys::signal::Signal::SIGTERM, unistd::Pid};
+use tokio::{process::Command, signal};
 
 const FROGGI_REMOTE_URL: &'static str = "https://github.com/AllLiver/Froggi.git";
 const BUILD_TMP_DIR: &'static str = "./tmp/froggi";
