@@ -1,10 +1,81 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>404 Not Found</title>
-    </head>
-    <body>
-        <h1>404 Not Found</h1>
-    </body>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <title>404 ERROR</title>
+    <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500&family=Noto+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
+    <script src="/app.js" defer></script>
+</head>
+
+<body id="body-not-found">
+    <nav>
+        <button class="hamburger-menu">
+            <span class="line"></span>
+            <span class="line"></span>
+            <span class="line"></span>
+        </button>
+        <ul class="sidenavbar">
+            <li>
+                <div class="navbar-content-container">
+                <box-icon type='solid' name='dashboard' class="ico-white"></box-icon>
+                <a href="/" class="nav-text">Dashboard</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='group' class="ico-white"></box-icon>
+                <a href="/teaminfo" class="nav-text">Sponsors & Teaminfo</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='layer' class="ico-white"></box-icon>
+                <a href="/overlay" target="_blank" rel="noopener noreferrer" class="nav-text">Overlay</a>
+            </div></div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                <box-icon name='cog' class="ico-white"></box-icon>
+                <a href="/settings" class="nav-text">Settings</a>
+                </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                    <box-icon name='align-justify' class="ico-white"></box-icon>
+                <a href="/" id="open-logs" class="nav-text">Open Logs</a>
+            </div>
+            </li>
+            <li>
+                <div class="navbar-content-container">
+                    <box-icon name='log-out' class="ico-logout"></box-icon>
+                    <a href="/" id="log-out" class="nav-text">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <div class="not-found-container">
+        <h1 class="not-found">:(</h1>
+        <p class="error-message">The requested page simply doesn't exist.</p>
+        <div class="error-details">
+            <p>Error Code: <span class="error-code">404</span></p>
+            <p>The page you are requesting was not found.</p>
+            <div class="qr-code">
+                <img src="/favicon.png" alt="Frog favicon in the place of a qr code" width="100" height="100">
+            </div>
+            <p class="error-container">
+                return to the previous page, or 
+                <a href="https://github.com/AllLiver/Froggi/issues">report an issue on the repository</a>
+            </p>
+        </div>
+    </div>
+</body>
+
 </html>
