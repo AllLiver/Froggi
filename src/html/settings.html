@@ -74,17 +74,6 @@
     <div class="settings-container" id="settings-overlay-box">
         <div class="settings-box">
             <div class="settings-title">
-                <h2>Additional Settings</h2>
-                <div class="subtext-settings">
-                    <h6>  "secure_auth_cookie": false,
-                        "sponsor_wait_time": 5,
-                        "sponsor_img_width": 50
-                    Secure_auth_cookie, sponsor_wait_time, sponsor_img_width, countdown_opacity are controlled in the config.json file, changes will require a restart to take affect. To disable feaatures such as the lock interface button, or to change the url of the preview on the dashboard, the constants at the top of "app.js" will have to be changed and then recompiled.</h6>
-                </div>
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
                 <h2>Overlay background color</h2>
                 <div class="subtext-settings">
                     <h6>The background color is determined by this color picker, additionally you can set the alpha
@@ -154,12 +143,13 @@
             <div class="settings-title">
                 <h2>API Key</h2>
                 <div class="subtext-settings">
-                    <h6>The api key is used for OCR & authentication through http headers (api-auth: api-key), <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
+                    <h6>The api key is used for OCR & http header authenication, <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
                             TRAFFIC</u></h6>
                 </div>
                 <div hx-put="/api/key/show" hx-trigger="load, hide-api-key from:body">
                     <!--Copy&Reveal buttons are handled in the backend-->
                 </div>
+                <button hx-post="/api/key/regen" hx-swap="none" class="button-settings" hx-confirm="This will reset the API key to a new, random API key, are you sure?">Regenerate Api Key</button>
             </div>
         </div>
         <div class="settings-box">
