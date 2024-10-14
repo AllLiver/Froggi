@@ -121,7 +121,7 @@ async fn main() {
                 nix::sys::signal::kill(Pid::from_raw(froggi_process.id().expect("Failed to get froggi-worker pid") as i32), SIGTERM).expect("Failed to terminate froggi-worker");
 
                 #[cfg(not(unix))]
-                froggi_process.kill();
+                froggi_process.kill().await.expect("Failed to kill child process");
 
                 break 0;
             }
