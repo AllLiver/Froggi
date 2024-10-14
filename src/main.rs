@@ -2587,6 +2587,30 @@ async fn auto_update_checker() {
     }
 }
 
+async fn update_menu_handler() -> impl IntoResponse {
+    if *OUT_OF_DATE.lock().await {
+        return Html::from(format!("
+        <div class=\"settings-box\">
+            <div class=\"settings-title\">
+                <h2>Update</h2>
+                <div class=\"subtext-settings\">
+                    <h6>Update availible! ({} -> {})</h6>
+                    <h6>Do not restart the server during update!</h6>
+                </div>
+            </div>
+            <div class=\"setting\">
+                <button hx-post=\"/update\" hx-confirm=\"You are trying to update Froggi, are you sure? This completely stops Froggi until the update is complete.\">Update now</button>
+            </div>
+        </div>
+        ", 
+        env!("CARGO_PKG_VERSION"),
+        *REMOTE_VERSION.lock().await
+    ));
+    } else {
+        return Html::from(String::from("<div class=\"settings-box\"><div class=\"settings-title\"><h2>Update</h2><div class=\"subtext-settings\"><h6>Froggi is up to date!</h6></div></div></div>"));
+    }
+}
+
 // endregion: updating
 // region: popups
 
@@ -2808,25 +2832,6 @@ async fn shutdown_handler() -> impl IntoResponse {
             .status(StatusCode::METHOD_NOT_ALLOWED)
             .body(String::from("Shutdown already sent!"))
             .unwrap();
-    }
-}
-
-async fn update_menu_handler() -> impl IntoResponse {
-    if *OUT_OF_DATE.lock().await {
-        return Html::from(format!("
-        <div class=\"update-menu\">
-            <h2>Update</h2>
-            <h3>Update availible! ({} -> {})</h3>
-            <br>
-            <p>Do not restart the server during update!</p>
-            <button hx-post=\"/update\" hx-confirm=\"Are you sure would like to update Froggi? This completely stops Froggi until the update is complete.\">Update now</button>
-        </div>
-        ", 
-        env!("CARGO_PKG_VERSION"),
-        *REMOTE_VERSION.lock().await
-    ));
-    } else {
-        return Html::from(String::from("<div class=\"update-menu\"><h2>Update</h2><h3>Froggi is up to date!</h3></div>"));
     }
 }
 
