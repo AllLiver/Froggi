@@ -2482,6 +2482,7 @@ async fn api_key_show_handler() -> impl IntoResponse {
         <h6 id=\"api-key\">{}</h6>
         <button class=\"copy-button\" onclick=\"apiCopy(this, '{}')\">Copy</button>
         <button class=\"button-settings\" hx-post=\"/api/key/reveal\" hx-target=\"#api-key\">Reveal Key</button>
+        <button hx-post=\"/api/key/regen\" hx-swap=\"none\" class=\"button-settings\" hx-confirm=\"This will reset the API key to a new, random API key, are you sure?\">Regenerate Api Key</button>
         </div>",
         hidden_key, login.api_key
     ))

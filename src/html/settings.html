@@ -154,13 +154,12 @@
             <div class="settings-title">
                 <h2>API Key</h2>
                 <div class="subtext-settings">
-                    <h6>The api key is used for OCR & Streamdeck companion, <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
+                    <h6>The api key is used for OCR & authentication through http headers (api-auth: api-key), <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
                             TRAFFIC</u></h6>
                 </div>
                 <div hx-put="/api/key/show" hx-trigger="load, hide-api-key from:body">
                     <!--Copy&Reveal buttons are handled in the backend-->
                 </div>
-                <button hx-post="/api/key/regen" hx-swap="none" class="button-settings" hx-confirm="This will reset the API key to a new, random API key, are you sure?">Regenerate Api Key</button>
             </div>
         </div>
         <div class="settings-box">
