@@ -409,7 +409,7 @@ body::-webkit-scrollbar {
 .sidenavbar a {
     color: #fff;
     text-decoration: none;
-    font-size: 18px;
+    font-size: 1rem;
     padding: 10px 15px;
     display: block;
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -435,6 +435,13 @@ body::-webkit-scrollbar {
 #log-out, .ico-logout{
     color: var(--color-red);
     fill: var(--color-red);
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    font-size: 1rem;
 }
 
 .ico-white {
@@ -2153,10 +2160,6 @@ form input[type="color"] {
     margin-top: 2.22vh;
 }
 
-#settings-overlay-box {
-    margin-top: 5vh;
-}
-
 #toggle-group {
     margin-right: 1vw;
 }
@@ -2170,15 +2173,6 @@ form input[type="color"] {
 
 .button-settings-hidden {
     display: none;
-}
-
-.settings-box-indev {
-    background-color: var(--color-background-contrast, #1d1e22);
-    border-radius: 8px;
-    padding: 2.22vh;
-    margin-bottom: 2.22vh;
-    filter: blur(0.1vh);
-    cursor: not-allowed;
 }
 
 .settings-title h2 {
@@ -2219,6 +2213,7 @@ form input[type="color"] {
     cursor: pointer;
     width: auto;
     border-radius: 5px;
+    margin-right: 0.5vw
 }
 
 .copy-button {
