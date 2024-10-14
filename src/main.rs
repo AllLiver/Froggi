@@ -1992,8 +1992,10 @@ async fn sponsor_ticker() {
         let mut sponsor_idx = SPONSOR_IDX.lock().await;
         let show_sponsors = SHOW_SPONSORS.lock().await;
 
-        if *show_sponsors {
-            if *sponsor_idx < SPONSOR_TAGS.lock().await.len() - 1 {
+        let sponsor_tags_len = SPONSOR_TAGS.lock().await.len();
+
+        if *show_sponsors && sponsor_tags_len > 0 {
+            if *sponsor_idx < sponsor_tags_len - 1 {
                 *sponsor_idx += 1;
             } else {
                 *sponsor_idx = 0;
