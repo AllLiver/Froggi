@@ -2,7 +2,6 @@ const PING_TIME = 1000;
 const DEFAULT_THEME = 'theme-dark';
 const LOCK_INTERFACE_BTN_ID = 'lockInterfaceBtn';
 const POPUP_DURATION = 7500;
-const VERSION = '1.0.0';
 const PING_URL = '/';
 const PREVIEW_URL = '/overlay';
 
