@@ -72,6 +72,32 @@
 
     
     <div class="settings-container" id="settings-overlay-box">
+        <div hx-put="/update/menu" hx-trigger="load"></div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Reset Scoreboard</h2>
+                <div class="subtext-settings">
+                    <h6>Resets the scoreboard to its original startup state, no data is erased.</u></h6>
+                </div>
+                <div class="setting">
+                    <button class="reset-button" id="reset-button" hx-post="/reset" hx-swap="none"
+                             hx-confirm ="Resetting scoreboard will clear the currently used preset, score, and clock. Do you wish to proceed?">⚠️Reset⚠️</button>
+                </div>
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>Theme</h2>
+                <div class="subtext-settings">
+                    <h6>Changing themes can be helpful for different levels of lights, and for more contrast when neccesary.</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <button id="light-theme" class="theme-button">Light Theme</button>
+                <button id="dark-theme" class="theme-button theme-active">Dark Theme</button>
+                <button id="colorblind-theme" class="theme-button">Colorblind Theme</button>
+            </div>
+        </div>
         <div class="settings-box">
             <div class="settings-title">
                 <h2>Overlay background color</h2>
@@ -90,19 +116,6 @@
         </div>
         <div class="settings-box">
             <div class="settings-title">
-                <h2>Theme</h2>
-                <div class="subtext-settings">
-                    <h6>Changing themes can be helpful for different levels of lights, and for more contrast when neccesary.</h6>
-                </div>
-            </div>
-            <div class="setting">
-                <button id="light-theme" class="theme-button">Light Theme</button>
-                <button id="dark-theme" class="theme-button theme-active">Dark Theme</button>
-                <button id="colorblind-theme" class="theme-button">Colorblind Theme</button>
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
                 <h2>Professional Mode</h2>
                 <div class="subtext-settings">
                     <h6>Toggling this on will make the frontend more professional.</h6>
@@ -113,6 +126,39 @@
                     <input type="checkbox" id="professional-mode-toggle">
                     <span class="slider round"></span>
                 </label>
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>To-Go Distances</h2>
+                <div class="subtext-settings">
+                    <h6>Choose between different modes and customize the distances for the to-go presets.</h6>
+                    <h6>⚠️This will be deprecated in the near future</h6>
+                </div>
+            </div>
+            <div class="setting">
+                <button id="toggle-group" class="button-settings" onclick="toggleButtonGroup()">Switch Mode</button>
+                <p id="current-mode">Mode: High School</p>
+            </div>
+            <div class="setting">
+                <input type="number" id="input1" class="number-input" placeholder="Distance 1">
+                <input type="number" id="input2" class="number-input" placeholder="Distance 2">
+                <input type="number" id="input3" class="number-input" placeholder="Distance 3">
+                <input type="number" id="input4" class="number-input" placeholder="Distance 4">
+                <input type="number" id="input5" class="number-input" placeholder="Distance 5">
+                <button class="button-settings" onclick="saveDistances()">Save Distances</button>
+            </div>
+        </div>
+        <div class="settings-box">
+            <div class="settings-title">
+                <h2>API Key</h2>
+                <div class="subtext-settings">
+                    <h6>The api key is used for OCR & http header authenication, <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
+                            TRAFFIC</u></h6>
+                </div>
+                <div hx-put="/api/key/show" hx-trigger="load, hide-api-key from:body">
+                    <!--Copy&Reveal buttons are handled in the backend-->
+                </div>
             </div>
         </div>
         <div class="settings-box">
@@ -141,52 +187,6 @@
         </div>
         <div class="settings-box">
             <div class="settings-title">
-                <h2>API Key</h2>
-                <div class="subtext-settings">
-                    <h6>The api key is used for OCR & http header authenication, <u>DO NOT SHARE OR SEND OVER UNENCRYPTED
-                            TRAFFIC</u></h6>
-                </div>
-                <div hx-put="/api/key/show" hx-trigger="load, hide-api-key from:body">
-                    <!--Copy&Reveal buttons are handled in the backend-->
-                </div>
-                <button hx-post="/api/key/regen" hx-swap="none" class="button-settings" hx-confirm="This will reset the API key to a new, random API key, are you sure?">Regenerate Api Key</button>
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
-                <h2>Reset Scoreboard</h2>
-                <div class="subtext-settings">
-                    <h6>Resets the scoreboard to its original startup state, no data is erased.</u></h6>
-                </div>
-                <div class="setting">
-                    <button class="reset-button" id="reset-button" hx-post="/reset" hx-swap="none"
-                             hx-confirm ="Resetting scoreboard will clear the currently used preset, score, and clock. Do you wish to proceed?">⚠️Reset⚠️</button>
-                </div>
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
-                <h2>To-Go Distances</h2>
-                <div class="subtext-settings">
-                    <h6>Choose between different modes and customize the distances for the to-go presets.</h6>
-                    <h6>⚠️This will be deprecated in the near future</h6>
-                </div>
-            </div>
-            <div class="setting">
-                <button id="toggle-group" class="button-settings" onclick="toggleButtonGroup()">Switch Mode</button>
-                <p id="current-mode">Mode: High School</p>
-            </div>
-            <div class="setting">
-                <input type="number" id="input1" class="number-input" placeholder="Distance 1">
-                <input type="number" id="input2" class="number-input" placeholder="Distance 2">
-                <input type="number" id="input3" class="number-input" placeholder="Distance 3">
-                <input type="number" id="input4" class="number-input" placeholder="Distance 4">
-                <input type="number" id="input5" class="number-input" placeholder="Distance 5">
-                <button class="button-settings" onclick="saveDistances()">Save Distances</button>
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
                 <h2>Program Controls</h2>
                 <div class="subtext-settings">
                     <h6>Manage system restart, shutdown, and updates</h6>
@@ -195,7 +195,6 @@
                 <button hx-post="/shutdown" hx-swap="none" class="button-settings" hx-confirm="You are trying to shutdown Froggi, are you sure?">Shutdown</button>
             </div>
         </div>
-        <div hx-put="/update/menu" hx-trigger="load"></div>
     <div id="log-popup" class="popup">
         <div class="popup-header">
             <h2>Logs</h2>
