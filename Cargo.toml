@@ -12,6 +12,7 @@ axum = { version = "0.7.5", features = ["macros", "multipart", "tokio", "ws"] }
 axum-extra = { version = "0.9.3", features = ["cookie"] }
 base64 = "0.22.1"
 cookie = "0.18.1"
+git2 = "0.19.0"
 jsonwebtoken = "9.3.0"
 lazy_static = "1.4.0"
 nix = { version = "0.29.0", features = ["signal"] }

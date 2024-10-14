@@ -1,10 +1,15 @@
+use git2::Repository;
+use tokio::{process::Command, signal};
 #[cfg(unix)]
 use nix::{sys::signal::Signal::SIGTERM, unistd::Pid};
-use tokio::{process::Command, signal};
+
+const FROGGI_REMOTE_URL: &'static str = "https://github.com/AllLiver/Froggi.git";
+const BUILD_TMP_DIR: &'static str = "./tmp/froggi";
 
 #[tokio::main]
 async fn main() {
     let mut worker_exe = std::env::current_exe().expect("Failed to get current directory");
+    let cwd = std::env::current_dir().expect("Failed to get current working directory");
 
     worker_exe.pop();
 
@@ -22,6 +27,84 @@ async fn main() {
                     match code {
                         // Exit code 10 is to restart
                         10 => {
+                            continue;
+                        }
+                        // Exit code 11 is to update
+                        11 => {
+                            println!("Cloning {} to {}", FROGGI_REMOTE_URL, BUILD_TMP_DIR);
+
+                            if let Ok(_) = Repository::clone(FROGGI_REMOTE_URL, BUILD_TMP_DIR) {
+                                println!("Repository cloned to {}", BUILD_TMP_DIR);
+                                println!("Changing current dir to {}", BUILD_TMP_DIR);
+
+                                match std::env::set_current_dir(BUILD_TMP_DIR) {
+                                    Ok(_) => {
+                                        println!("{}", std::env::current_dir().expect("msg").to_string_lossy());
+                                        println!("Compiling update...");
+
+                                        let p = Command::new("cargo").args(&["build", "--release"]).spawn();
+
+                                        match p {
+                                            Ok(mut cargo_process) => {
+                                                let cargo_process_result = cargo_process.wait().await;
+
+                                                match cargo_process_result {
+                                                    Ok(_) => {
+                                                        println!("Update compiled successfully!");
+                                                        println!("Replacing local froggi-worker with updated froggi-worker...");
+
+                                                        #[cfg(unix)]
+                                                        match tokio::fs::rename(format!("./target/release/froggi-worker"), worker_exe.clone()).await {
+                                                            Ok(_) => {
+                                                                println!("Local froggi-worker replaced, update successful!");
+                                                            },
+                                                            Err(e) => {
+                                                                println!("{} occurred when moving froggi-worker! Update unsuccessful.", e);
+                                                            }
+                                                        }
+
+                                                        #[cfg(not(unix))]
+                                                        match tokio::fs::rename("./target/release/froggi-worker.exe", worker_exe.clone()).await {
+                                                            Ok(_) => {
+                                                                println!("Local froggi-worker replaced, update successful!");
+                                                            },
+                                                            Err(e) => {
+                                                                println!("{} occurred when moving froggi-worker! Update unsuccessful.", e);
+                                                            }
+                                                        }
+                                                    },
+                                                    Err(e) => {
+                                                        println!("\"{}\" occurred when compiling froggi! Update unsuccessful.", e);
+                                                    }
+                                                }
+                                            },
+                                            Err(e) => {
+                                                println!("\"{}\" occurred when swpaning cargo build --release! Update unsuccessful.", e);
+                                            }
+                                        }
+
+                                        println!("Moving back to {}", cwd.to_string_lossy());
+
+                                        if let Err(_) = std::env::set_current_dir(cwd.clone()) {
+                                            println!("Failed to move back to {}, please restart froggi manually.", cwd.to_string_lossy());
+                                            break 1;
+                                        }
+                                    },
+                                    Err(_) => {
+                                        println!("Failed to move to {}", BUILD_TMP_DIR);
+                                    }
+                                }
+                            } else {
+                                println!("Failed to clone repository, update unsuccessful.");
+                                continue;
+                            }
+
+                            println!("Cleaning up...");
+
+                            tokio::fs::remove_dir_all(BUILD_TMP_DIR).await.expect("Failed to remove temp build directory");
+
+                            println!("Restarting froggi...");
+
                             continue;
                         }
                         _ => {
