@@ -1683,7 +1683,7 @@ button:hover,
     font-size: large;
 }
 
-.login-rectangle input[type="submit"] {
+.login-submit {
     background-color: var(--color-green, #27a644);
     color: white;
     border: none;
@@ -1691,13 +1691,15 @@ button:hover,
     width: 100%;
     font-size: 1rem;
     border-radius: 5px;
-    height: 3.5vh;
     text-align: center;
     justify-content: center;
-    vertical-align: middle;
     height: 4vh;
     margin-bottom: 0.5vh;
     padding: 0%;
+    display: flex;
+    fill: #fff;
+    align-items: center;
+    letter-spacing: 2rem;
 }
 
 .login-error {
@@ -1713,10 +1715,6 @@ button:hover,
     justify-content: space-between;
     align-items: center;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', sans-serif;
-}
-
-.login-submit {
-    display: flex;
 }
 
 .create-login-rectangle h1 {
@@ -1737,6 +1735,11 @@ button:hover,
     font-weight: bold;
 }
 
+.create-login-submit {
+    font-weight: bold;
+    height: 3.5vh;
+}
+
 .create-login-rectangle input[type="text"],
 .create-login-rectangle input[type="password"] {
     width: 100%;
@@ -1750,7 +1753,7 @@ button:hover,
     font-weight: bold;
 }
 
-.create-login-rectangle input[type="submit"] {
+.create-login-rectangle input[type="submit"], .create-login-submit {
     background-color: #27a644;
     color: #fff;
     margin: 0.74vh 0;

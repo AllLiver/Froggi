@@ -2,257 +2,262 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
-    <title>Login to Froggi</title>
-    <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
-    <link rel="stylesheet" href="styles.css">
-    <script src="/app.js" defer></script>
-    <script src="/htmx.js"></script>
-    <script src="/ws.js" defer></script>
-    <link rel="icon" href="/favicon.png">
-    <content security-policy="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; manifest-src 'self'; worker-src 'self'; block-all-mixed-content; upgrade-insecure-requests; require-sri-for script style; report-to default">
-<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
-   <content security policy="frame-ancestors 'none';">
-    <link rel="preload" href="/app.js" as="script">
-    <link rel="preload" href="styles.css" as="style">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap"
-    rel="stylesheet" crossorigin="anonymous">
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js" crossorigin="anonymous"></script>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'> 
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <script>window.addEventListener('load', function() {
-        console.log('Script loaded for', window.location.pathname);
-       // Constants
-	   const CANVAS_ID = 'canvas';
-	   const IMAGE_SRC = 'favicon.png';
-	   const NUM_CIRCLES = 50;
-	   const NUM_NUMBERS = 75;
-	   const MIN_RADIUS = 10;
-	   const MAX_RADIUS = 30;
-	   const MAX_VELOCITY = 1;
-	   const ROTATION_SPEED = 1;
-	   const NUMBER_VELOCITY = 0.5;
-	   const COLORED_NUMBER_PROBABILITY = 0.2;
-	   const COLORS = ["rgba(100, 200, 100, 0.8)", "rgba(255, 100, 100, 0.8)", "rgba(100, 100, 255, 0.8)", "rgba(255, 255, 100, 0.8)"];
-	   const THRESHOLD = 100;
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+	<title>Login to Froggi</title>
+	<meta name="description"
+		content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
+	<link rel="stylesheet" href="styles.css">
+	<script src="/app.js" defer></script>
+	<script src="/htmx.js"></script>
+	<script src="/ws.js" defer></script>
+	<link rel="icon" href="/favicon.png">
+	<content
+		security-policy="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; manifest-src 'self'; worker-src 'self'; block-all-mixed-content; upgrade-insecure-requests; require-sri-for script style; report-to default">
+		<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
+		<content security policy="frame-ancestors 'none';">
+			<link rel="preload" href="/app.js" as="script">
+			<link rel="preload" href="styles.css" as="style">
+			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+			<link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
+			<link
+				href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap"
+				rel="stylesheet" crossorigin="anonymous">
+			<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js" crossorigin="anonymous"></script>
+			<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+			<meta http-equiv="Referrer-Policy" content="no-referrer">
+			<meta http-equiv="X-Content-Type-Options" content="nosniff">
+			<script>window.addEventListener('load', function () {
+					console.log('Script loaded for', window.location.pathname);
+					// Constants
+					const CANVAS_ID = 'canvas';
+					const IMAGE_SRC = 'favicon.png';
+					const NUM_CIRCLES = 50;
+					const NUM_NUMBERS = 75;
+					const MIN_RADIUS = 10;
+					const MAX_RADIUS = 30;
+					const MAX_VELOCITY = 1;
+					const ROTATION_SPEED = 1;
+					const NUMBER_VELOCITY = 0.5;
+					const COLORED_NUMBER_PROBABILITY = 0.2;
+					const COLORS = ["rgba(100, 200, 100, 0.8)", "rgba(255, 100, 100, 0.8)", "rgba(100, 100, 255, 0.8)", "rgba(255, 255, 100, 0.8)"];
+					const THRESHOLD = 100;
 
-	   const canvas = document.getElementById(CANVAS_ID);
-	   const ctx = canvas.getContext('2d');
-	   canvas.width = window.innerWidth;
-	   canvas.height = window.innerHeight;
+					const canvas = document.getElementById(CANVAS_ID);
+					const ctx = canvas.getContext('2d');
+					canvas.width = window.innerWidth;
+					canvas.height = window.innerHeight;
 
-	   const circles = [];
-	   const numberItems = [];
-	   const downs = ["1st & 10", "2nd & 8", "3rd & 5", "4th & 2"];
-	   const mellowColorIndex = Math.floor(Math.random() * downs.length);
-	   const downItems = downs.map(down => ({
-		   text: down,
-		   x: Math.random() * canvas.width,
-		   y: Math.random() * canvas.height,
-		   vx: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY),
-		   vy: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY)
-	   }));
+					const circles = [];
+					const numberItems = [];
+					const downs = ["1st & 10", "2nd & 8", "3rd & 5", "4th & 2"];
+					const mellowColorIndex = Math.floor(Math.random() * downs.length);
+					const downItems = downs.map(down => ({
+						text: down,
+						x: Math.random() * canvas.width,
+						y: Math.random() * canvas.height,
+						vx: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY),
+						vy: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY)
+					}));
 
-	   const image = new Image();
-	   image.src = IMAGE_SRC;
+					const image = new Image();
+					image.src = IMAGE_SRC;
 
-	   const professionalMode = localStorage.getItem('professionalMode') === 'true';
+					const professionalMode = localStorage.getItem('professionalMode') === 'true';
 
-	   let mouseX = 0;
-	   let mouseY = 0;
+					let mouseX = 0;
+					let mouseY = 0;
 
-	   canvas.addEventListener('mousemove', (event) => {
-		   mouseX = event.clientX;
-		   mouseY = event.clientY;
-	   });
+					canvas.addEventListener('mousemove', (event) => {
+						mouseX = event.clientX;
+						mouseY = event.clientY;
+					});
 
-	   image.onload = () => {
-		   initializeCircles();
-		   initializeNumberItems();
-		   draw();
-	   };
+					image.onload = () => {
+						initializeCircles();
+						initializeNumberItems();
+						draw();
+					};
 
-	   image.onerror = () => {
-		   console.error('Failed to load image.');
-	   };
+					image.onerror = () => {
+						console.error('Failed to load image.');
+					};
 
-	   function initializeCircles() {
-		   for (let i = 0; i < NUM_CIRCLES; i++) {
-			   circles.push(createCircle());
-		   }
-	   }
+					function initializeCircles() {
+						for (let i = 0; i < NUM_CIRCLES; i++) {
+							circles.push(createCircle());
+						}
+					}
 
-	   function initializeNumberItems() {
-		   for (let i = 0; i < NUM_NUMBERS; i++) {
-			   numberItems.push(createNumberItem());
-		   }
-	   }
+					function initializeNumberItems() {
+						for (let i = 0; i < NUM_NUMBERS; i++) {
+							numberItems.push(createNumberItem());
+						}
+					}
 
-	   function createCircle() {
-		   return {
-			   x: Math.random() * canvas.width,
-			   y: Math.random() * canvas.height,
-			   radius: Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS,
-			   vx: Math.random() * 2 * MAX_VELOCITY - MAX_VELOCITY,
-			   vy: Math.random() * 2 * MAX_VELOCITY - MAX_VELOCITY,
-			   rotation: Math.random() * 360,
-		   };
-	   }
+					function createCircle() {
+						return {
+							x: Math.random() * canvas.width,
+							y: Math.random() * canvas.height,
+							radius: Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS,
+							vx: Math.random() * 2 * MAX_VELOCITY - MAX_VELOCITY,
+							vy: Math.random() * 2 * MAX_VELOCITY - MAX_VELOCITY,
+							rotation: Math.random() * 360,
+						};
+					}
 
-	   function createNumberItem() {
-		   return {
-			   number: Math.floor(Math.random() * 60) + 1,
-			   x: Math.random() * canvas.width,
-			   y: Math.random() * canvas.height,
-			   vx: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY),
-			   vy: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY),
-			   color: Math.random() < COLORED_NUMBER_PROBABILITY ? COLORS[Math.floor(Math.random() * COLORS.length)] : "rgba(255, 255, 255, 0.8)"
-		   };
-	   }
+					function createNumberItem() {
+						return {
+							number: Math.floor(Math.random() * 60) + 1,
+							x: Math.random() * canvas.width,
+							y: Math.random() * canvas.height,
+							vx: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY),
+							vy: (Math.random() * 2 * NUMBER_VELOCITY - NUMBER_VELOCITY),
+							color: Math.random() < COLORED_NUMBER_PROBABILITY ? COLORS[Math.floor(Math.random() * COLORS.length)] : "rgba(255, 255, 255, 0.8)"
+						};
+					}
 
-	   function draw() {
-		   ctx.clearRect(0, 0, canvas.width, canvas.height);
+					function draw() {
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-		   if (professionalMode) {
-			   numberItems.forEach(numberItem => {
-				   drawNumber(numberItem);
-				   updateNumber(numberItem);
-			   });
+						if (professionalMode) {
+							numberItems.forEach(numberItem => {
+								drawNumber(numberItem);
+								updateNumber(numberItem);
+							});
 
-			   downItems.forEach(downItem => {
-				   drawText(downItem.text, downItem.x, downItem.y, downItem.color);
-				   updateDown(downItem);
-			   });
-		   } else {
-			   circles.forEach(circle => {
-				   drawCircle(circle);
-				   updateCircle(circle);
-			   });
-		   }
+							downItems.forEach(downItem => {
+								drawText(downItem.text, downItem.x, downItem.y, downItem.color);
+								updateDown(downItem);
+							});
+						} else {
+							circles.forEach(circle => {
+								drawCircle(circle);
+								updateCircle(circle);
+							});
+						}
 
-		   requestAnimationFrame(draw);
-	   }
+						requestAnimationFrame(draw);
+					}
 
-	   function drawCircle(circle) {
-		   ctx.save();
-		   ctx.translate(circle.x, circle.y);
-		   ctx.rotate(circle.rotation * Math.PI / 180);
-		   ctx.drawImage(image, -circle.radius, -circle.radius, circle.radius * 2, circle.radius * 2);
-		   ctx.restore();
-	   }
+					function drawCircle(circle) {
+						ctx.save();
+						ctx.translate(circle.x, circle.y);
+						ctx.rotate(circle.rotation * Math.PI / 180);
+						ctx.drawImage(image, -circle.radius, -circle.radius, circle.radius * 2, circle.radius * 2);
+						ctx.restore();
+					}
 
-	   function updateCircle(circle) {
-		   const dx = circle.x - mouseX;
-		   const dy = circle.y - mouseY;
-		   const distance = Math.sqrt(dx * dx + dy * dy);
+					function updateCircle(circle) {
+						const dx = circle.x - mouseX;
+						const dy = circle.y - mouseY;
+						const distance = Math.sqrt(dx * dx + dy * dy);
 
-		   if (distance < THRESHOLD) {
-			   const angle = Math.atan2(dy, dx);
-			   circle.x += Math.cos(angle) * 1;
-			   circle.y += Math.sin(angle) * 1;
-		   }
+						if (distance < THRESHOLD) {
+							const angle = Math.atan2(dy, dx);
+							circle.x += Math.cos(angle) * 1;
+							circle.y += Math.sin(angle) * 1;
+						}
 
-		   circle.x += circle.vx;
-		   circle.y += circle.vy;
+						circle.x += circle.vx;
+						circle.y += circle.vy;
 
-		   if (circle.x - circle.radius < 0 || circle.x + circle.radius > canvas.width) {
-			   circle.vx *= -1;
-		   }
-		   if (circle.y - circle.radius < 0 || circle.y + circle.radius > canvas.height) {
-			   circle.vy *= -1;
-		   }
+						if (circle.x - circle.radius < 0 || circle.x + circle.radius > canvas.width) {
+							circle.vx *= -1;
+						}
+						if (circle.y - circle.radius < 0 || circle.y + circle.radius > canvas.height) {
+							circle.vy *= -1;
+						}
 
-		   circle.rotation += Math.random() * 2 * ROTATION_SPEED - ROTATION_SPEED;
-	   }
+						circle.rotation += Math.random() * 2 * ROTATION_SPEED - ROTATION_SPEED;
+					}
 
-	   function drawText(text, x, y, color) {
-		   const parts = text.split('&');
-		   const leftText = parts[0].trim();
-		   const rightText = parts[1] ? parts[1].trim() : '';
-		   ctx.font = "24px 'Seven Segment', sans-serif";
-		   ctx.fillStyle = color;
-		   ctx.fillText(leftText, x, y);
-		   const leftWidth = ctx.measureText(leftText).width;
-		   ctx.font = "24px 'franklin-gothic-atf', sans-serif";
-		   ctx.fillText('&', x + leftWidth, y);
-		   const ampersandWidth = ctx.measureText('&').width;
-		   ctx.font = "24px 'Seven Segment', sans-serif";
-		   ctx.fillText(rightText, x + leftWidth + ampersandWidth, y);
-	   }
+					function drawText(text, x, y, color) {
+						const parts = text.split('&');
+						const leftText = parts[0].trim();
+						const rightText = parts[1] ? parts[1].trim() : '';
+						ctx.font = "24px 'Seven Segment', sans-serif";
+						ctx.fillStyle = color;
+						ctx.fillText(leftText, x, y);
+						const leftWidth = ctx.measureText(leftText).width;
+						ctx.font = "24px 'franklin-gothic-atf', sans-serif";
+						ctx.fillText('&', x + leftWidth, y);
+						const ampersandWidth = ctx.measureText('&').width;
+						ctx.font = "24px 'Seven Segment', sans-serif";
+						ctx.fillText(rightText, x + leftWidth + ampersandWidth, y);
+					}
 
-	   function drawNumber(numberItem) {
-		   ctx.font = "24px 'Seven Segment', sans-serif";
-		   ctx.fillStyle = numberItem.color;
-		   ctx.fillText(numberItem.number, numberItem.x, numberItem.y);
-	   }
+					function drawNumber(numberItem) {
+						ctx.font = "24px 'Seven Segment', sans-serif";
+						ctx.fillStyle = numberItem.color;
+						ctx.fillText(numberItem.number, numberItem.x, numberItem.y);
+					}
 
-	   function updateNumber(numberItem) {
-		   const dx = numberItem.x - mouseX;
-		   const dy = numberItem.y - mouseY;
-		   const distance = Math.sqrt(dx * dx + dy * dy);
+					function updateNumber(numberItem) {
+						const dx = numberItem.x - mouseX;
+						const dy = numberItem.y - mouseY;
+						const distance = Math.sqrt(dx * dx + dy * dy);
 
-		   if (distance < THRESHOLD) {
-			   const angle = Math.atan2(dy, dx);
-			   numberItem.x += Math.cos(angle) * 0.5;
-			   numberItem.y += Math.sin(angle) * 0.5;
-		   }
+						if (distance < THRESHOLD) {
+							const angle = Math.atan2(dy, dx);
+							numberItem.x += Math.cos(angle) * 0.5;
+							numberItem.y += Math.sin(angle) * 0.5;
+						}
 
-		   numberItem.x += numberItem.vx;
-		   numberItem.y += numberItem.vy;
+						numberItem.x += numberItem.vx;
+						numberItem.y += numberItem.vy;
 
-		   if (numberItem.x < 0 || numberItem.x > canvas.width) {
-			   numberItem.vx *= -1;
-		   }
-		   if (numberItem.y < 0 || numberItem.y > canvas.height) {
-			   numberItem.vy *= -1;
-		   }
-	   }
+						if (numberItem.x < 0 || numberItem.x > canvas.width) {
+							numberItem.vx *= -1;
+						}
+						if (numberItem.y < 0 || numberItem.y > canvas.height) {
+							numberItem.vy *= -1;
+						}
+					}
 
-	   function updateDown(downItem) {
-		   const dx = downItem.x - mouseX;
-		   const dy = downItem.y - mouseY;
-		   const distance = Math.sqrt(dx * dx + dy * dy);
-		   if (distance < THRESHOLD) {
-			   const angle = Math.atan2(dy, dx);
-			   downItem.x += Math.cos(angle) * 0.5;
-			   downItem.y += Math.sin(angle) * 0.5;
-		   }
-		   downItem.x += downItem.vx;
-		   downItem.y += downItem.vy;
+					function updateDown(downItem) {
+						const dx = downItem.x - mouseX;
+						const dy = downItem.y - mouseY;
+						const distance = Math.sqrt(dx * dx + dy * dy);
+						if (distance < THRESHOLD) {
+							const angle = Math.atan2(dy, dx);
+							downItem.x += Math.cos(angle) * 0.5;
+							downItem.y += Math.sin(angle) * 0.5;
+						}
+						downItem.x += downItem.vx;
+						downItem.y += downItem.vy;
 
-		   if (downItem.x < 0 || downItem.x > canvas.width) {
-			   downItem.vx *= -1;
-		   }
-		   if (downItem.y < 0 || downItem.y > canvas.height) {
-			   downItem.vy *= -1;
-		   }
-	   }})</script>
+						if (downItem.x < 0 || downItem.x > canvas.width) {
+							downItem.vx *= -1;
+						}
+						if (downItem.y < 0 || downItem.y > canvas.height) {
+							downItem.vy *= -1;
+						}
+					}
+				})</script>
 </head>
 
 <body hx-history="false" id="login-body">
-    <canvas id="canvas"></canvas>
+	<canvas id="canvas"></canvas>
 
-    <div class="login-rectangle">
-        <h1 class="login-title">Froggi Login</h1>
-        <form hx-post="/login" hx-swap="innerHTML" hx-target="#message_create_login">
-            <label class="login-label" for="username">Username:</label>
-            <input type="text" name="username" id="username"  oninput="handleInput(event)">
+	<div class="login-rectangle">
+		<h1 class="login-title">Froggi Login</h1>
+		<form hx-post="/login" hx-swap="innerHTML" hx-target="#message_create_login">
+			<label class="login-label" for="username">Username:</label>
+			<input type="text" name="username" id="username" oninput="handleInput(event)">
 
-            <label class="login-label" for="password">Password:</label>
-            <input type="password" name="password" id="password"  oninput="handleInput(event)">
-
-            <input type="submit" value="Login">
-            <div class="login-submit">
-                <box-icon name='log-in'></box-icon>
-                <img class="htmx-indicator" src="/spinner.svg">
-        </form>
-        <div id="message_create_login"></div>
-    </div>
-    <script src="app.js"></script>
+			<label class="login-label" for="password">Password:</label>
+			<input type="password" name="password" id="password" oninput="handleInput(event)">
+			<button type="submit" class="login-submit">
+				<span>Login</span>
+				<box-icon name='log-in'></box-icon>
+			</button>
+		</form>
+	</div>
+	<img class="htmx-indicator" src="/spinner.svg">
+	<div id="message_create_login"></div>
+	</div>
+	<script src="app.js"></script>
 </body>
 
 </html>

@@ -37,8 +37,10 @@
             <input type="password" id="confirm_password" name="confirm_password"  oninput="handleInput(event)">
             <div id="password_error" class="error"></div>
 
-            <input type="submit" value="Create">
-            <img class="htmx-indicator" src="/spinner.svg">
+			<button type="submit" class="login-submit">
+				<span>Create Login</span>
+				<box-icon name='log-in'></box-icon>
+			</button>
         </form>
         <div id="message_create_login"></div>
     </div>

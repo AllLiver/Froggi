@@ -178,6 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(pingServer, PING_TIME);
 
     initializePopup();
+
+    let sidebar = document.querySelector(".sidebar");
+
+    let storedScrollPosition = sessionStorage.getItem("sidebarScroll");
+    if (storedScrollPosition !== null) {
+        sidebar.scrollTop = Number(storedScrollPosition);
+    }
+    window.addEventListener("beforeunload", () => {
+        sessionStorage.setItem("sidebarScroll", sidebar.scrollTop);
+    });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -413,5 +423,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
 });
 
 pingServer();
-checkForUpdate();
 loadPresets()
