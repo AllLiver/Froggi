@@ -1,6 +1,8 @@
 # FROGGI
 [![Rust](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml/badge.svg)](https://github.com/AllLiver/Froggi/actions/workflows/rust.yml)
 ![GitHub License](https://img.shields.io/github/license/allliver/froggi)  
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
+
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
 Is a self-hosted portable scoreboard solution that aims to provide an intuitive and simple sports broadcasting overlay.
 
