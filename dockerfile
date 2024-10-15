@@ -4,7 +4,7 @@ COPY . .
 
 RUN cargo install --path .
 
-RUN apt-get update -y && apt-get install -y nano
+RUN apt-get update -y && apt-get install -y nano libssl-dev pkg-config
 
 EXPOSE 3000
 
