@@ -15,7 +15,7 @@ Is a self-hosted portable scoreboard solution that aims to provide an intuitive 
 Froggi is on [Docker Hub](https://hub.docker.com/repository/docker/allliver/froggi/general)  
 Alternatively, Docker image archives can be found under [releases](https://github.com/AllLiver/Froggi/releases)  
   
-If you would like to run Froggi as a standalone executable, then follow the guide on how to [compile](https://github.com/AllLiver/Froggi/README.md#compilation)
+If you would like to run Froggi as a standalone executable, then follow the guide on how to [compile from source](https://github.com/AllLiver/Froggi/tree/main?tab=readme-ov-file#compilation)
 
 # Usage
 If running as a standalone executable, make sure to start the "froggi" binary, not the "froggi-worker" binary.  
@@ -42,7 +42,7 @@ However due to the way Windows signals work, you should never stop Froggi by sim
 It is heavily suggested to run Froggi under WSL or Docker due to the majority of backend development happening on Linux.  
 
 ## MacOS
-Froggi has full MacOS support, however due to the difficulty in cross-compiling for MacOS precompiled binaries are not offered. Detailed instructions on how to [compile from source](https://github.com/AllLiver/Froggi/README.md#compilation) are found below.  
+Froggi has full MacOS support, however due to the difficulty in cross-compiling for MacOS precompiled binaries are not offered. Detailed instructions on how to [compile from source](https://github.com/AllLiver/Froggi/tree/main?tab=readme-ov-file#compilation) are found below.  
 If you would not like to compile the binaries from source please use Docker.
 
 ## Linux
@@ -54,7 +54,7 @@ It is the best way to run Froggi if you are familiar with Docker.
 
 # Updating
 Froggi is able to update itself, and if an update is availible you will be able to update it through the Settings page.  
-Updates are compiled from source, and in order to update Froggi needs all [build dependencies](https://github.com/AllLiver/Froggi/dependencies) installed.  
+Updates are compiled from source, and in order to update Froggi needs all [build dependencies](https://github.com/AllLiver/Froggi/tree/main?tab=readme-ov-file#dependencies) installed.  
 The Docker image comes with everything needed to compile updates from source.
 
 # Compilation 
