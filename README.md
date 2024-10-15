@@ -31,9 +31,9 @@ Modifications to config.json are automatically applied upon restarting Froggi, t
 # Roadmap
 Froggi is an indev project so changes are very likley.
 Here are some features/updates planned in no particular order
- - 🗺️ Support for more sports
- - 🗺️ Pop-up animations
- - 🗺️ Devices connected counter
+ - [] 🗺️ Support for more sports
+ - [] 🗺️ Pop-up animations
+ - [] 🗺️ Devices connected counter
 
 # Platform support
 ## Windows
