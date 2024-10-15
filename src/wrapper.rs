@@ -72,6 +72,28 @@ async fn main() {
                                                                 println!("{} occurred when moving froggi-worker! Update unsuccessful.", e);
                                                             }
                                                         }
+
+                                                        println!("Replacing local froggi (wrapper binary) with updated froggi...");
+
+                                                        #[cfg(unix)]
+                                                        match tokio::fs::rename(format!("./target/release/froggi"), worker_exe.clone()).await {
+                                                            Ok(_) => {
+                                                                println!("Local froggi replaced, update successful!");
+                                                            },
+                                                            Err(e) => {
+                                                                println!("{} occurred when moving froggi! Update unsuccessful.", e);
+                                                            }
+                                                        }
+
+                                                        #[cfg(not(unix))]
+                                                        match tokio::fs::rename("./target/release/froggi.exe", worker_exe.clone()).await {
+                                                            Ok(_) => {
+                                                                println!("Local froggi replaced, update successful!");
+                                                            },
+                                                            Err(e) => {
+                                                                println!("{} occurred when moving froggi! Update unsuccessful.", e);
+                                                            }
+                                                        }
                                                     },
                                                     Err(e) => {
                                                         println!("\"{}\" occurred when compiling froggi! Update unsuccessful.", e);
