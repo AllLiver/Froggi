@@ -16,10 +16,11 @@
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="htmx-config" content='{"includeIndicatorStyles": false}'>
     <script src="/htmx.js"></script>
     <script src="/app.js" defer></script>
     <script src="/ws.js" defer></script>
-</head>
+  </head>
 
 
 <body hx-history="false" id="login-body">
@@ -43,73 +44,8 @@
 			</button>
         </form>
         <div id="message_create_login"></div>
+        <img class="htmx-indicator"></img>
     </div>
-
-    <script>
-        const createLoginBackground = document.getElementById('background');
-        const ctx = createLoginBackground.getContext('2d');
-
-        createLoginBackground.width = window.innerWidth;
-        createLoginBackground.height = window.innerHeight;
-
-        const circles = createCircles(50);
-
-        function createCircles(num) {
-            const circles = [];
-            for (let i = 0; i < num; i++) {
-                circles.push({
-                    x: Math.random() * createLoginBackground.width,
-                    y: Math.random() * createLoginBackground.height,
-                    radius: Math.random() * 20 + 10,
-                    color: `rgba(${Math.random() * 255},${Math.random() * 255},${Math.random() * 255},0.3)`,
-                    vx: Math.random() * 4 - 2,
-                    vy: Math.random() * 4 - 2
-                });
-            }
-            return circles;
-        }
-
-        function draw() {
-            ctx.clearRect(0, 0, createLoginBackground.width, createLoginBackground.height);
-            circles.forEach(circle => {
-                ctx.beginPath();
-                ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
-                ctx.fillStyle = circle.color;
-                ctx.fill();
-                ctx.closePath();
-
-                circle.x += circle.vx;
-                circle.y += circle.vy;
-
-                if (circle.x - circle.radius < 0 || circle.x + circle.radius > createLoginBackground.width) {
-                    circle.vx *= -1;
-                }
-                if (circle.y - circle.radius < 0 || circle.y + circle.radius > createLoginBackground.height) {
-                    circle.vy *= -1;
-                }
-            });
-
-            requestAnimationFrame(draw);
-        }
-
-        draw();
-
-        let lastMouseMove = 0;
-        createLoginBackground.addEventListener('mousemove', function(event) {
-            const now = Date.now();
-            if (now - lastMouseMove < 100) return; // Throttle mouse movement
-            lastMouseMove = now;
-
-            circles.forEach(circle => {
-                const dx = event.clientX - circle.x;
-                const dy = event.clientY - circle.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance < 100) {
-                    circle.vx += dx * 0.001;
-                    circle.vy += dy * 0.001;
-                }
-            });
-        });
-    </script>
+    <script>const createLoginBackground=document.getElementById("background"),ctx=createLoginBackground.getContext("2d");createLoginBackground.width=window.innerWidth,createLoginBackground.height=window.innerHeight;const circles=createCircles(50);function createCircles(e){let r=[];for(let t=0;t<e;t++)r.push({x:Math.random()*createLoginBackground.width,y:Math.random()*createLoginBackground.height,radius:20*Math.random()+10,color:`rgba(${255*Math.random()},${255*Math.random()},${255*Math.random()},0.3)`,vx:4*Math.random()-2,vy:4*Math.random()-2});return r}function draw(){ctx.clearRect(0,0,createLoginBackground.width,createLoginBackground.height),circles.forEach(e=>{ctx.beginPath(),ctx.arc(e.x,e.y,e.radius,0,2*Math.PI),ctx.fillStyle=e.color,ctx.fill(),ctx.closePath(),e.x+=e.vx,e.y+=e.vy,(e.x-e.radius<0||e.x+e.radius>createLoginBackground.width)&&(e.vx*=-1),(e.y-e.radius<0||e.y+e.radius>createLoginBackground.height)&&(e.vy*=-1)}),requestAnimationFrame(draw)}draw();let lastMouseMove=0;createLoginBackground.addEventListener("mousemove",function(e){let r=Date.now();r-lastMouseMove<100||(lastMouseMove=r,circles.forEach(r=>{let t=e.clientX-r.x,c=e.clientY-r.y;100>Math.sqrt(t*t+c*c)&&(r.vx+=.001*t,r.vy+=.001*c)}))});</script>
 </body>
 </html>
