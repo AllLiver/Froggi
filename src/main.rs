@@ -236,45 +236,49 @@ async fn main() -> Result<()> {
     if let Err(_) = File::open("secret.key").await {
         printlg!("Initializing secret.key");
         let mut f = File::create("secret.key")
-            .await
-            .expect("Could not create secret.key");
+            .await?;
 
         let key: [u8; 32] = rand::thread_rng().gen();
         let secret = BASE64_STANDARD.encode(key);
 
         f.write_all(secret.as_bytes())
-            .await
-            .expect("Could not init secret.key");
+            .await?;
     }
 
-    if let Err(_) = File::open("config.json").await {
-        printlg!("Initializing config.json");
-        let mut f = File::create("config.json")
-            .await
-            .expect("Cannot create config.json");
+    match File::open("config.json").await {
+        Ok(_) => {
+            let cfg: Config = serde_json::from_str(&tokio::fs::read_to_string("config.json").await?)?;
 
-        let default_config = Config {
-            secure_auth_cookie: true,
-            sponsor_wait_time: 5,
-            countdown_opacity: 0.5,
-        };
-
-        f.write_all(
-            serde_json::to_string_pretty(&default_config)
-                .expect("Could not serialize default config")
-                .as_bytes(),
-        )
-        .await
-        .expect("Could not initialize config.json")
+            if cfg.secure_auth_cookie == false {
+                printlg!("! ! ! ! ! ! ! ! ! !");
+                printlg!("WARNING! DISABLING SECURE AUTH COOKIE IN config.json COULD RESULT IN SENDING LOGIN CREDENTIALS OVER UNENCRYPTED TRAFFIC, THIS IS UNSAFE AND SHOULD ONLY BE USED FOR DEVELOPMENT PURPOSES! UNLESS YOU KNOW WHAT YOU ARE DOING, PLEASE ENABLE SECURE AUTH COOKIE.");
+                printlg!("! ! ! ! ! ! ! ! ! !");
+            }
+        }
+        Err(_) => {
+            printlg!("Initializing config.json");
+            let mut f = File::create("config.json")
+                .await?;
+    
+            let default_config = Config {
+                secure_auth_cookie: true,
+                sponsor_wait_time: 5,
+                countdown_opacity: 0.5,
+            };
+    
+            f.write_all(
+                serde_json::to_string_pretty(&default_config)?
+                    .as_bytes(),
+            )
+            .await?;
+        }
     }
 
     create_dir_all(format!("./sponsors"))
-        .await
-        .expect("Could not create sponsors directory");
+        .await?;
 
     create_dir_all(format!("./team-presets"))
-        .await
-        .expect("Could not create sponsors directory");
+        .await?;
 
     // Load sponsor img tags
     load_sponsors().await;
