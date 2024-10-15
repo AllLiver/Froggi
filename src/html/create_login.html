@@ -45,7 +45,6 @@
             <img class="htmx-indicator" src="/favicon.png"></img>
         </form>
         <div id="message_create_login"></div>
-        <img class="htmx-indicator"></img>
     </div>
     <script>const createLoginBackground=document.getElementById("background"),ctx=createLoginBackground.getContext("2d");createLoginBackground.width=window.innerWidth,createLoginBackground.height=window.innerHeight;const circles=createCircles(50);function createCircles(e){let r=[];for(let t=0;t<e;t++)r.push({x:Math.random()*createLoginBackground.width,y:Math.random()*createLoginBackground.height,radius:20*Math.random()+10,color:`rgba(${255*Math.random()},${255*Math.random()},${255*Math.random()},0.3)`,vx:4*Math.random()-2,vy:4*Math.random()-2});return r}function draw(){ctx.clearRect(0,0,createLoginBackground.width,createLoginBackground.height),circles.forEach(e=>{ctx.beginPath(),ctx.arc(e.x,e.y,e.radius,0,2*Math.PI),ctx.fillStyle=e.color,ctx.fill(),ctx.closePath(),e.x+=e.vx,e.y+=e.vy,(e.x-e.radius<0||e.x+e.radius>createLoginBackground.width)&&(e.vx*=-1),(e.y-e.radius<0||e.y+e.radius>createLoginBackground.height)&&(e.vy*=-1)}),requestAnimationFrame(draw)}draw();let lastMouseMove=0;createLoginBackground.addEventListener("mousemove",function(e){let r=Date.now();r-lastMouseMove<100||(lastMouseMove=r,circles.forEach(r=>{let t=e.clientX-r.x,c=e.clientY-r.y;100>Math.sqrt(t*t+c*c)&&(r.vx+=.001*t,r.vy+=.001*c)}))});</script>
 </body>

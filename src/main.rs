@@ -358,7 +358,6 @@ async fn main() -> Result<()> {
         .route("/app.js", get(app_js_handler))
         .route("/ws.js", get(ws_js_handler))
         .route("/favicon.png", get(favicon_handler))
-        .route("/spinner.svg", get(spinner_handler))
         .route("/overlay-websocket", get(overlay_websocket_handler))
         .route("/login", get(login_page_handler))
         .route("/login/", get(login_page_handler))
@@ -797,14 +796,6 @@ async fn favicon_handler() -> impl IntoResponse {
         .body(Body::from(
             include_bytes!("./html/img/favicon.png").to_vec(),
         ))
-        .unwrap()
-}
-
-async fn spinner_handler() -> impl IntoResponse {
-    Response::builder()
-        .status(StatusCode::OK)
-        .header(CONTENT_TYPE, HeaderValue::from_static("image/svg+xml"))
-        .body(String::from(include_str!("./html/img/spinner.svg")))
         .unwrap()
 }
 
