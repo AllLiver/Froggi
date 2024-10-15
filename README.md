@@ -90,4 +90,4 @@ cargo run --release --bin froggi
  - HTML, CSS, JavaScript, and the HTMX library for the frontend
 
 # Licence
-Froggi is licenced under the permissive [MIT licence](https://mit-license.org/).
+Froggi is licenced under the permissive [MIT Licence](https://mit-license.org/).
