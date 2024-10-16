@@ -1,10 +1,29 @@
+// Froggi routing (misc)
+
+use std::collections::HashMap;
 use axum::{
-    extract::State,
+    extract::{Path, Query, State},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
 };
 
 use crate::{appstate::global::*, printlg, AppState};
+
+pub async fn popup_handler(
+    Path(a): Path<String>,
+    Query(params): Query<HashMap<String, String>>,
+) -> impl IntoResponse {
+    if let Some(p) = params.get("text") {
+        if a == "home" {
+            POPUPS_HOME.lock().await.push((p.clone(), 7));
+        } else if a == "away" {
+            POPUPS_AWAY.lock().await.push((p.clone(), 7));
+        }
+        printlg!("POPUP: {}", p);
+    }
+
+    return StatusCode::OK;
+}
 
 pub async fn reset_handler(State(ref mut state): State<AppState>) -> impl IntoResponse {
     *state.home_points.lock().await = 0;

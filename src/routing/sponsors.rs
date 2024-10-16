@@ -1,3 +1,5 @@
+// Froggi routing (sponsors)
+
 use std::path::PathBuf;
 
 use axum::{
@@ -11,7 +13,7 @@ use tokio::{
     io::AsyncWriteExt,
 };
 
-use crate::{appstate::global::*, id_create, printlg, Config};
+use crate::{appstate::global::*, id_create, printlg, utility::load_sponsors};
 
 pub async fn upload_sponsors_handler(mut form: Multipart) -> impl IntoResponse {
     create_dir_all(format!("./sponsors"))
@@ -113,59 +115,4 @@ pub async fn sponsor_remove_handler(Path(id): Path<String>) -> impl IntoResponse
         )
         .body(String::new())
         .unwrap();
-}
-
-pub async fn load_sponsors() {
-    create_dir_all(format!("./sponsors"))
-        .await
-        .expect("Could not create sponsors directory");
-
-    let mut d = read_dir("./sponsors")
-        .await
-        .expect("Could not read sponsors dir");
-
-    while let Ok(Some(f)) = d.next_entry().await {
-        let fname = f.file_name().to_string_lossy().to_string();
-
-        let mime_type = match fname.split(".").collect::<Vec<&str>>()[1] {
-            "png" => "png",
-            "jpg" => "jpeg",
-            "jpeg" => "jpeg",
-            _ => "",
-        };
-
-        let f_bytes = tokio::fs::read(f.path())
-            .await
-            .expect("Could not read sponsor image");
-
-        *SPONSOR_IDX.lock().await = 0;
-        SPONSOR_TAGS.lock().await.push(format!(
-            "<img class=\"ol-sponsor-img\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"auto\">",
-            mime_type,
-            BASE64_STANDARD.encode(f_bytes),
-        ))
-    }
-}
-
-pub async fn sponsor_ticker() {
-    let cfg = tokio::fs::read_to_string("./config.json")
-        .await
-        .expect("Could not read config json");
-    let cfg_json: Config = serde_json::from_str(&cfg).expect("Could not deserialize config json");
-
-    loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(cfg_json.sponsor_wait_time)).await;
-        let mut sponsor_idx = SPONSOR_IDX.lock().await;
-        let show_sponsors = SHOW_SPONSORS.lock().await;
-
-        let sponsor_tags_len = SPONSOR_TAGS.lock().await.len();
-
-        if *show_sponsors && sponsor_tags_len > 0 {
-            if *sponsor_idx < sponsor_tags_len - 1 {
-                *sponsor_idx += 1;
-            } else {
-                *sponsor_idx = 0;
-            }
-        }
-    }
 }

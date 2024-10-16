@@ -1,10 +1,11 @@
+// Froggi routing (teaminfo)
+
 use axum::{
     extract::{Multipart, Path, State},
     http::{HeaderName, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Response},
 };
 use base64::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, File},
@@ -12,26 +13,7 @@ use tokio::{
 };
 
 use crate::appstate::global::*;
-use crate::{hex_to_rgb, id_create, printlg, rgb_to_hex, AppState};
-
-#[derive(Serialize, Deserialize)]
-pub struct Teaminfo {
-    pub home_name: String,
-    pub home_color: String,
-    pub away_name: String,
-    pub away_color: String,
-}
-
-impl Teaminfo {
-    fn new() -> Teaminfo {
-        Teaminfo {
-            home_name: String::new(),
-            home_color: String::new(),
-            away_name: String::new(),
-            away_color: String::new(),
-        }
-    }
-}
+use crate::{hex_to_rgb, id_create, printlg, rgb_to_hex, utility::Teaminfo, AppState};
 
 pub async fn teaminfo_preset_create_handler(mut form: Multipart) -> impl IntoResponse {
     let mut teaminfo = Teaminfo::new();

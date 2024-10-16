@@ -1,5 +1,6 @@
-use std::collections::HashMap;
+// Froggi routing (api)
 
+use std::collections::HashMap;
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, HeaderName, HeaderValue, StatusCode},

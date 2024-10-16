@@ -1,3 +1,5 @@
+// Froggi routing (time)
+
 use axum::{
     extract::{Path, State},
     response::IntoResponse,
@@ -5,38 +7,8 @@ use axum::{
 };
 use reqwest::StatusCode;
 use serde::Deserialize;
-use std::time::Instant;
 
 use crate::{appstate::global::*, printlg, AppState};
-
-pub async fn uptime_ticker() {
-    let start_time = Instant::now();
-
-    loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        let mut uptime_secs = UPTIME_SECS.lock().await;
-
-        *uptime_secs = (Instant::now() - start_time).as_secs() as usize;
-    }
-}
-
-pub async fn game_clock_ticker() {
-    loop {
-        let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
-        let mut game_clock = GAME_CLOCK.lock().await;
-        let mut game_clock_start = GAME_CLOCK_START.lock().await;
-
-        if *game_clock_start && !*OCR_API.lock().await {
-            let time_diff = -1 * (Instant::now() - call_time).as_millis() as isize;
-            if *game_clock as isize + time_diff >= 0 {
-                *game_clock = (*game_clock as isize + time_diff) as usize;
-            } else {
-                *game_clock_start = false;
-            }
-        }
-    }
-}
 
 pub async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse {
     let mut game_clock_start = GAME_CLOCK_START.lock().await;
@@ -98,24 +70,6 @@ pub async fn game_clock_display_handler(Path(o): Path<String>) -> impl IntoRespo
     }
 
     time_display
-}
-
-pub async fn countdown_clock_ticker() {
-    loop {
-        let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-        let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
-
-        if *countdown_clock_start {
-            let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
-            if *countdown_clock as isize + time_diff >= 0 {
-                *countdown_clock = (*countdown_clock as isize + time_diff) as usize;
-            } else {
-                *countdown_clock_start = false;
-            }
-        }
-    }
 }
 
 pub async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse {

@@ -1,3 +1,5 @@
+// Froggi middleware
+
 use axum::{
     body::Body,
     extract::Request,
@@ -10,7 +12,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 
-use crate::{session_cookie_builder, verify_auth, verify_session, Login};
+use crate::utility::login::*;
 
 pub async fn auth_session_layer(
     jar: CookieJar,
