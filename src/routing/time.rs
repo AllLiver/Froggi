@@ -24,9 +24,9 @@ pub async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse 
     return StatusCode::OK;
 }
 
-pub async fn game_clock_set_handler(Path(mins): Path<usize>) -> impl IntoResponse {
+pub async fn game_clock_set_handler(Path((mins, secs)): Path<(usize, usize)>) -> impl IntoResponse {
     let mut game_clock = GAME_CLOCK.lock().await;
-    *game_clock = mins * 60 * 1000;
+    *game_clock = mins * 60 * 1000 + secs * 1000;
 
     printlg!("SET game_clock: {}", game_clock);
 
@@ -86,9 +86,9 @@ pub async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResp
     return StatusCode::OK;
 }
 
-pub async fn countdown_clock_set_handler(Path(mins): Path<usize>) -> impl IntoResponse {
+pub async fn countdown_clock_set_handler(Path((mins, secs)): Path<(usize, usize)>) -> impl IntoResponse {
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-    *countdown_clock = mins * 60;
+    *countdown_clock = mins * 60 + secs;
 
     printlg!("SET countdown_clock: {}", *countdown_clock);
 
