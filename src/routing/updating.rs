@@ -1,7 +1,10 @@
-use axum::{http::StatusCode, response::{Html, IntoResponse, Response}};
-use anyhow::{Result, anyhow};
+use anyhow::{anyhow, Result};
+use axum::{
+    http::StatusCode,
+    response::{Html, IntoResponse, Response},
+};
 
-use crate::{printlg, appstate::global::*};
+use crate::{appstate::global::*, printlg};
 
 const REMOTE_CARGO_TOML_URL: &'static str =
     "https://raw.githubusercontent.com/AllLiver/Froggi/refs/heads/main/Cargo.toml";

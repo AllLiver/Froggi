@@ -1,8 +1,15 @@
-use axum::{http::StatusCode, extract::{Path, State}, response::IntoResponse};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    response::IntoResponse,
+};
 
-use crate::{printlg, AppState, appstate::global::*};
+use crate::{appstate::global::*, printlg, AppState};
 
-pub async fn downs_set_handler(State(state): State<AppState>, Path(d): Path<u8>) -> impl IntoResponse {
+pub async fn downs_set_handler(
+    State(state): State<AppState>,
+    Path(d): Path<u8>,
+) -> impl IntoResponse {
     if (1..=4).contains(&d) {
         let mut down = state.down.lock().await;
         *down = d;

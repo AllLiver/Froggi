@@ -1,45 +1,40 @@
 #[forbid(unsafe_code)]
 mod appstate;
 mod routing;
+mod utility_functions;
 
 use crate::appstate::global::*;
 use crate::appstate::routing::*;
 
+use crate::routing::api::*;
 use crate::routing::basic::*;
+use crate::routing::downs::*;
+use crate::routing::froggi_middleware::*;
 use crate::routing::login::*;
+use crate::routing::misc::*;
 use crate::routing::overlay::*;
+use crate::routing::popups::*;
 use crate::routing::sponsors::*;
 use crate::routing::team::*;
 use crate::routing::teaminfo::*;
 use crate::routing::time::*;
+use crate::routing::updating::*;
 use crate::routing::visibility::*;
 use crate::routing::websockets::*;
-use crate::routing::downs::*;
-use crate::routing::api::*;
-use crate::routing::updating::*;
+use crate::utility_functions::*;
 
 use anyhow::{Context, Result};
 use axum::{
-    body::Body,
-    extract::{DefaultBodyLimit, Path, Query, Request, State},
-    http::{
-        header::{LOCATION, SET_COOKIE},
-        HeaderMap, HeaderValue, StatusCode,
-    },
-    middleware::{self, Next},
-    response::{Html, IntoResponse, Response},
+    extract::DefaultBodyLimit,
+    middleware,
+    response::Html,
     routing::{get, head, post, put},
     Router,
 };
-use axum_extra::extract::cookie::CookieJar;
 use base64::prelude::*;
-use rand::{thread_rng, Rng};
+use rand::Rng;
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashMap,
-    env,
-    time::{Instant, UNIX_EPOCH},
-};
+use std::{env, time::UNIX_EPOCH};
 use tokio::{
     fs::{create_dir_all, File},
     io::AsyncWriteExt,
@@ -369,331 +364,13 @@ struct Config {
 // endregion: updating
 // region: popups
 
-async fn popup_handler(
-    Path(a): Path<String>,
-    Query(params): Query<HashMap<String, String>>,
-) -> impl IntoResponse {
-    if let Some(p) = params.get("text") {
-        if a == "home" {
-            POPUPS_HOME.lock().await.push((p.clone(), 7));
-        } else if a == "away" {
-            POPUPS_AWAY.lock().await.push((p.clone(), 7));
-        }
-        printlg!("POPUP: {}", p);
-    }
-
-    return StatusCode::OK;
-}
-
-async fn popup_home_ticker() {
-    loop {
-        let start_time = Instant::now();
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        let mut popups = POPUPS_HOME.lock().await;
-
-        let mut i = 0;
-        loop {
-            if i >= popups.len() {
-                break;
-            }
-
-            let time_diff = (Instant::now() - start_time).as_secs();
-            if popups[i].1 - time_diff > 0 {
-                popups[i].1 -= time_diff;
-                i += 1;
-            } else {
-                popups.remove(i);
-            }
-        }
-    }
-}
-
-async fn popup_away_ticker() {
-    loop {
-        let start_time = Instant::now();
-        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-        let mut popups = POPUPS_AWAY.lock().await;
-
-        let mut i = 0;
-        loop {
-            if i >= popups.len() {
-                break;
-            }
-
-            let time_diff = (Instant::now() - start_time).as_secs();
-            if popups[i].1 - time_diff > 0 {
-                popups[i].1 -= time_diff;
-                i += 1;
-            } else {
-                popups.remove(i);
-            }
-        }
-    }
-}
-
 // endregion: popups
 // region: misc
-
-async fn reset_handler(State(ref mut state): State<AppState>) -> impl IntoResponse {
-    *state.home_points.lock().await = 0;
-    *state.home_name.lock().await = String::from("Home");
-    *state.away_points.lock().await = 0;
-    *state.away_name.lock().await = String::from("Away");
-    *state.quarter.lock().await = 1;
-    *state.preset_id.lock().await = String::new();
-    *state.down.lock().await = 1;
-    *state.downs_togo.lock().await = 1;
-    *state.countdown_text.lock().await = String::from("Countdown");
-    *state.show_countdown.lock().await = false;
-    *state.show_downs.lock().await = true;
-    *state.show_scoreboard.lock().await = true;
-
-    *GAME_CLOCK.lock().await = 0;
-    *GAME_CLOCK_START.lock().await = false;
-    *COUNTDOWN_CLOCK.lock().await = 0;
-    *COUNTDOWN_CLOCK_START.lock().await = false;
-    *SHOW_SPONSORS.lock().await = false;
-    *OCR_API.lock().await = false;
-
-    printlg!("SCOREBOARD REST");
-
-    return StatusCode::OK;
-}
-
-async fn logs_handler() -> impl IntoResponse {
-    let logs = LOGS.lock().await;
-    let mut logs_display = Vec::new();
-
-    for i in 0..logs.len() {
-        logs_display.push(format!("<span>({}) {}</span>", i + 1, logs[i]))
-    }
-
-    Html::from(logs_display.join("<br>"))
-}
-
-async fn load_config() {
-    let config: Config = serde_json::from_str(
-        &tokio::fs::read_to_string("./config.json")
-            .await
-            .expect("Failed to read config.json"),
-    )
-    .expect("Failed to deserialize config.json");
-
-    *COUNTDOWN_OPACITY.lock().await = config.countdown_opacity;
-}
-
-fn hex_to_rgb(hex: &String) -> (u8, u8, u8) {
-    let hex_chars: Vec<char> = hex.trim_start_matches("#").to_string().chars().collect();
-
-    let r = hex_char_to_u8(hex_chars[0]) * 16 + hex_char_to_u8(hex_chars[1]);
-    let g = hex_char_to_u8(hex_chars[2]) * 16 + hex_char_to_u8(hex_chars[3]);
-    let b = hex_char_to_u8(hex_chars[4]) * 16 + hex_char_to_u8(hex_chars[5]);
-
-    (r, g, b)
-}
-
-fn hex_char_to_u8(c: char) -> u8 {
-    match c {
-        '0' => 0,
-        '1' => 1,
-        '2' => 2,
-        '3' => 3,
-        '4' => 4,
-        '5' => 5,
-        '6' => 6,
-        '7' => 7,
-        '8' => 8,
-        '9' => 9,
-        'A' => 10,
-        'B' => 11,
-        'C' => 12,
-        'D' => 13,
-        'E' => 14,
-        'F' => 15,
-        'a' => 10,
-        'b' => 11,
-        'c' => 12,
-        'd' => 13,
-        'e' => 14,
-        'f' => 15,
-        _ => 15,
-    }
-}
-
-fn rgb_to_hex(rgb: &(u8, u8, u8)) -> String {
-    format!(
-        "#{}{}{}{}{}{}",
-        u8_to_hex_char((rgb.0 - (rgb.0 % 16)) / 16),
-        u8_to_hex_char(rgb.0 % 16),
-        u8_to_hex_char((rgb.1 - (rgb.1 % 16)) / 16),
-        u8_to_hex_char(rgb.1 % 16),
-        u8_to_hex_char((rgb.2 - (rgb.2 % 16)) / 16),
-        u8_to_hex_char(rgb.2 % 16)
-    )
-}
-
-fn u8_to_hex_char(u: u8) -> char {
-    match u {
-        0 => '0',
-        1 => '1',
-        2 => '2',
-        3 => '3',
-        4 => '4',
-        5 => '5',
-        6 => '6',
-        7 => '7',
-        8 => '8',
-        9 => '9',
-        10 => 'A',
-        11 => 'B',
-        12 => 'C',
-        13 => 'D',
-        14 => 'E',
-        15 => 'F',
-        _ => 'F',
-    }
-}
-
-async fn restart_handler() -> impl IntoResponse {
-    printlg!("Restarting...");
-
-    if let Some(tx) = RESTART_SIGNAL.lock().await.take() {
-        let _ = tx.send(());
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::from("Restarting..."))
-            .unwrap();
-    } else {
-        printlg!("Restart signal already sent");
-        return Response::builder()
-            .status(StatusCode::METHOD_NOT_ALLOWED)
-            .body(String::from("Restart already sent!"))
-            .unwrap();
-    }
-}
-
-async fn shutdown_handler() -> impl IntoResponse {
-    printlg!("Shutting down...");
-
-    if let Some(tx) = SHUTDOWN_SIGNAL.lock().await.take() {
-        let _ = tx.send(());
-        return Response::builder()
-            .status(StatusCode::OK)
-            .body(String::from("Shutting down..."))
-            .unwrap();
-    } else {
-        printlg!("Shutdown signal already sent");
-        return Response::builder()
-            .status(StatusCode::METHOD_NOT_ALLOWED)
-            .body(String::from("Shutdown already sent!"))
-            .unwrap();
-    }
-}
-
-async fn ping_handler() -> impl IntoResponse {
-    return StatusCode::OK;
-}
 
 // endregion: misc
 // region: middleware
 
-async fn auth_session_layer(
-    jar: CookieJar,
-    headers: HeaderMap,
-    request: Request,
-    next: Next,
-) -> Result<Response, StatusCode> {
-    if verify_session(jar).await {
-        return Ok(next.run(request).await);
-    } else {
-        if let Some(h) = headers.get("api-auth") {
-            let login: Login = serde_json::from_str(
-                &tokio::fs::read_to_string("./login.json")
-                    .await
-                    .expect("Failed to read login.json"),
-            )
-            .expect("Failed to deserialize login.json");
-            if h.to_str().expect("Failed to cast headervalue into a str") == login.api_key {
-                return Ok(next.run(request).await);
-            } else {
-                return Err(StatusCode::UNAUTHORIZED);
-            }
-        } else {
-            return Err(StatusCode::UNAUTHORIZED);
-        }
-    }
-}
-
-async fn auth_give_session_layer(
-    jar: CookieJar,
-    request: Request,
-    next: Next,
-) -> Result<Response, Response> {
-    if verify_auth(jar.clone()).await || verify_session(jar.clone()).await {
-        if verify_session(jar).await {
-            return Ok(next.run(request).await);
-        } else {
-            let mut response = next.run(request).await;
-            let cookie = session_cookie_builder().await;
-
-            response.headers_mut().append(
-                SET_COOKIE,
-                HeaderValue::from_str(&cookie)
-                    .expect("Failed to get headervalue from session cookie!"),
-            );
-
-            return Ok(response);
-        }
-    } else {
-        return Err(Response::builder()
-            .status(StatusCode::SEE_OTHER)
-            .header(LOCATION, HeaderValue::from_static("/login"))
-            .body(Body::empty())
-            .unwrap());
-    }
-}
-
 // endregion: middleware
-
-fn id_create(l: u8) -> String {
-    const BASE62: &'static str = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890";
-
-    let mut id = String::new();
-    let base62: Vec<char> = BASE62.chars().collect();
-
-    for _ in 0..l {
-        id.push(base62[thread_rng().gen_range(0..base62.len())])
-    }
-
-    id
-}
-
-async fn program_lock() -> Result<(), std::io::Error> {
-    let time = std::time::SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("Time went backwards")
-        .as_secs();
-
-    tokio::fs::write("./tmp/froggi.lock", time.to_string()).await
-}
-
-async fn release_program_lock() -> Result<(), std::io::Error> {
-    tokio::fs::remove_file("./tmp/froggi.lock").await
-}
-
-async fn update_program_lock() {
-    loop {
-        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-        let time = std::time::SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("Time went backwards")
-            .as_secs();
-
-        tokio::fs::write("./tmp/froggi.lock", time.to_string())
-            .await
-            .expect("Failed to update froggi.lock");
-    }
-}
 
 // Code borrowed from https://github.com/tokio-rs/axum/blob/806bc26e62afc2e0c83240a9e85c14c96bc2ceb3/examples/graceful-shutdown/src/main.rs
 async fn shutdown_signal(
