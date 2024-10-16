@@ -1,3 +1,5 @@
+// Froggi wrapper
+
 use git2::Repository;
 #[cfg(unix)]
 use nix::{sys::signal::Signal::SIGTERM, unistd::Pid};
