@@ -35,7 +35,7 @@ pub async fn game_clock_set_handler(Path((mins, secs)): Path<(usize, usize)>) ->
 
 pub async fn game_clock_set_mins_handler(Path(mins): Path<usize>) -> impl IntoResponse {
     let mut game_clock = GAME_CLOCK.lock().await;
-    *game_clock = (*game_clock / 1000 % 60) + mins * 60 * 1000;
+    *game_clock = (*game_clock / 1000 % 60 * 1000) + mins * 60 * 1000;
 
     printlg!("SET game_clock: {}", game_clock);
 
@@ -44,7 +44,7 @@ pub async fn game_clock_set_mins_handler(Path(mins): Path<usize>) -> impl IntoRe
 
 pub async fn game_clock_set_secs_handler(Path(secs): Path<usize>) -> impl IntoResponse {
     let mut game_clock = GAME_CLOCK.lock().await;
-    *game_clock = (*game_clock / 1000 / 60) + secs * 1000;
+    *game_clock = (*game_clock / 1000 / 60 * 60 * 1000) + secs * 1000;
 
     printlg!("SET game_clock: {}", game_clock);
 
@@ -124,7 +124,7 @@ pub async fn countdown_clock_set_mins_handler(Path(mins): Path<usize>) -> impl I
 
 pub async fn countdown_clock_set_secs_handler(Path(secs): Path<usize>) -> impl IntoResponse {
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-    *countdown_clock = (*countdown_clock / 60) + secs;
+    *countdown_clock = (*countdown_clock / 60 * 60) + secs;
 
     printlg!("SET game_clock: {}", countdown_clock);
 
