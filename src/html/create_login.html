@@ -21,31 +21,47 @@
     <script src="/app.js" defer></script>
     <script src="/ws.js" defer></script>
   </head>
+<body hx-history="false" id="create-login-body">
+    <div class="create-login-container">
+        <div class="rotating-text-container">
+            <h3 class="rotating-text-title">Froggi is</h3>
+            <div class="rotating-text">
+                <ul>
+                    <li class="rotating-text-1">Fast</li>
+                    <li class="rotating-text-2">Secure</li>
+                    <li class="rotating-text-3">Portable</li>
+                    <li class="rotating-text-1">Lightweight</li>
+                    <li class="rotating-text-4">Simple</li>
+                    <li class="rotating-text-5">Reliable</li>
+                    <li class="rotating-text-1">Fast</li>
+                    <li class="rotating-text-2">Secure</li>
+                    <li class="rotating-text-3">Portable</li>
+                    <li class="rotating-text-1">Lightweight</li>
+                    <li class="rotating-text-4">Simple</li>
+                    <li class="rotating-text-5">Reliable</li>
+                </ul>
+            </div>
+        </div>
+        <input type="checkbox" id="show-create-login-form" class="show-create-login-form-checkbox">
+        <label for="show-create-login-form" class="continue-button">Continue</label>
 
+        <div class="create-login-form" id="createLoginForm">
+            <div class="create-login-background"></div>
+            <label class="create-login-username" for="username">Username:</label>
+            <input class="create-login-input" type="text" id="username" name="username" oninput="handleInput(event)">
 
-<body hx-history="false" id="login-body">
-    <canvas id="background"></canvas>
-    <div class="create-login-rectangle">
-        <h1>Create Froggi Login</h1>
-        <form id="create-login-form" hx-post="/login/create" hx-swap="innerHTML" hx-target="#message_create_login" onsubmit="return validateForm()">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" oninput="handleInput(event)">
+            <label class="create-login-password"for="password">Password:</label>
+            <input class="create-login-input" type="password" id="password" name="password" oninput="handleInput(event)">
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password"  oninput="handleInput(event)">
-
-            <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password"  oninput="handleInput(event)">
+            <label class="create-login-password" for="confirm_password">Confirm Password:</label>
+            <input class="create-login-input" type="password" id="confirm_password" name="confirm_password" oninput="handleInput(event)">
             <div id="password_error" class="error"></div>
 
-			<button type="submit" class="login-submit">
-				<span>Create Login</span>
-				<box-icon name='log-in'></box-icon>
-			</button>
-            <img class="htmx-indicator" src="/favicon.png"></img>
-        </form>
-        <div id="message_create_login"></div>
+            <button type="submit" class="create-login-submit">
+                <span>Create Login</span>
+                <box-icon name='log-in'></box-icon>
+            </button>
+        </div>
     </div>
-    <script>const createLoginBackground=document.getElementById("background"),ctx=createLoginBackground.getContext("2d");createLoginBackground.width=window.innerWidth,createLoginBackground.height=window.innerHeight;const circles=createCircles(50);function createCircles(e){let r=[];for(let t=0;t<e;t++)r.push({x:Math.random()*createLoginBackground.width,y:Math.random()*createLoginBackground.height,radius:20*Math.random()+10,color:`rgba(${255*Math.random()},${255*Math.random()},${255*Math.random()},0.3)`,vx:4*Math.random()-2,vy:4*Math.random()-2});return r}function draw(){ctx.clearRect(0,0,createLoginBackground.width,createLoginBackground.height),circles.forEach(e=>{ctx.beginPath(),ctx.arc(e.x,e.y,e.radius,0,2*Math.PI),ctx.fillStyle=e.color,ctx.fill(),ctx.closePath(),e.x+=e.vx,e.y+=e.vy,(e.x-e.radius<0||e.x+e.radius>createLoginBackground.width)&&(e.vx*=-1),(e.y-e.radius<0||e.y+e.radius>createLoginBackground.height)&&(e.vy*=-1)}),requestAnimationFrame(draw)}draw();let lastMouseMove=0;createLoginBackground.addEventListener("mousemove",function(e){let r=Date.now();r-lastMouseMove<100||(lastMouseMove=r,circles.forEach(r=>{let t=e.clientX-r.x,c=e.clientY-r.y;100>Math.sqrt(t*t+c*c)&&(r.vx+=.001*t,r.vy+=.001*c)}))});</script>
 </body>
 </html>
