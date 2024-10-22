@@ -17,6 +17,12 @@ pub async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse 
         *game_clock_start = true;
     } else if a == "stop" {
         *game_clock_start = false;
+    } else if a == "toggle" {
+        if *game_clock_start {
+            *game_clock_start = false;
+        } else {
+            *game_clock_start = true;
+        }
     }
 
     printlg!("UPDATE game_clock_start: {}", *game_clock_start);
@@ -97,6 +103,12 @@ pub async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResp
         *countdown_clock_start = true;
     } else if a == "stop" {
         *countdown_clock_start = false;
+    } else if a == "toggle" {
+        if *countdown_clock_start {
+            *countdown_clock_start = false;
+        } else {
+            *countdown_clock_start = true;
+        }
     }
 
     printlg!("UPDATE countdown_clock_start: {}", *countdown_clock_start);
