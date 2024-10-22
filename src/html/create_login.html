@@ -21,6 +21,7 @@
     <script src="/app.js" defer></script>
     <script src="/ws.js" defer></script>
   </head>
+  
 <body hx-history="false" id="create-login-body">
     <div class="create-login-container">
         <div class="rotating-text-container">
@@ -43,7 +44,7 @@
             </div>
         </div>
         <input type="checkbox" id="show-create-login-form" class="show-create-login-form-checkbox">
-        <label for="show-create-login-form" class="continue-button">Continue</label>
+        <label for="show-create-login-form" class="continue-button">Get Started</label>
 
         <div class="create-login-form" id="createLoginForm">
             <div class="create-login-background"></div>
@@ -61,6 +62,7 @@
                 <span>Create Login</span>
                 <box-icon name='log-in'></box-icon>
             </button>
+            <div id="message_create_login"></div>
         </div>
     </div>
 </body>
