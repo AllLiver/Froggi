@@ -126,7 +126,7 @@ pub async fn countdown_clock_set_secs_handler(Path(secs): Path<usize>) -> impl I
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
     *countdown_clock = (*countdown_clock / 60 * 60) + secs;
 
-    printlg!("SET game_clock: {}", countdown_clock);
+    printlg!("SET countdown_clock: {}", countdown_clock);
 
     return StatusCode::OK;
 }
