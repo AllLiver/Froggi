@@ -359,6 +359,14 @@ pub async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl 
                     background-color: {};
                     color: {};
                 }}
+                .trigger-home-popup {{
+                    background-color: {};
+                    color: {};
+                }}
+                .trigger-away-popup {{
+                    background-color: {};
+                    color: {};
+                }}
             </style>
             ",
                 teaminfo.home_color,
@@ -371,6 +379,10 @@ pub async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl 
                 away_text_color,
                 teaminfo.away_color,
                 away_text_color,
+                teaminfo.away_color,
+                away_text_color,
+                teaminfo.home_color,
+                home_text_color,
                 teaminfo.away_color,
                 away_text_color,
             ));

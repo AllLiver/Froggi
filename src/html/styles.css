@@ -1329,6 +1329,19 @@ iframe {
     margin: 0.5vh;
 }
 
+.trigger-game-popup {
+    background-color: var(--color-home, #007BFF);
+    color: white;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 80%;
+    padding: 0.93vh;
+    border-radius: 5px;
+    text-wrap: nowrap;
+    margin: 0.5vh;
+}
+
 .popup-subtitle {
     font-weight: 600;
 }
