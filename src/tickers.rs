@@ -85,6 +85,7 @@ pub async fn countdown_clock_ticker() {
             if *countdown_clock as isize + time_diff >= 0 {
                 *countdown_clock = (*countdown_clock as isize + time_diff) as usize;
             } else {
+                *countdown_clock = 0;
                 *countdown_clock_start = false;
             }
         }
@@ -114,6 +115,7 @@ pub async fn game_clock_ticker() {
             if *game_clock as isize + time_diff >= 0 {
                 *game_clock = (*game_clock as isize + time_diff) as usize;
             } else {
+                *game_clock = 0;
                 *game_clock_start = false;
             }
         }
