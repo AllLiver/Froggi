@@ -105,7 +105,7 @@ pub async fn uptime_ticker() {
 pub async fn game_clock_ticker() {
     loop {
         let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_millis(10)).await;
+        tokio::time::sleep(tokio::time::Duration::from_millis(1)).await;
         let mut game_clock = GAME_CLOCK.lock().await;
         let mut game_clock_start = GAME_CLOCK_START.lock().await;
 
