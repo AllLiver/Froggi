@@ -31,9 +31,10 @@ Modifications to config.json are automatically applied upon restarting Froggi, t
 # Roadmap
 Froggi is an indev project so changes are very likley.
 Here are some features/updates planned in no particular order
- - [x] 🗺️ Support for more sports
+ - [] 🗺️ Support for more sports
  - [] 🗺️ Pop-up animations
  - [] 🗺️ Devices connected counter
+- [] 🗺️ A streamdeck companion first party plugin making generic http requests obsolete for froggi
 
 # Platform support
 ## Windows
