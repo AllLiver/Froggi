@@ -85,11 +85,17 @@
                 </div>
             </div>
         </div>
-        <div class="settings-box">
+        <div class="settings-box"> 
             <div class="settings-title">
+                <div class="settings-info-parent">
                 <h2>Theme</h2>
+                <div class="settings-info-container">
+                    <box-icon name='info-circle' class="info-circle"></box-icon>
+                    <span class="tooltiptext">Changing themes is helpful for different light enviornments, and can add contrast.</span>
+                </div>
+            </div>
                 <div class="subtext-settings">
-                    <h6>Changing themes can be helpful for different levels of lights, and for more contrast when neccesary.</h6>
+                    <h6>Changing the theme will apply across pages, saved per device</h6>
                 </div>
             </div>
             <div class="setting">
@@ -100,10 +106,16 @@
         </div>
         <div class="settings-box">
             <div class="settings-title">
-                <h2>Overlay background color</h2>
+                <div class="settings-info-parent">
+                    <h2>Overlay Background color</h2>
+                    <div class="settings-info-container">
+                        <box-icon name='info-circle' class="info-circle"></box-icon>
+                        <span class="tooltiptext">Different background colors are useful for when using froggi with chromakey.</span>
+                    </div>
+                </div>
                 <div class="subtext-settings">
                     <h6>The background color is determined by this color picker, additionally you can set the alpha
-                        channel with the slider.</h6>
+                        channel.</h6>
                 </div>
             </div>
             <div class="setting">
@@ -126,27 +138,6 @@
                     <input type="checkbox" id="professional-mode-toggle">
                     <span class="slider round"></span>
                 </label>
-            </div>
-        </div>
-        <div class="settings-box">
-            <div class="settings-title">
-                <h2>To-Go Distances</h2>
-                <div class="subtext-settings">
-                    <h6>Choose between different modes and customize the distances for the to-go presets.</h6>
-                    <h6>⚠️This will be deprecated in the near future</h6>
-                </div>
-            </div>
-            <div class="setting">
-                <button id="toggle-group" class="button-settings" onclick="toggleButtonGroup()">Switch Mode</button>
-                <p id="current-mode">Mode: High School</p>
-            </div>
-            <div class="setting">
-                <input type="number" id="input1" class="number-input" placeholder="Distance 1">
-                <input type="number" id="input2" class="number-input" placeholder="Distance 2">
-                <input type="number" id="input3" class="number-input" placeholder="Distance 3">
-                <input type="number" id="input4" class="number-input" placeholder="Distance 4">
-                <input type="number" id="input5" class="number-input" placeholder="Distance 5">
-                <button class="button-settings" onclick="saveDistances()">Save Distances</button>
             </div>
         </div>
         <div class="settings-box">
