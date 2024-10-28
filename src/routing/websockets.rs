@@ -1,5 +1,7 @@
 // Froggi routing (websockets)
 
+use std::time::Instant;
+
 use axum::{
     extract::{ws::Message, State, WebSocketUpgrade},
     response::IntoResponse,
@@ -71,13 +73,13 @@ pub async fn dashboard_websocket_handler(
                     _ => "OT",
                 },
                 {
-                    let uptime = UPTIME_SECS.lock().await;
+                    let uptime = (Instant::now() - *state.start_time.lock().await).as_secs();
 
                     format!(
                         "{:02}:{:02}:{:02}",
-                        *uptime / 3600,
-                        (*uptime % 3600) / 60,
-                        *uptime % 60
+                        uptime / 3600,
+                        (uptime % 3600) / 60,
+                        uptime % 60
                     )
                 },
                 format!(

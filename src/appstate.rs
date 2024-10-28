@@ -9,7 +9,6 @@ pub mod global {
     use tokio::sync::oneshot;
 
     lazy_static! {
-        pub static ref UPTIME_SECS: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
         pub static ref GAME_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
         pub static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
         pub static ref COUNTDOWN_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
@@ -38,6 +37,8 @@ pub mod global {
 }
 
 pub mod routing {
+    use std::time::Instant;
+
     use super::global::*;
     use super::*;
     use anyhow::{anyhow, Error};
@@ -57,6 +58,7 @@ pub mod routing {
         pub show_countdown: Arc<Mutex<bool>>,
         pub show_downs: Arc<Mutex<bool>>,
         pub show_scoreboard: Arc<Mutex<bool>>,
+        pub start_time: Arc<Mutex<Instant>>
     }
 
     impl AppState {
@@ -74,6 +76,7 @@ pub mod routing {
                 show_countdown: Arc::new(Mutex::new(false)),
                 show_downs: Arc::new(Mutex::new(true)),
                 show_scoreboard: Arc::new(Mutex::new(true)),
+                start_time: Arc::new(Mutex::new(Instant::now())),
             }
         }
         pub async fn load_saved_state() -> Result<AppState, Error> {
@@ -97,6 +100,7 @@ pub mod routing {
                         show_countdown: Arc::new(Mutex::new(saved_state.show_countdown)),
                         show_downs: Arc::new(Mutex::new(saved_state.show_downs)),
                         show_scoreboard: Arc::new(Mutex::new(saved_state.show_scoreboard)),
+                        start_time: Arc::new(Mutex::new(Instant::now())),
                     });
                 } else {
                     return Err(anyhow!("Failed to deserialize appstate.json"));

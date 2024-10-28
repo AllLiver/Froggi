@@ -137,7 +137,6 @@ async fn main() -> Result<()> {
     let app = froggi_router(&state);
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
-        tokio::spawn(uptime_ticker());
         tokio::spawn(update_program_lock());
         tokio::spawn(game_clock_ticker());
         tokio::spawn(countdown_clock_ticker());

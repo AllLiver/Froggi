@@ -92,17 +92,6 @@ pub async fn countdown_clock_ticker() {
     }
 }
 
-pub async fn uptime_ticker() {
-    let start_time = Instant::now();
-
-    loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        let mut uptime_secs = UPTIME_SECS.lock().await;
-
-        *uptime_secs = (Instant::now() - start_time).as_secs() as usize;
-    }
-}
-
 pub async fn game_clock_ticker() {
     loop {
         let call_time = Instant::now();
