@@ -76,12 +76,12 @@ pub async fn sponsor_ticker() {
 pub async fn countdown_clock_ticker() {
     loop {
         let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        tokio::time::sleep(tokio::time::Duration::from_millis(1)).await;
         let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
         let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
 
         if *countdown_clock_start {
-            let time_diff = -1 * (Instant::now() - call_time).as_secs() as isize;
+            let time_diff = -1 * (Instant::now() - call_time).as_millis() as isize;
             if *countdown_clock as isize + time_diff >= 0 {
                 *countdown_clock = (*countdown_clock as isize + time_diff) as usize;
             } else {

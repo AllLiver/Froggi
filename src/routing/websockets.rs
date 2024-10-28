@@ -43,8 +43,8 @@ pub async fn dashboard_websocket_handler(
                 *state.away_points.lock().await,
                 *game_clock / 1000 / 60,
                 *game_clock / 1000 % 60,
-                *countdown_clock / 60,
-                *countdown_clock % 60,
+                *countdown_clock / 1000 / 60,
+                *countdown_clock / 1000 % 60,
                 match *state.down.lock().await {
                     1 => "1st",
                     2 => "2nd",
@@ -188,8 +188,8 @@ pub async fn overlay_websocket_handler(
                         "<div id=\"ol-countdown\" class=\"countdown-container\" style=\"opacity: {};\"><h2 class=\"countdown-title\">{}:</h2>{}:{:02}</div>",
                         countdown_opacity,
                         state.countdown_text.lock().await,
-                        *countdown_clock / 60,
-                        *countdown_clock % 60
+                        *countdown_clock / 1000 / 60,
+                        *countdown_clock / 1000 % 60
                     )
                 } else {
                     String::new()

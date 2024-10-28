@@ -118,7 +118,7 @@ pub async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResp
 
 pub async fn countdown_clock_set_handler(Path((mins, secs)): Path<(usize, usize)>) -> impl IntoResponse {
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-    *countdown_clock = mins * 60 + secs;
+    *countdown_clock = mins * 60 * 1000 + secs * 1000;
 
     printlg!("SET countdown_clock: {}", *countdown_clock);
 
@@ -127,7 +127,7 @@ pub async fn countdown_clock_set_handler(Path((mins, secs)): Path<(usize, usize)
 
 pub async fn countdown_clock_set_mins_handler(Path(mins): Path<usize>) -> impl IntoResponse {
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-    *countdown_clock = (*countdown_clock % 60) + mins * 60;
+    *countdown_clock = (*countdown_clock / 1000 % 60 * 1000) + mins * 60 * 1000;
 
     printlg!("SET game_clock: {}", countdown_clock);
 
@@ -136,7 +136,7 @@ pub async fn countdown_clock_set_mins_handler(Path(mins): Path<usize>) -> impl I
 
 pub async fn countdown_clock_set_secs_handler(Path(secs): Path<usize>) -> impl IntoResponse {
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
-    *countdown_clock = (*countdown_clock / 60 * 60) + secs;
+    *countdown_clock = (*countdown_clock / 1000 / 60 * 60 * 1000) + secs * 1000;
 
     printlg!("SET countdown_clock: {}", countdown_clock);
 
@@ -147,7 +147,7 @@ pub async fn countdown_clock_update_handler(
     Path((mins, secs)): Path<(isize, isize)>,
 ) -> impl IntoResponse {
     let mut coundown_clock = COUNTDOWN_CLOCK.lock().await;
-    let time_diff = mins * 60 + secs;
+    let time_diff = mins * 60 * 1000 + secs * 1000;
 
     if *coundown_clock as isize + time_diff >= 0 {
         *coundown_clock = (*coundown_clock as isize + time_diff) as usize;
@@ -163,11 +163,11 @@ pub async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl Into
     let mut time_display = String::new();
 
     if o == "minutes" {
-        time_display = (*countdown_clock / 60).to_string();
+        time_display = (*countdown_clock / 1000 / 60).to_string();
     } else if o == "seconds" {
-        time_display = (*countdown_clock % 60).to_string();
+        time_display = (*countdown_clock / 1000 % 60).to_string();
     } else if o == "both" {
-        time_display = format!("{}:{:02}", *countdown_clock / 60, *countdown_clock % 60);
+        time_display = format!("{}:{:02}", *countdown_clock / 1000 / 60, *countdown_clock / 1000 % 60);
     }
 
     time_display
