@@ -293,44 +293,24 @@ pub async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl 
                 .unwrap(),
         ) {
             let home_rgb = hex_to_rgb(&teaminfo.home_color);
-            let home_rgb_complimentary =
-                ((255 - home_rgb.0), (255 - home_rgb.1), (255 - home_rgb.2));
-            let home_rgb_grayscale_nudge = (((255.0 - home_rgb_complimentary.0 as f32)
-                * (home_rgb_complimentary.0 as f32 / 255.0)
-                + (255.0 - home_rgb_complimentary.1 as f32)
-                    * (home_rgb_complimentary.1 as f32 / 255.0)
-                + (255.0 - home_rgb_complimentary.2 as f32)
-                    * (home_rgb_complimentary.2 as f32 / 255.0))
-                / 3.0) as u8;
-            let home_rgb_grayscale_value = ((home_rgb_complimentary.0 as u32
-                + home_rgb_complimentary.1 as u32
-                + home_rgb_complimentary.2 as u32)
-                / 3) as u8;
-            let home_text_color = rgb_to_hex(&(
-                home_rgb_grayscale_value + home_rgb_grayscale_nudge,
-                home_rgb_grayscale_value + home_rgb_grayscale_nudge,
-                home_rgb_grayscale_value + home_rgb_grayscale_nudge,
-            ));
+            let home_grayscale_value = home_rgb.0 as f32 * 0.299 + home_rgb.1 as f32 * 0.587 + home_rgb.2 as f32 * 0.114;
+            
+            let mut home_text_color = rgb_to_hex(&(0, 0, 0));
+            
+            if home_grayscale_value >= 128.0 {
+                home_text_color = rgb_to_hex(&(255, 255, 255));
+            }
+            
 
             let away_rgb = hex_to_rgb(&teaminfo.away_color);
-            let away_rgb_complimentary =
-                ((255 - away_rgb.0), (255 - away_rgb.1), (255 - away_rgb.2));
-            let away_rgb_grayscale_nudge = (((255.0 - away_rgb_complimentary.0 as f32)
-                * (away_rgb_complimentary.0 as f32 / 255.0)
-                + (255.0 - away_rgb_complimentary.1 as f32)
-                    * (away_rgb_complimentary.1 as f32 / 255.0)
-                + (255.0 - away_rgb_complimentary.2 as f32)
-                    * (away_rgb_complimentary.2 as f32 / 255.0))
-                / 3.0) as u8;
-            let away_rgb_grayscale_value = ((away_rgb_complimentary.0 as u32
-                + away_rgb_complimentary.1 as u32
-                + away_rgb_complimentary.2 as u32)
-                / 3) as u8;
-            let away_text_color = rgb_to_hex(&(
-                away_rgb_grayscale_value + away_rgb_grayscale_nudge,
-                away_rgb_grayscale_value + away_rgb_grayscale_nudge,
-                away_rgb_grayscale_value + away_rgb_grayscale_nudge,
-            ));
+            let away_grayscale_value = away_rgb.0 as f32 * 0.299 + home_rgb.1 as f32 * 0.587 + home_rgb.2 as f32 * 0.114;
+            
+            let mut away_text_color = rgb_to_hex(&(0, 0, 0));
+            
+            if away_grayscale_value >= 128.0 {
+                away_text_color = rgb_to_hex(&(255, 255, 255))
+            }
+            
 
             return Html::from(format!(
                 "
