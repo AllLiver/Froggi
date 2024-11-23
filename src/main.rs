@@ -5,7 +5,6 @@ use anyhow::Context;
 use anyhow::Result;
 use base64::prelude::*;
 use rand::Rng;
-// use std::time::UNIX_EPOCH;
 use tokio::{
     fs::{create_dir_all, File},
     io::AsyncWriteExt,
@@ -48,31 +47,6 @@ macro_rules! printlg {
 async fn main() -> Result<()> {
     // Verify tmp directory exists
     create_dir_all("./tmp").await?;
-
-    // // Wait for program lock to release
-    // if std::path::Path::new("./tmp/froggi.lock").exists() {
-    //     printlg!("Waiting on program lock to release...");
-
-    //     loop {
-    //         if std::path::Path::new("./tmp/froggi.lock").exists() {
-    //             let lock_timestamp = tokio::fs::read_to_string("./tmp/froggi.lock").await?;
-    //             let current_time = std::time::SystemTime::now()
-    //                 .duration_since(UNIX_EPOCH)
-    //                 .expect("Time went backwards")
-    //                 .as_secs();
-
-    //             if current_time - lock_timestamp.trim().parse::<u64>()? >= 30 {
-    //                 printlg!("Lock not updated for 30 seconds, old lock assumed to have crashed.");
-    //                 break;
-    //             }
-    //         } else {
-    //             break;
-    //         }
-    //         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
-    //     }
-    // }
-
-    // program_lock().await?;
 
     let (restart_tx, restart_rx) = oneshot::channel();
     let (shutdown_tx, shutdown_rx) = oneshot::channel();
@@ -167,8 +141,6 @@ async fn main() -> Result<()> {
     } else {
         printlg!("Failed to save app state!");
     }
-
-    // release_program_lock().await?;
 
     if let Some(code) = EXIT_CODE.lock().await.take() {
         if code == 10 {

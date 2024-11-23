@@ -41,7 +41,7 @@ async fn main() {
 
                                 match std::env::set_current_dir(BUILD_TMP_DIR) {
                                     Ok(_) => {
-                                        println!("{}", std::env::current_dir().expect("msg").to_string_lossy());
+                                        println!("{}", std::env::current_dir().expect("Failed to get current working directory").to_string_lossy());
                                         println!("Compiling update...");
 
                                         let p = Command::new("cargo").args(&["build", "--release"]).spawn();

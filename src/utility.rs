@@ -226,19 +226,6 @@ pub mod lock {
                 .expect("Failed to update froggi.lock");
         }
     }
-
-    // pub async fn program_lock() -> Result<(), std::io::Error> {
-    //     let time = std::time::SystemTime::now()
-    //         .duration_since(UNIX_EPOCH)
-    //         .expect("Time went backwards")
-    //         .as_secs();
-
-    //     tokio::fs::write("./tmp/froggi.lock", time.to_string()).await
-    // }
-
-    // pub async fn release_program_lock() -> Result<(), std::io::Error> {
-    //     tokio::fs::remove_file("./tmp/froggi.lock").await
-    // }
 }
 
 pub mod hex {
