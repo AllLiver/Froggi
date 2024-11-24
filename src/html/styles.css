@@ -1,11 +1,11 @@
 /* Inherited Styles */
 body {
     background-color: var(--color-background);
-    color: var(--text-color, #000000);
-    font-family: "franklin-gothic-atf", sans-serif;
+    color: var(--text-color, #ffffff);
+    font-family: "Franklin Gothic Medium", "Sawarbi Gothic", "Fira Sans", sans-serif;
     font-weight: 500;
     font-style: normal;
-    font-size: 0.83vw;
+    font-size: 0.8vw;
     margin: 0;
     padding: 0;
     height: 100vh;
@@ -266,6 +266,8 @@ body::-webkit-scrollbar {
     --text-color-italic: #a7a8af;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Sawarabi+Gothic&display=swap'); /*Open Google Fonts*/
+@import url("https://use.typekit.net/ikl4cbb.css"); /*⚠️Proprietary adobe font⚠️*/
 @media (prefers-color-scheme: dark) {
     :root {
         --color-background: #000000;
@@ -452,98 +454,6 @@ body::-webkit-scrollbar {
     align-items: center; 
 }
 
-/* Logs */
-
-#log-popup {
-    width: 80%;
-    max-width: 25vw;
-    margin: 0 auto;
-    border-radius: 5px;
-    text-overflow: ellipsis;
-}
-
-.close-btn {
-    position: absolute;
-    top: 2vh;
-    right: 2vh;
-    color: #fff;
-    cursor: pointer;
-    font-size: 24px;
-    transition: color 0.3s ease;
-}
-
-.close-btn:hover {
-    color: #e74c3c;
-}
-
-.popup-content {
-    max-height: 95vh;
-    text-overflow: ellipsis;
-}
-
-#log-content {
-    font-family: monospace;
-    font-size: 1rem;
-    color: var(--text-color, #000000);
-    line-height: normal;
-    font-kerning: normal;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    padding: 0.2vh;
-
-}
-
-.popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: var(--color-background-contrast, #1d1e22);
-    border-radius: 5px;
-    width: 80%;
-    max-width: 25vw;
-    z-index: 1000;
-    opacity: 0.95;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-    max-height: 95vh;
-    line-height: normal;
-}
-
-.popup-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 15px;
-    border-bottom: 1px solid #ddd;
-    background-color: var(--text-color-contrast, #000000);
-    opacity: 0.99;
-}
-
-.popup-content {
-    padding: 20px;
-    overflow-y: auto;
-    user-select: text;
-    line-height: normal;
-    font-kerning: normal;
-}
-
-.popup-close {
-    font-size: 2rem;
-    cursor: pointer;
-    color: var(--text-color, #ffffff);
-    background: none;
-    border: none;
-    outline: none;
-    z-index: 999;
-}
-
-.popup-close:hover {
-    color: #f00;
-}
-
 /*& Dashboard styles */
 
 /* Columns */
@@ -580,7 +490,7 @@ body::-webkit-scrollbar {
     background-color: var(--color-green, #27a644);
     border: none;
     border-radius: 5px;
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     font-weight: 600;
     height: 4vh;
     margin-left: var(--margin-left);
@@ -671,19 +581,11 @@ body::-webkit-scrollbar {
 }
 
 .tabset-2>label {
-    border: none;
-    border-bottom: 0;
     cursor: pointer;
     font-weight: 600;
-    background-color: var(--color-green-2, #27a644);
-    border: none;
+    background-color: var(--color-green, #27a644);
     border-radius: 5px;
     color: var(--text-color-2);
-    font-weight: 600;
-    height: 4vh;
-    margin-left: var(--margin-left-2);
-    margin-bottom: var(--margin-bottom-2);
-    width: 6vw;
     cursor: pointer;
     text-align: center;
     margin: auto;
@@ -701,7 +603,6 @@ body::-webkit-scrollbar {
 
 .tabset-2>input:checked+label {
     filter: drop-shadow(0 0 1vh #27a644);
-    border: 2px solid var(--color-selected-2);
     border: none;
 }
 
@@ -741,7 +642,6 @@ iframe {
 .counter-subtext {
     font-size: 12px;
     color: var(--text-color-contrast, #000000);
-    font-family: "franklin-gothic-atf", "Fira Sans", sans-serif;
     font-weight: 500;
 }
 
@@ -782,7 +682,6 @@ iframe {
     cursor: pointer;
     width: 3.5vw;
     border-radius: 5px;
-    font-weight: bold;
 }
 
 .button-increment-home,
@@ -807,8 +706,8 @@ iframe {
 .button-decrement-togo,
 .button-increment-downs,
 .button-decrement-downs {
-    background-color: var(--text-color, #000000);
-    color: var(--text-color-contrast);
+    background-color: var(--text-color, #ffffff);
+    color: var(--text-color-contrast, #000000);
     border: none;
     padding: 0.93vh;
     margin: 0.40vh;
@@ -826,8 +725,8 @@ iframe {
     text-align: center;
     padding: 0.93vh;
     border-radius: 5px;
-    background-color: var(--text-color, #000000);
-    color: var(--text-color-contrast);
+    background-color: var(--text-color, #ffffff);
+    color: var(--text-color-contrast, #000000);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -846,7 +745,7 @@ iframe {
     height: 4vh;
     border-radius: 5px;
     margin: 0.65vh;
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
 
 }
 
@@ -862,7 +761,7 @@ iframe {
 
 .button-preset-down {
     background-color: var(--color-green, #27a644);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     font-size: 1rem;
     cursor: pointer;
@@ -875,7 +774,7 @@ iframe {
 .button-preset-togo,
 #togo-button-6 {
     background-color: var(--color-green, #27a644);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     font-size: 1rem;
     cursor: pointer;
@@ -890,7 +789,6 @@ iframe {
     flex-direction: column;
     align-items: center;
     width: 100%;
-    text-align: center;
 }
 
 .preset-down-buttons {
@@ -901,7 +799,6 @@ iframe {
 }
 
 /* Netstats rectangle */
-
 .netstats-title {
     font-size: 2vh;
     margin: 0 0.52vw;
@@ -919,9 +816,10 @@ iframe {
 .netstats-content {
     display: flex;
     flex-direction: row;
-    align-items: end;
-    justify-content: space-between;
-    margin-left: 5vw;
+    align-items: center; 
+    justify-content: center; 
+    margin: 0 auto; 
+    gap: 2vw; 
 }
 
 .stat-item {
@@ -934,11 +832,11 @@ iframe {
 .stat-item label {
     font-weight: bold;
     margin-right: 0.52vw;
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
 }
 
 .stat-item span {
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
 }
 
 #ping-value {
@@ -959,20 +857,20 @@ iframe {
 
 .button-lock-interface {
     background-color: #888888;
-    color: var(--text-color-contrast);
+    color: var(--text-color-contrast, #000000);
     border: none;
     font-size: 0.83vw;
     cursor: pointer;
     border-radius: 5px;
-    margin-right: 2.08vw;
-    margin-left: 1vw;
-    z-index: 20;
     position: relative;
-    pointer-events: auto;
-    width: 7vw;
-    height: auto;
-    text-wrap: balance;
-    padding: 0.8vh;
+    width: 8vw; 
+    height: 2.5vh; 
+    white-space: nowrap;
+    padding: 2vh 1vh;
+    text-align: center; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .unlock-interface-btn {
@@ -985,9 +883,10 @@ iframe {
 /* Clock rectangle */
 
 .clock-title {
-    font-size: 2vh;
+    font-size: 2rem;
     margin: 0 0.52vw;
-    color: var(--text-color, #000000);
+    font-weight: 700;
+    color: var(--text-color, #ffffff);
 }
 
 .clock-controls,
@@ -995,7 +894,6 @@ iframe {
     width: 100%;
     display: flex;
     justify-content: space-around;
-    margin-bottom: 10px;
 }
 
 .preset-clock-buttons {
@@ -1058,13 +956,12 @@ iframe {
 }
 
 .countdown-title {
-    font-size: 1.25rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin: 0;
     padding: 5px 0;
     text-align: center;
-    color: #fff;
-    font-family: 'Courier New', Courier, monospace;
+    margin: 0px 0.5vw;
+    color: var(--text-color, #ffffff);
 }
 
 .countdown-form-grid {
@@ -1079,7 +976,7 @@ iframe {
 .button-stop-countdown,
 .button-start-countdown {
     background-color: var(--color-red);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     padding: 10px;
     margin: 0.46vh;
@@ -1094,7 +991,7 @@ iframe {
 
 .button-preset-countdown {
     background-color: var(--color-green, #27a644);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     font-size: 1rem;
     cursor: pointer;
@@ -1120,7 +1017,7 @@ iframe {
 
 #countdown-submit {
     background-color: var(--color-green, #27a644);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     cursor: pointer;
     height: 4vh;
@@ -1149,8 +1046,8 @@ iframe {
     border-radius: 5px;
     box-sizing: border-box;
     padding: 10px;
-    background-color: var(--text-color-contrast);
-    color: var(--text-color, #000);
+    background-color: var(--text-color-contrast, #000000);
+    color: var(--text-color, #ffffff);
     height: 4vh;
     margin-right: 0.5vh;
     width: 37.78vw;
@@ -1167,7 +1064,7 @@ iframe {
 .button-stop-clock,
 .button-start-clock {
     background-color: var(--color-red);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     padding: 10px;
     margin: 0.46vh;
@@ -1186,7 +1083,7 @@ iframe {
 
 .button-preset-clock {
     background-color: var(--color-green, #27a644);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     font-size: 1rem;
     cursor: pointer;
@@ -1220,7 +1117,7 @@ iframe {
     width: calc(100% - 11.85vh);
     border-radius: 5px;
     padding: 10px;
-    background-color: var(--text-color-contrast);
+    background-color: var(--text-color-contrast, #000000);
     color: #fff;
     margin-bottom: 3px;
 }
@@ -1229,7 +1126,7 @@ iframe {
 
 .button-preset-quarter {
     background-color: var(--color-green, #27a644);
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
     border: none;
     font-size: 0.96rem;
     cursor: pointer;
@@ -1278,11 +1175,10 @@ iframe {
     width: 24.1vw;
     height: 4vh;
     background-color: var(--color-green, #27a644);
-    color: #fff;
     border-radius: 10.5px;
     margin: 0.3vh;
     cursor: pointer;
-    color: var(--text-color, #000000);
+    color: var(--text-color, #ffffff);
 }
 
 .visibility-active {
@@ -1333,12 +1229,10 @@ iframe {
 }
 
 .trigger-game-popup {
-    background-color: var(--color-home, #007BFF);
     color: white;
     border: none;
     font-size: 1rem;
     cursor: pointer;
-    width: 80%;
     padding: 0.93vh;
     border-radius: 5px;
     text-wrap: nowrap;
@@ -1351,22 +1245,20 @@ iframe {
 
 .popup-table {
     width: 100%;
-    border-collapse: collapse;
     text-align: center;
 }
 
 .popup-table th,
 .popup-table td {
     padding: 10px;
-    border: 1px solid var(--text-color, #000);
-    color: var(--text-color-contrast, #fff);
+    border: 1px solid var(--text-color, #ffffff);
+    color: var(--text-color-contrast, #000000);
 }
 
 
 .popup-table td {
     background-color: var(--color-background-contrast, #1d1e22);
-    filter: brightness(80%);
-    color: var(--text-color, #000);
+    color: var(--text-color, #ffffff);
 }
 
 .button.trigger-home-popup {
@@ -1598,7 +1490,6 @@ iframe {
         padding: 5px 0;
         text-align: center;
         color: #fff;
-        font-family: 'Courier New', Courier, monospace;
     }
 }
 
@@ -1643,7 +1534,6 @@ button:hover {
     overflow: hidden;
     position: relative;
     background-color: #000;
-    font-family: "franklin-gothic-atf", sans-serif;
 }
 
 #canvas {
@@ -1734,7 +1624,6 @@ button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', sans-serif;
 }
 
 #create-login-body {
@@ -1746,7 +1635,6 @@ button:hover {
     width: 100vw;
     height: 100vh;
     margin: 0;
-    font-family: "franklin-gothic-atf", "Fira Sans", sans-serif;
     background-image: -webkit-gradient(radial, 100% 100%, 0, 100% 100%, 808, color-stop(0%, rgba(0, 0, 0, 0)), color-stop(100%, #1a1a1a));
     background-image: -webkit-radial-gradient(right bottom, farthest-side, rgba(0, 0, 0, 0) 0%, #1a1a1a 100%);
     background-image: -moz-radial-gradient(right bottom, farthest-side, rgba(0, 0, 0, 0) 0%, #1a1a1a 100%);
@@ -1915,7 +1803,6 @@ button:hover {
 .create-login-username,
 .create-login-password {
     color: var(--text-color);
-    font-family: "franklin-gothic-atf", "Fira Sans", sans-serif;
     font-size: 2rem;
 }
 
@@ -1928,7 +1815,6 @@ button:hover {
     color: var(--text-color);
     height: 3vh;
     border: 1px solid var(--text-color);
-    font-family: "franklin-gothic-atf", "Fira Sans", sans-serif;
     width: calc(100% - 0.5vw);
     padding: 0%;
     padding-left: 0.5vw;
@@ -1978,7 +1864,6 @@ button:hover {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    font-family: "franklin-gothic-atf", "Fira Sans", "Lato" sans-serif;
     font-weight: 600;
     text-wrap: nowrap;
 }
@@ -2066,119 +1951,22 @@ button:hover {
 
 /* Ol-Popups */
 
-.popup-text {
+.ol-home-popup, .ol-away-popup {
     position: fixed;
-    bottom: -100%;
     left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    bottom: 9.5vh;
+    top: 2vh; 
+    transform: translate(-50%, 0);
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 1.2rem 2rem;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 400;
     opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-home 2s ease-out infinite;
-}
-
-.ol-home-popup {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    bottom: 9vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-home 2s ease-out infinite;
     z-index: 999;
-}
-
-.ol-popup-home.show {
-    bottom: 9.5vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-home 2s ease-out infinite;
-}
-
-@keyframes borderPulse-home {
-    0% {
-        border-color: transparent;
-        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
-    }
-
-    50% {
-        border-color: #3498db;
-        box-shadow: 0 0 0 10px rgba(52, 152, 219, 0);
-    }
-
-    100% {
-        border-color: transparent;
-        box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7);
-    }
-}
-
-
-.ol-popup-away,
-.ol-popup-home {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    opacity: 0;
-    font-size: large;
-    width: auto;
-    text-align: center;
-    border: 2px solid transparent;
-    box-sizing: border-box;
-    pointer-events: none;
-}
-
-.ol-away-popup {
-    position: fixed;
-    bottom: -100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #ffffff;
-    color: #000;
-    padding: 1.85vh;
-    border-radius: 10px;
-    bottom: 9.5vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-away 2s infinite;
-}
-
-.ol-popup-away.show {
-    bottom: 9.5vh;
-    opacity: 1;
-    transition-delay: 0.2s;
-    animation: borderPulse-away 2s infinite;
-}
-
-@keyframes borderPulse-away {
-    0% {
-        border-color: transparent;
-        box-shadow: 0 0 0 0 rgba(219, 165, 17, 0.7);
-    }
-
-    50% {
-        border-color: #e67e22;
-        box-shadow: 0 0 0 10px rgba(230, 126, 34, 0);
-    }
-
-    100% {
-        border-color: transparent;
-        box-shadow: 0 0 0 0 rgba(230, 126, 34, 0.7);
-    }
 }
 
 /*& Teaminfo, Sponsors, Teampresets */
@@ -2215,7 +2003,6 @@ form label {
     font-style: italic;
     font-size: 0.75em;
     font-weight: bold;
-    font-family: "open-sans", sans-serif;
 }
 
 .label-container {
@@ -2428,8 +2215,8 @@ form input[type="color"] {
 .button-settings,
 .copy-button,
 .ocr-button {
-    background-color: var(--text-color, #000000);
-    color: var(--text-color-contrast);
+    background-color: var(--text-color, #ffffff);
+    color: var(--text-color-contrast, #000000);
     border: none;
     padding: 0.93vh;
     font-size: 1rem;
@@ -2525,8 +2312,8 @@ input:checked + .slider:before {
 #light-theme,
 #dark-theme,
 #colorblind-theme {
-    background-color: var(--text-color, #000000);
-    color: var(--text-color-contrast);
+    background-color: var(--text-color, #ffffff);
+    color: var(--text-color-contrast, #000000);
     border: none;
     padding: 0.93vh;
     margin: 0.40vh;
@@ -2534,6 +2321,87 @@ input:checked + .slider:before {
     cursor: pointer;
     width: auto;
     border-radius: 5px;
+}
+
+/* Logs */
+
+#logs-body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #000000;
+    color: #f0f0f0;
+  }
+
+  .logs-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .header {
+    padding: 20px;
+    background-color: #282b2f;
+    border-bottom: 2px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .header h1 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .status-indicator {
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 14px;
+  }
+  
+  .status-indicator.success {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .last-updated {
+    color: #aaa;
+  }
+  
+  .content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+  
+  .sidebar {
+    width: 250px;
+    background-color: #111213;
+    border-right: 2px solid #333;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .sidebar h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #f0f0f0;
+  }
+
+  .logs-sidebar-text {
+  display: inline-block;
+  margin-right: 0.5vw; 
+  font-style: normal;
+  font-family: "Bitter", serif;
+  font-weight: bold;
 }
 
 /* 404 */

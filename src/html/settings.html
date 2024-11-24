@@ -12,8 +12,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link rel="preload" href="/app.js" as="script">
     <link rel="preload" href="styles.css" as="style">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap" rel="stylesheet" crossorigin="anonymous">
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -21,8 +19,6 @@
     <script src="/app.js" defer></script>
     <script src="/ws.js" defer></script>
 </head>
-
-<!--TODO: Masonry Layout, make slider smaller, set :visited psuedo, Regenerate API Key-->
 <body id="settings-body">
     <nav>
         <button class="hamburger-menu">
@@ -58,7 +54,7 @@
             <li>
                 <div class="navbar-content-container">
                     <box-icon name='align-justify' class="ico-white"></box-icon>
-                <a href="/" id="open-logs" class="nav-text">Open Logs</a>
+                <a href="/logs" id="open-logs" class="nav-text">Open Logs</a>
             </div>
             </li>
             <li>
@@ -91,7 +87,7 @@
                 <h2>Theme</h2>
                 <div class="settings-info-container">
                     <box-icon name='info-circle' class="info-circle"></box-icon>
-                    <span class="tooltiptext">Changing themes is helpful for different light enviornments, and can add contrast.</span>
+                    <span class="tooltiptext">Switch themes to adapt to different lighting and enhance contrast.</span>
                 </div>
             </div>
                 <div class="subtext-settings">
@@ -110,7 +106,7 @@
                     <h2>Overlay Background color</h2>
                     <div class="settings-info-container">
                         <box-icon name='info-circle' class="info-circle"></box-icon>
-                        <span class="tooltiptext">Different background colors are useful for when using froggi with chromakey.</span>
+                        <span class="tooltiptext">Different background colors are ideal for chromakey use with Froggi.</span>
                     </div>
                 </div>
                 <div class="subtext-settings">
@@ -121,8 +117,8 @@
             <div class="setting">
                 <input type="color" id="overlay-color" value="#00b140">
                 <h3 class="alpha-range-title" id="color-value">#00b140</h3>
-                <input type="range" id="overlay-alpha" min="0" max="100" value="100">
-                <h3 class="alpha-range-title" id="alpha-value">100</h3>
+                <input type="range" id="overlay-alpha" min="0" max="1" step="1" value="1">
+                <h3 class="alpha-range-title" id="alpha-value">1</h3>
                 <button id="reset-color">Default</button>
             </div>
         </div>
@@ -130,7 +126,7 @@
             <div class="settings-title">
                 <h2>Professional Mode</h2>
                 <div class="subtext-settings">
-                    <h6>Toggling this on will make the frontend more professional.</h6>
+                    <h6>Enable this to enhance the professionalism of the frontend.</h6>
                 </div>
             </div>
             <div class="setting">
@@ -186,15 +182,6 @@
                 <button hx-post="/shutdown" hx-swap="none" class="button-settings" hx-confirm="You are trying to shutdown Froggi, are you sure?">Shutdown</button>
             </div>
         </div>
-    <div id="log-popup" class="popup">
-        <div class="popup-header">
-            <h2>Logs</h2>
-            <span class="popup-close">&times;</span>
-        </div>
-        <div id="popup-content" class="popup-content">
-            <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
-        </div>
-    </div>
 </body>
 
 </html>

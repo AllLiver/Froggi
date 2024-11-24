@@ -190,72 +190,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const popup = document.getElementById('log-popup');
-    const popupContent = document.getElementById('popup-content');
-    const logLink = document.getElementById('open-logs'); 
-
-    function togglePopup() {
-        popup.style.display = popup.style.display === 'none' || popup.style.display === '' ? 'block' : 'none';
-        if (popup.style.display === 'block') scrollToBottom();
-    }
-
-    function scrollToBottom() {
-        if (popupContent) popupContent.scrollTop = popupContent.scrollHeight;
-    }
-
-    popup.style.display = 'none';
-
-    document.addEventListener('keydown', (event) => {
-        if (event.shiftKey && (event.key === '`' || event.key === '~')) {
-            togglePopup();
-        }
-    });
-
-    logLink?.addEventListener('click', (event) => {
-        event.preventDefault();
-        togglePopup();
-    });
-
-    document.querySelector('.popup-close')?.addEventListener('click', () => {
-        popup.style.display = 'none';
-    });
-
-    document.body.addEventListener('htmx:afterOnLoad', (event) => {
-        if (event.detail.elt.id === 'log-content') {
-            scrollToBottom();
-        }
-    });
-
-    popupContent?.addEventListener('DOMSubtreeModified', scrollToBottom);
-});
-
-window.onload = function () {
-    const savedColor = localStorage.getItem('overlayColor');
-    const savedAlpha = localStorage.getItem('overlayAlpha');
-
-    if (savedColor) {
-        document.getElementById('overlay-color').value = savedColor;
-        document.getElementById('color-value').textContent = savedColor;
-    }
-
-    if (savedAlpha) {
-        document.getElementById('overlay-alpha').value = savedAlpha;
-        document.getElementById('alpha-value').textContent = savedAlpha;
-    }
-};
-
 document.getElementById('overlay-color').addEventListener('input', function () {
     const color = this.value;
     document.getElementById('color-value').textContent = color;
     localStorage.setItem('overlayColor', color);
+
+    updateOverlay(color, document.getElementById('overlay-alpha').value);
 });
 
 document.getElementById('overlay-alpha').addEventListener('input', function () {
-    const alpha = this.value;
+    const alpha = this.value; 
     document.getElementById('alpha-value').textContent = alpha;
     localStorage.setItem('overlayAlpha', alpha);
+
+    updateOverlay(document.getElementById('overlay-color').value, alpha);
 });
+
+document.getElementById('reset-color').addEventListener('click', function () {
+    const defaultColor = '#00b140';
+    const defaultAlpha = '1';
+
+    document.getElementById('overlay-color').value = defaultColor;
+    document.getElementById('overlay-alpha').value = defaultAlpha;
+
+    document.getElementById('color-value').textContent = defaultColor;
+    document.getElementById('alpha-value').textContent = defaultAlpha;
+
+    localStorage.setItem('overlayColor', defaultColor);
+    localStorage.setItem('overlayAlpha', defaultAlpha);
+
+    updateOverlay(defaultColor, defaultAlpha);
+});
+
+function updateOverlay(color, alpha) {
+    const overlay = document.querySelector('.overlay');
+    if (overlay) {
+        const r = parseInt(color.slice(1, 3), 16);
+        const g = parseInt(color.slice(3, 5), 16);
+        const b = parseInt(color.slice(5, 7), 16);
+        overlay.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    }
+}
+
+window.onload = function() {
+    const savedColor = localStorage.getItem('overlayColor') || '#00b140';
+    const savedAlpha = localStorage.getItem('overlayAlpha') || '1';
+
+    document.getElementById('overlay-color').value = savedColor;
+    document.getElementById('overlay-alpha').value = savedAlpha;
+
+    document.getElementById('color-value').textContent = savedColor;
+    document.getElementById('alpha-value').textContent = savedAlpha;
+
+    updateOverlay(savedColor, savedAlpha);
+};
 
 document.getElementById('reset-color').addEventListener('click', function () {
     const defaultColor = '#00b140';

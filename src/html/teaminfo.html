@@ -12,8 +12,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link rel="preload" href="/app.js" as="script">
     <link rel="preload" href="styles.css" as="style">
-    <link rel="stylesheet" href="https://use.typekit.net/ikl4cbb.css" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Sawarabi+Gothic&display=swap" rel="stylesheet" crossorigin="anonymous">
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
@@ -58,7 +56,7 @@
             <li>
                 <div class="navbar-content-container">
                     <box-icon name='align-justify' class="ico-white"></box-icon>
-                <a href="/" id="open-logs" class="nav-text">Open Logs</a>
+                <a href="/logs" id="open-logs" class="nav-text">Open Logs</a>
             </div>
             </li>
             <li>
@@ -118,16 +116,6 @@
                 <img class="htmx-indicator" src="/favicon.png">
             </form>
             <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body"></div>
-        </div>
-
-        <div id="log-popup" class="popup">
-            <div class="popup-header">
-                <h2>Logs</h2>
-                <span class="popup-close">&times;</span>
-            </div>
-            <div id="popup-content" class="popup-content">
-                <div id="log-content" hx-put="/logs" hx-trigger="every 1000ms"></div>
-            </div>
         </div>
         <script src="/app.js"></script>
     </div>
