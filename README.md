@@ -33,7 +33,6 @@ Froggi is an indev project so changes are very likley.
 Here are some features/updates planned in no particular order
  - [] 🗺️ Support for more sports
  - [] 🗺️ Pop-up animations, and support for .gif animations (in an 16:9 or 1920x1080 aspect ratio)
- - [] 🗺️ A counter displaying how many devices are connected
  - [] 🗺️ A first party bitfocus companion plugin
  - [] 🗺️ Frontend settings saving via the backend
 
