@@ -35,6 +35,10 @@ pub async fn settings_handler() -> impl IntoResponse {
     Html::from(include_str!("../html/settings.html"))
 }
 
+pub async fn logs_page_handler() -> impl IntoResponse {
+    Html::from(include_str!("../html/logs.html"))
+}
+
 pub async fn css_handler() -> impl IntoResponse {
     Response::builder()
         .status(StatusCode::OK)

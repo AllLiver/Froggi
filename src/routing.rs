@@ -57,6 +57,7 @@ pub fn froggi_router(state: &AppState) -> Router {
         .route("/", get(index_handler))
         .route("/teaminfo", get(teaminfo_handler))
         .route("/settings", get(settings_handler))
+        .route("/logs", get(logs_page_handler))
         .layer(middleware::from_fn(auth_give_session_layer));
 
     let auth_session_routes = Router::new()
