@@ -1,4 +1,4 @@
-// Froggi routing 
+// Froggi routing
 
 use axum::{
     extract::DefaultBodyLimit,
@@ -68,15 +68,27 @@ pub fn froggi_router(state: &AppState) -> Router {
         .route("/away-points/set/:a", post(away_points_set_handler))
         .route("/game-clock/ctl/:o", post(game_clock_ctl_handler))
         .route("/game-clock/set/:mins/:secs", post(game_clock_set_handler))
-        .route("/game-clock/set-mins/:mins", post(game_clock_set_mins_handler))
-        .route("/game-clock/set-secs/:secs", post(game_clock_set_secs_handler))
+        .route(
+            "/game-clock/set-mins/:mins",
+            post(game_clock_set_mins_handler),
+        )
+        .route(
+            "/game-clock/set-secs/:secs",
+            post(game_clock_set_secs_handler),
+        )
         .route(
             "/game-clock/update/:mins/:secs",
             post(game_clock_update_handler),
         )
         .route("/countdown-clock/ctl/:o", post(countdown_clock_ctl_handler))
-        .route("/countdown-clock/set-mins/:mins", post(countdown_clock_set_mins_handler))
-        .route("/countdown-clock/set-secs/:secs", post(countdown_clock_set_secs_handler))
+        .route(
+            "/countdown-clock/set-mins/:mins",
+            post(countdown_clock_set_mins_handler),
+        )
+        .route(
+            "/countdown-clock/set-secs/:secs",
+            post(countdown_clock_set_secs_handler),
+        )
         .route(
             "/countdown-clock/set/:mins/:secs",
             post(countdown_clock_set_handler),

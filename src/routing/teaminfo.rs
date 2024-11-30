@@ -293,24 +293,24 @@ pub async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl 
                 .unwrap(),
         ) {
             let home_rgb = hex_to_rgb(&teaminfo.home_color);
-            let home_grayscale_value = home_rgb.0 as f32 * 0.299 + home_rgb.1 as f32 * 0.587 + home_rgb.2 as f32 * 0.114;
-            
+            let home_grayscale_value =
+                home_rgb.0 as f32 * 0.299 + home_rgb.1 as f32 * 0.587 + home_rgb.2 as f32 * 0.114;
+
             let mut home_text_color = rgb_to_hex(&(0, 0, 0));
-            
+
             if home_grayscale_value >= 128.0 {
                 home_text_color = rgb_to_hex(&(255, 255, 255));
             }
-            
 
             let away_rgb = hex_to_rgb(&teaminfo.away_color);
-            let away_grayscale_value = away_rgb.0 as f32 * 0.299 + home_rgb.1 as f32 * 0.587 + home_rgb.2 as f32 * 0.114;
-            
+            let away_grayscale_value =
+                away_rgb.0 as f32 * 0.299 + home_rgb.1 as f32 * 0.587 + home_rgb.2 as f32 * 0.114;
+
             let mut away_text_color = rgb_to_hex(&(0, 0, 0));
-            
+
             if away_grayscale_value >= 128.0 {
                 away_text_color = rgb_to_hex(&(255, 255, 255))
             }
-            
 
             return Html::from(format!(
                 "

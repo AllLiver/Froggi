@@ -302,8 +302,6 @@ pub mod hex {
     }
 }
 
-
-
 #[derive(Serialize, Deserialize)]
 pub struct Config {
     pub secure_auth_cookie: bool,

@@ -116,7 +116,9 @@ pub async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResp
     return StatusCode::OK;
 }
 
-pub async fn countdown_clock_set_handler(Path((mins, secs)): Path<(usize, usize)>) -> impl IntoResponse {
+pub async fn countdown_clock_set_handler(
+    Path((mins, secs)): Path<(usize, usize)>,
+) -> impl IntoResponse {
     let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
     *countdown_clock = mins * 60 * 1000 + secs * 1000;
 
@@ -167,7 +169,11 @@ pub async fn countdown_clock_display_handler(Path(o): Path<String>) -> impl Into
     } else if o == "seconds" {
         time_display = (*countdown_clock / 1000 % 60).to_string();
     } else if o == "both" {
-        time_display = format!("{}:{:02}", *countdown_clock / 1000 / 60, *countdown_clock / 1000 % 60);
+        time_display = format!(
+            "{}:{:02}",
+            *countdown_clock / 1000 / 60,
+            *countdown_clock / 1000 % 60
+        );
     }
 
     time_display

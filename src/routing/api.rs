@@ -1,11 +1,11 @@
 // Froggi routing (api)
 
-use std::collections::HashMap;
 use axum::{
     extract::{Path, State},
     http::{HeaderMap, HeaderName, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Response},
 };
+use std::collections::HashMap;
 
 use crate::{appstate::global::*, key_create, printlg, AppState, Login, API_KEY_LEN};
 

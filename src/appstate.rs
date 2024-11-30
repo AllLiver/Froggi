@@ -58,7 +58,7 @@ pub mod routing {
         pub show_countdown: Arc<Mutex<bool>>,
         pub show_downs: Arc<Mutex<bool>>,
         pub show_scoreboard: Arc<Mutex<bool>>,
-        pub start_time: Arc<Mutex<Instant>>
+        pub start_time: Arc<Mutex<Instant>>,
     }
 
     impl AppState {

@@ -1,11 +1,11 @@
 // Froggi routing (misc)
 
-use std::collections::HashMap;
 use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
 };
+use std::collections::HashMap;
 
 use crate::{appstate::global::*, printlg, AppState};
 
