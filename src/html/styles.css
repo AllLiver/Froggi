@@ -935,26 +935,6 @@ iframe {
 
 /* Countdown rectangle */
 
-.countdown-container {
-    position: absolute;
-    margin-left: auto;
-    margin-right: 0;
-    width: 12vw;
-    height: 6vw;
-    background-color: #111111;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    border-radius: 5px;
-    bottom: 0;
-    right: 0;
-    margin: 0.2%;
-    overflow: hidden;
-}
-
 .countdown-title {
     font-size: 2rem;
     font-weight: 700;
@@ -1469,7 +1449,7 @@ iframe {
         transform: translateY(-20px)
     }
 
-    .countdown-container {
+    .ol-countdown-container {
         width: 10%;
         height: 10%;
         transform: translateY(-20px)
@@ -1947,6 +1927,35 @@ button:hover {
     padding-left: 0.7vw;
     padding-right: 0.7vw;
     display: flex;
+}
+
+.ol-countdown-container {
+    position: absolute;
+    margin-left: auto;
+    margin-right: 0;
+    width: 12vw;
+    height: 6vw;
+    background-color: #111111;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    border-radius: 5px;
+    bottom: 0;
+    right: 0;
+    margin: 0.2%;
+    overflow: hidden;
+}
+
+.ol-countdown-title {
+    font-size: 1.5vw;
+    font-weight: 700;
+    text-align: center;
+    margin: 0px 0.5vw;
+    color: var(--text-color, #ffffff);
+    text-overflow: "-";
 }
 
 /* Ol-Popups */

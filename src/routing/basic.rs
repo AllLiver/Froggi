@@ -78,6 +78,14 @@ pub async fn app_js_handler() -> impl IntoResponse {
         .unwrap()
 }
 
+pub async fn index_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("../html/js/index.js")))
+        .unwrap()
+}
+
 pub async fn favicon_handler() -> impl IntoResponse {
     Response::builder()
         .status(StatusCode::OK)

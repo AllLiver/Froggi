@@ -187,7 +187,7 @@ pub async fn overlay_websocket_handler(
                 if *state.show_countdown.lock().await {
                     let countdown_clock = COUNTDOWN_CLOCK.lock().await;
                     format!(
-                        "<div id=\"ol-countdown\" class=\"countdown-container\" style=\"opacity: {};\"><h2 class=\"countdown-title\">{}</h2>{}:{:02}</div>",
+                        "<div id=\"ol-countdown\" class=\"ol-countdown-container\" style=\"opacity: {};\"><h2 class=\"ol-countdown-title\">{}</h2>{}:{:02}</div>",
                         countdown_opacity,
                         state.countdown_text.lock().await,
                         *countdown_clock / 1000 / 60,

@@ -119,6 +119,7 @@ pub fn froggi_router(state: &AppState) -> Router {
         .route("/styles.css", get(css_handler))
         .route("/htmx.js", get(htmx_js_handler))
         .route("/app.js", get(app_js_handler))
+        .route("/index.js", get(index_js_handler))
         .route("/ws.js", get(ws_js_handler))
         .route("/favicon.png", get(favicon_handler))
         .route("/overlay-websocket", get(overlay_websocket_handler))

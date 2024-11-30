@@ -5,18 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
     <title>Dashboard</title>
     <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link rel="preload" href="styles.css" as="style">
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
-    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js" integrity="sha512-kWH92pHUC/rcjpSMu19lT+H6TlZwZCAftg9AuSw+AVYSdEKSlXXB8o6g12mg5f+Pj5xO40A7ju2ot/VdodCthw==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
+    <script src="https://unpkg.com/sanitize-html@2.13.1/index.js" integrity="sha512-wmecYPj53t22fg3RXuWA/dCMhXvxclEz/pqKwHkDkklNuUG5RID+mSe+AMN5+oh/zIjP8GA2fSrInbxA1Fl5UA==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <script src="/htmx.js"></script>
     <script src="/app.js" defer></script>
+    <script src="/index.js" defer></script>
     <script src="/ws.js" defer></script>
-    <script>document.addEventListener("DOMContentLoaded",function(){let e=document.querySelectorAll('input[name="tabset-2"]'),t=document.getElementById("tab5"),o=document.querySelectorAll(".counter-input"),c=document.querySelectorAll(".counter-value, #clock-counter-minutes, #clock-counter-seconds, #countdown-counter-minutes, #countdown-counter-seconds");function n(e){o.forEach((t,o)=>{let n=c[o];t.style.display=e?"inline-block":"none",n.style.display=e?"none":"inline-block",e&&(t.value=n.textContent)})}function r(e){let t="tab5"===e.target.id;n(t),t||o.forEach((e,t)=>{c[t].textContent=e.value.padStart(2,"0")})}function a(e){let t=e.value,o=e.dataset.uri;if(o){htmx.ajax("POST",o+t,{target:e,swap:"none"});let c=e.closest(".counter").querySelector(".counter-value, #clock-counter-minutes, #clock-counter-seconds, #countdown-counter-minutes, #countdown-counter-seconds");c&&(c.textContent=t.padStart(2,"0"))}else console.error("No data-uri found for this input")}e.forEach(e=>{e.addEventListener("change",r)}),o.forEach(e=>{e.addEventListener("change",function(){a(this)}),e.addEventListener("keydown",function(e){"Enter"===e.key&&(a(this),this.blur())})}),n(t.checked)}),document.addEventListener("keyup",function(e){if("input"===e.target.tagName.toLowerCase()||"textarea"===e.target.tagName.toLowerCase())return;let t=document.querySelectorAll(".counter-input");for(let o of t)if("none"!==o.style.display)return;switch(e.key){case"f":document.querySelector(".button-increment-home").click();break;case"j":document.querySelector(".button-increment-away").click();break;case"1":document.querySelector("#button-preset-down-1").click();break;case"2":document.querySelector("#button-preset-down-2").click();break;case"3":document.querySelector("#button-preset-down-3").click();break;case"4":document.querySelector("#button-preset-down-4").click();break;case"z":document.querySelector("#togo-button-1").click();break;case"x":document.querySelector("#togo-button-2").click();break;case"c":document.querySelector("#togo-button-3").click();break;case"v":document.querySelector("#togo-button-4").click();break;case"b":document.querySelector("#togo-button-5").click();break;case"n":document.querySelector("#togo-button-6").click();break;case"m":document.querySelector("#togo-button-goal").click();break;case" ":e.preventDefault(),document.querySelector(".keybind-toggle-clock").dispatchEvent(new Event("change",{bubbles:!0}))}});</script>
        </head>
   <body hx-ext="ws" ws-connect="/dashboard-websocket">
     <!--TODO: Imrpove popup looks, remove leftover fonts & logs from htmls, and update banner-->
@@ -259,7 +262,7 @@
                     </div>
                     <div class="countdown-title-container">
                       <form class="countdown-form-grid" id="countdown-form" hx-post="/countdown/text/set" hx-swap="none" style="display: grid; grid-template-columns: 1fr 1fr;">
-                        <input type="text" id="set-countdown-clock-text" maxlength="25" * oninput="handleInput(event)" placeholder="The title to display on overlay" name="text">
+                        <input type="text" id="set-countdown-clock-text" maxlength="25" oninput="handleCountdownInput(event)" placeholder="The title to display on overlay" name="text">
                         <input type="submit" value="Submit" id="countdown-submit">
                       </form>
                     </div>

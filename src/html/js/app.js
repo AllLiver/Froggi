@@ -25,7 +25,7 @@ function pingServer() {
         })
         .catch(error => {
             pingValue.textContent = 'Configure IP E003.5';
-            handleError('003', 'Ping request failed', error);
+            console.error('003', 'Ping request failed', error);
         });
 }
 
@@ -34,7 +34,7 @@ function toggleMenu() {
         $('.hamburger-menu')?.classList.toggle('active');
         $('.sidenavbar')?.classList.toggle('active');
     } catch (error) {
-        handleError('005', 'Error toggling menu', error);
+        console.error('005', 'Error toggling menu', error);
     }
 }
 
@@ -88,7 +88,7 @@ function initializeButtonIndicators(startButtonId, stopButtonId, storageKey) {
     const stopButton = document.getElementById(stopButtonId);
 
     if (!startButton || !stopButton) {
-        handleError('008', `Button elements not found for: ${startButtonId}, ${stopButtonId}`);
+        console.error('008', `Button elements not found for: ${startButtonId}, ${stopButtonId}`);
         return;
     }
 
