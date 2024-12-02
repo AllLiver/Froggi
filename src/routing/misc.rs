@@ -55,7 +55,7 @@ pub async fn logs_handler() -> impl IntoResponse {
     let logs = LOGS.lock().await;
     let mut logs_display = Vec::new();
 
-    for i in 0..logs.len() {
+    for i in (0..logs.len()).rev() {
         logs_display.push(format!("<span>({}) {}</span>", i + 1, logs[i]))
     }
 
