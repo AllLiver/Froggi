@@ -66,26 +66,20 @@
         </ul>
       </nav>
     </div>
-  
     <div class="content">
-      <!-- Left Sidebar -->
       <aside class="sidebar">
         <div class="overview">
           <p class="logs-sidebar-text">Uptime:</p>
           <span id="uptime-value" class="inline-text">00:00:00</span>
         </div>
       </aside>
-  
       <main>
-        </div>
-        <div class="logs-list">
-                <div id="popup-content" class="popup-content">
-                    <div id="log-content" hx-put="/logs" hx-trigger="load, every 1000ms"></div>
-                </div>
-            </div>
+          <div id="popup-content" class="popup-content">
+            <div id="log-content" hx-put="/logs" hx-trigger="load, every 1000ms"></div>
           </div>
         </div>
       </main>
     </div>
   </div>
-  
+</body>
+</html>
