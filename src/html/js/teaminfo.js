@@ -31,3 +31,12 @@ document.addEventListener('DOMContentLoaded', () => {
         inputElement.value = sanitizedValue;
     });
 });
+
+function toggleMenu() {
+    try {
+        $('.hamburger-menu')?.classList.toggle('active');
+        $('.sidenavbar')?.classList.toggle('active');
+    } catch (error) {
+        console.error('005', 'Error toggling menu', error);
+    }
+}
