@@ -13,6 +13,7 @@
     <link rel="preload" href="/app.js" as="script">
     <link rel="preload" href="styles.css" as="style">
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
+    <script src="https://unpkg.com/sanitize-html@2.13.1/index.js" integrity="sha512-wmecYPj53t22fg3RXuWA/dCMhXvxclEz/pqKwHkDkklNuUG5RID+mSe+AMN5+oh/zIjP8GA2fSrInbxA1Fl5UA==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <script src="/htmx.js"></script>
@@ -76,7 +77,7 @@
                 <div class="ti-home-section">
                     <label for="home_name">Home name:</label> <br>
                     <input type="text" id="home_name" name="home_name" required maxlength="25"
-                        oninput="handleInput(event)"><br>
+                        oninput="handleTeamInput(event)"><br>
                     <div class="icon-container"></div>
                     <label for="home_img">Home icon:</label> <br>
                     <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" required><br>
@@ -86,7 +87,7 @@
 
                 <div class="ti-away-section">
                     <label for="away_name">Away name:</label> <br>
-                    <input type="text" id="away_name" name="away_name" required maxlength="25" oninput="handleInput(event)"><br>
+                    <input type="text" id="away_name" name="away_name" required maxlength="25" oninput="handleTeamInput(event)"><br>
                     <div class="icon-container"></div>
                     <label for="away_img">Away icon:</label> <br>
                     <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" required><br>

@@ -22,7 +22,7 @@
     <script src="/ws.js" defer></script>
        </head>
   <body hx-ext="ws" ws-connect="/dashboard-websocket">
-    <!--TODO: Imrpove popup looks, remove leftover fonts & logs from htmls, and update banner-->
+    <!--TODO: Standardize head & secure has fonts in css aswell as combine them, and seperate app.js-->
     <div id="backend-css-index"></div>
     <div hx-put="/teaminfo/button-css" hx-trigger="load"></div>
     <nav>
