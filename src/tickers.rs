@@ -2,7 +2,7 @@
 
 use std::time::Instant;
 
-use crate::{appstate::global::*, update_checker, utility::Config};
+use crate::{appstate::global::*, update_checker};
 
 pub async fn popup_home_ticker() {
     loop {
@@ -51,13 +51,11 @@ pub async fn popup_away_ticker() {
 }
 
 pub async fn sponsor_ticker() {
-    let cfg = tokio::fs::read_to_string("./config.json")
-        .await
-        .expect("Could not read config json");
-    let cfg_json: Config = serde_json::from_str(&cfg).expect("Could not deserialize config json");
-
     loop {
-        tokio::time::sleep(tokio::time::Duration::from_secs(cfg_json.sponsor_wait_time)).await;
+        tokio::time::sleep(tokio::time::Duration::from_secs(
+            *SPONSOR_WAIT_TIME.lock().await,
+        ))
+        .await;
         let mut sponsor_idx = SPONSOR_IDX.lock().await;
         let show_sponsors = SHOW_SPONSORS.lock().await;
 

@@ -24,6 +24,7 @@ pub mod global {
             Arc::new(Mutex::new(Vec::new()));
         pub static ref COUNTDOWN_OPACITY: Arc<Mutex<f32>> = Arc::new(Mutex::new(1.0));
         pub static ref POPUP_OPACITY: Arc<Mutex<f32>> = Arc::new(Mutex::new(1.0));
+        pub static ref SPONSOR_WAIT_TIME: Arc<Mutex<u64>> = Arc::new(Mutex::new(5));
         pub static ref RESTART_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> =
             Arc::new(Mutex::new(None));
         pub static ref SHUTDOWN_SIGNAL: Arc<Mutex<Option<oneshot::Sender<()>>>> =

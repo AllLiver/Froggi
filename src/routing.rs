@@ -118,6 +118,7 @@ pub fn froggi_router(state: &AppState) -> Router {
         .route("/api/key/reveal", post(api_key_reveal_handler))
         .route("/api/key/regen", post(api_key_regen_handler))
         .route("/popup/:t", post(popup_handler))
+        .route("/config-json/set", post(config_json_set_handler))
         .route("/reset", post(reset_handler))
         .route("/restart", post(restart_handler))
         .route("/shutdown", post(shutdown_handler))
@@ -168,6 +169,7 @@ pub fn froggi_router(state: &AppState) -> Router {
             put(|| async { Html::from(env!("CARGO_PKG_VERSION")) }),
         )
         .route("/update/menu", put(update_menu_handler))
+        .route("/config-json/form", put(config_json_form_handler))
         .nest("/", auth_session_routes)
         .nest("/", auth_give_session_routes)
         .with_state(state.clone())

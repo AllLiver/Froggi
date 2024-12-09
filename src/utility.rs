@@ -284,7 +284,7 @@ pub mod hex {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub secure_auth_cookie: bool,
     pub sponsor_wait_time: u64,
@@ -353,6 +353,7 @@ pub async fn load_config() {
 
     *COUNTDOWN_OPACITY.lock().await = config.countdown_opacity;
     *POPUP_OPACITY.lock().await = config.popup_opacity;
+    *SPONSOR_WAIT_TIME.lock().await = config.sponsor_wait_time;
 }
 
 pub fn id_create(l: u8) -> String {

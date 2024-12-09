@@ -4,10 +4,11 @@ use axum::{
     extract::{Path, Query, State},
     http::StatusCode,
     response::{Html, IntoResponse, Response},
+    Form,
 };
 use std::collections::HashMap;
 
-use crate::{appstate::global::*, printlg, AppState};
+use crate::{appstate::global::*, load_config, printlg, AppState, Config};
 
 pub async fn popup_handler(
     Path(a): Path<String>,
@@ -100,4 +101,90 @@ pub async fn shutdown_handler() -> impl IntoResponse {
 
 pub async fn ping_handler() -> impl IntoResponse {
     return StatusCode::OK;
+}
+
+pub async fn config_json_form_handler() -> impl IntoResponse {
+    let cfg: Config = serde_json::from_str(
+        &tokio::fs::read_to_string("./config.json")
+            .await
+            .expect("Failed to read config.json"),
+    )
+    .expect("Failed to serialize config.json");
+
+    return Html::from(format!(
+        "<form hx-post=\"/config-json/set\" hx-swap=\"outerHTML\">
+        <label for=\"sponsor-wait-time\">Sponsor roll time:</label>
+        <input type=\"text\" name=\"sponsor-wait-time\" placeholder=\"{}\">
+        
+        <label for=\"countdown-opacity\">Countdown opacity:</label>
+        <input type=\"text\" name=\"countdown-opacity\" placeholder=\"{}\">
+            
+        <label for=\"popup-opacity\">Popup opacity:</label>
+        <input type=\"text\" name=\"popup-opacity\" placeholder=\"{}\">
+            
+        <input type=\"submit\" value=\"Submit\">
+        <img class=\"htmx-indicator\" src=\"/favicon.png\"></img>
+    </form>",
+        cfg.sponsor_wait_time, cfg.countdown_opacity, cfg.popup_opacity
+    ));
+}
+
+pub async fn config_json_set_handler(
+    Form(set_cfg): Form<HashMap<String, String>>,
+) -> impl IntoResponse {
+    let mut config: Config = serde_json::from_str(
+        &tokio::fs::read_to_string("./config.json")
+            .await
+            .expect("Failed to read config.json"),
+    )
+    .expect("Failed to serialize config.json");
+
+    if let Some(val) = set_cfg.get("sponsor-wait-time") {
+        if let Ok(sponsor_wait_time) = val.parse::<u64>() {
+            config.sponsor_wait_time = sponsor_wait_time.clone();
+        }
+    }
+
+    if let Some(val) = set_cfg.get("countdown-opacity") {
+        if let Ok(countdown_opacity) = val.parse::<f32>() {
+            if countdown_opacity >= 0.0 && countdown_opacity <= 1.0 {
+                config.countdown_opacity = countdown_opacity.clone() as f32;
+            }
+        }
+    }
+
+    if let Some(val) = set_cfg.get("popup-opacity") {
+        if let Ok(popup_opacity) = val.parse::<f32>() {
+            if popup_opacity >= 0.0 && popup_opacity <= 1.0 {
+                config.popup_opacity = popup_opacity.clone() as f32;
+            }
+        }
+    }
+
+    tokio::fs::write(
+        "./config.json",
+        serde_json::to_string_pretty(&config).expect("Failed to serialize config.json"),
+    )
+    .await
+    .expect("Failed to write to config.json");
+    load_config().await;
+
+    printlg!("SET config_json: {:?}", config);
+
+    return Html::from(format!(
+        "<form hx-post=\"/config-json/set\" hx-swap=\"outerHTML\">
+        <label for=\"sponsor-wait-time\">Sponsor roll time:</label>
+        <input type=\"text\" name=\"sponsor-wait-time\" placeholder=\"{}\">
+        
+        <label for=\"countdown-opacity\">Countdown opacity:</label>
+        <input type=\"text\" name=\"countdown-opacity\" placeholder=\"{}\">
+            
+        <label for=\"popup-opacity\">Popup opacity:</label>
+        <input type=\"text\" name=\"popup-opacity\" placeholder=\"{}\">
+            
+        <input type=\"submit\" value=\"Submit\">
+        <img class=\"htmx-indicator\" src=\"/favicon.png\"></img>
+    </form>",
+        config.sponsor_wait_time, config.countdown_opacity, config.popup_opacity
+    ));
 }
