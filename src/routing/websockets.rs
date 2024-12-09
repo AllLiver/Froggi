@@ -113,6 +113,7 @@ pub async fn overlay_websocket_handler(
             tokio::time::interval(std::time::Duration::from_millis(WEBSOCKET_UPDATE_MILLIS - thread_rng().gen_range(5..=20)));
 
         let countdown_opacity = COUNTDOWN_OPACITY.lock().await.clone();
+        let popup_opacity = POPUP_OPACITY.lock().await.clone();
 
         loop {
             interval.tick().await;
@@ -242,7 +243,7 @@ pub async fn overlay_websocket_handler(
                 }
 
                 if h_vec.len() > 0 {
-                    html += &format!("<div class=\"ol-home-popup\">{}</div>", h_vec.join("<br>"));
+                    html += &format!("<div class=\"ol-home-popup\" style=\"opacity: {};\">{}</div>", popup_opacity, h_vec.join("<br>"));
                 }
 
                 drop(h_vec);
@@ -255,7 +256,7 @@ pub async fn overlay_websocket_handler(
                 }
 
                 if a_vec.len() > 0 {
-                    html += &format!("<div class=\"ol-away-popup\">{}</div>", a_vec.join("<br>"));
+                    html += &format!("<div class=\"ol-away-popup\" style=\"opacity: {};\">{}</div>", popup_opacity, a_vec.join("<br>"));
                 }
 
                 drop(a_vec);

@@ -21,7 +21,6 @@ use crate::appstate::global::*;
 use crate::appstate::routing::*;
 
 use crate::utility::hex::*;
-use crate::utility::lock::*;
 use crate::utility::login::*;
 use crate::utility::*;
 
@@ -93,6 +92,7 @@ async fn main() -> Result<()> {
                 secure_auth_cookie: true,
                 sponsor_wait_time: 5,
                 countdown_opacity: 0.5,
+                popup_opacity: 0.5,
             };
 
             f.write_all(serde_json::to_string_pretty(&default_config)?.as_bytes())
@@ -111,7 +111,6 @@ async fn main() -> Result<()> {
     let app = froggi_router(&state);
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
-        tokio::spawn(update_program_lock());
         tokio::spawn(game_clock_ticker());
         tokio::spawn(countdown_clock_ticker());
         tokio::spawn(sponsor_ticker());

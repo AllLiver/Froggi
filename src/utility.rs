@@ -210,24 +210,6 @@ pub mod login {
     }
 }
 
-pub mod lock {
-    use std::time::UNIX_EPOCH;
-
-    pub async fn update_program_lock() {
-        loop {
-            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-            let time = std::time::SystemTime::now()
-                .duration_since(UNIX_EPOCH)
-                .expect("Time went backwards")
-                .as_secs();
-
-            tokio::fs::write("./tmp/froggi.lock", time.to_string())
-                .await
-                .expect("Failed to update froggi.lock");
-        }
-    }
-}
-
 pub mod hex {
     pub fn hex_to_rgb(hex: &String) -> (u8, u8, u8) {
         let hex_chars: Vec<char> = hex.trim_start_matches("#").to_string().chars().collect();
@@ -307,6 +289,7 @@ pub struct Config {
     pub secure_auth_cookie: bool,
     pub sponsor_wait_time: u64,
     pub countdown_opacity: f32,
+    pub popup_opacity: f32,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -369,6 +352,7 @@ pub async fn load_config() {
     .expect("Failed to deserialize config.json");
 
     *COUNTDOWN_OPACITY.lock().await = config.countdown_opacity;
+    *POPUP_OPACITY.lock().await = config.popup_opacity;
 }
 
 pub fn id_create(l: u8) -> String {
