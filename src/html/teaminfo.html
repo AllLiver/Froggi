@@ -10,14 +10,14 @@
     <link rel="icon" href="/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
-    <link rel="preload" href="/app.js" as="script">
+    <link rel="preload" href="/teaminfo.js" as="script">
     <link rel="preload" href="styles.css" as="style">
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
     <script src="https://unpkg.com/sanitize-html@2.13.1/index.js" integrity="sha512-wmecYPj53t22fg3RXuWA/dCMhXvxclEz/pqKwHkDkklNuUG5RID+mSe+AMN5+oh/zIjP8GA2fSrInbxA1Fl5UA==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="/teaminfo.js"></script>
     <script src="/htmx.js"></script>
-    <script src="/app.js" defer></script>
     <script src="/ws.js" defer></script>
 </head>
 
@@ -118,7 +118,6 @@
             </form>
             <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body"></div>
         </div>
-        <script src="/app.js"></script>
     </div>
 </body>
 

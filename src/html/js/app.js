@@ -410,5 +410,4 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
-pingServer();
 loadPresets()
