@@ -17,6 +17,10 @@ pub async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse 
         *game_clock_start = true;
     } else if a == "stop" {
         *game_clock_start = false;
+        let mut game_clock = GAME_CLOCK.lock().await;
+        if *game_clock >= 1000 * 60 {
+            *game_clock = *game_clock / 1000 * 1000;
+        }
     } else if a == "toggle" {
         if *game_clock_start {
             *game_clock_start = false;
