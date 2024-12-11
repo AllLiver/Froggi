@@ -1,6 +1,6 @@
 // Froggi routing (websockets)
 
-use std::time::Instant;
+use tokio::time::Instant;
 
 use axum::{
     extract::{ws::Message, State, WebSocketUpgrade},

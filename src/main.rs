@@ -14,7 +14,7 @@ use tokio::{
 
 mod appstate;
 mod routing;
-mod tickers;
+mod app_time;
 mod utility;
 
 use crate::appstate::global::*;
@@ -26,7 +26,7 @@ use crate::utility::*;
 
 use crate::routing::froggi_router;
 
-use crate::tickers::*;
+use crate::app_time::*;
 
 #[macro_export]
 macro_rules! printlg {
@@ -111,8 +111,8 @@ async fn main() -> Result<()> {
     let app = froggi_router(&state);
 
     if let Ok(listener) = tokio::net::TcpListener::bind("0.0.0.0:3000").await {
-        tokio::spawn(game_clock_ticker());
-        tokio::spawn(countdown_clock_ticker());
+        tokio::spawn(game_clock_process());
+        tokio::spawn(countdown_clock_process());
         tokio::spawn(sponsor_ticker());
         tokio::spawn(popup_home_ticker());
         tokio::spawn(popup_away_ticker());
