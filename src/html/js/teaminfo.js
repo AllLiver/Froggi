@@ -1,5 +1,6 @@
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => document.querySelectorAll(selector);
+    $('.hamburger-menu')?.addEventListener('click', toggleMenu);
 document.addEventListener('DOMContentLoaded', () => {
     function handleTeamInput(event) {
         console.log("Input event triggered!");
