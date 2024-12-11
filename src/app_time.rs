@@ -1,6 +1,6 @@
 // Froggi tickers
 
-use std::time::Instant;
+use tokio::{sync::MutexGuard, time::Instant};
 
 use crate::{appstate::global::*, update_checker};
 
@@ -71,41 +71,87 @@ pub async fn sponsor_ticker() {
     }
 }
 
-pub async fn countdown_clock_ticker() {
+pub async fn countdown_clock_process() {
+    let now = Instant::now();
+    *COUNTDOWN_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*COUNTDOWN_CLOCK.lock().await as u64);
+    
     loop {
-        let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_millis(1)).await;
-        let mut countdown_clock = COUNTDOWN_CLOCK.lock().await;
         let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
-
         if *countdown_clock_start {
-            let time_diff = -1 * (Instant::now() - call_time).as_millis() as isize;
-            if *countdown_clock as isize + time_diff >= 0 {
-                *countdown_clock = (*countdown_clock as isize + time_diff) as usize;
-            } else {
-                *countdown_clock = 0;
+            let new_time = COUNTDOWN_CLOCK_END_INSTANT.lock().await.duration_since(Instant::now()).as_millis() as u64;
+            
+            if new_time == 0 {
                 *countdown_clock_start = false;
             }
+            
+            *COUNTDOWN_CLOCK.lock().await = new_time;
+            
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         }
     }
 }
 
-pub async fn game_clock_ticker() {
-    loop {
-        let call_time = Instant::now();
-        tokio::time::sleep(tokio::time::Duration::from_millis(1)).await;
-        let mut game_clock = GAME_CLOCK.lock().await;
-        let mut game_clock_start = GAME_CLOCK_START.lock().await;
+pub async fn set_countdown_clock(mutex: &mut MutexGuard<'_, u64>, millis: u64) {
+    if *COUNTDOWN_CLOCK_START.lock().await {
+        *COUNTDOWN_CLOCK_END_INSTANT.lock().await = Instant::now() + std::time::Duration::from_millis(millis);
+    } else {
+        **mutex = millis;
+    }   
+}
 
-        if *game_clock_start && !*OCR_API.lock().await {
-            let time_diff = -1 * (Instant::now() - call_time).as_millis() as isize;
-            if *game_clock as isize + time_diff >= 0 {
-                *game_clock = (*game_clock as isize + time_diff) as usize;
-            } else {
-                *game_clock = 0;
+pub async fn start_countdown_clock() {
+    let now = Instant::now();
+    
+    *COUNTDOWN_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*COUNTDOWN_CLOCK.lock().await as u64);
+    
+    *COUNTDOWN_CLOCK_START.lock().await = true;
+}
+
+pub async fn stop_countdown_clock() {
+    *COUNTDOWN_CLOCK_START.lock().await = false;
+}
+
+pub async fn game_clock_process() {
+    let now = Instant::now();
+    *GAME_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*GAME_CLOCK.lock().await as u64);
+    
+    loop {
+        let mut game_clock_start = GAME_CLOCK_START.lock().await;
+        if *game_clock_start {
+            let new_time = GAME_CLOCK_END_INSTANT.lock().await.duration_since(Instant::now()).as_millis() as u64;
+            
+            if new_time == 0 {
                 *game_clock_start = false;
             }
+            
+            *GAME_CLOCK.lock().await = new_time;
+            
+            tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         }
+    }
+}
+
+pub async fn set_game_clock(mutex: &mut MutexGuard<'_, u64>, millis: u64) {
+    if *GAME_CLOCK_START.lock().await {
+        *GAME_CLOCK_END_INSTANT.lock().await = Instant::now() + std::time::Duration::from_millis(millis);
+    } else {
+        **mutex = millis;
+    }   
+}
+
+pub async fn start_game_clock() {
+    let now = Instant::now();
+    
+    *GAME_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*GAME_CLOCK.lock().await as u64);
+    
+    *GAME_CLOCK_START.lock().await = true;
+}
+
+pub async fn stop_game_clock() {
+    *GAME_CLOCK_START.lock().await = false;
+    let mut game_clock = GAME_CLOCK.lock().await;
+    if *game_clock >= 1000 * 60 {
+        *game_clock = *game_clock / 1000 * 1000;
     }
 }
 

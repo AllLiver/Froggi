@@ -4,14 +4,18 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 
 pub mod global {
+    use tokio::time::Instant;
+
     use super::*;
     use lazy_static::lazy_static;
     use tokio::sync::oneshot;
 
     lazy_static! {
-        pub static ref GAME_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+        pub static ref GAME_CLOCK: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
+        pub static ref GAME_CLOCK_END_INSTANT: Arc<Mutex<Instant>> = Arc::new(Mutex::new(Instant::now()));
         pub static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
-        pub static ref COUNTDOWN_CLOCK: Arc<Mutex<usize>> = Arc::new(Mutex::new(0));
+        pub static ref COUNTDOWN_CLOCK: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
+        pub static ref COUNTDOWN_CLOCK_END_INSTANT: Arc<Mutex<Instant>> = Arc::new(Mutex::new(Instant::now()));
         pub static ref COUNTDOWN_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
         pub static ref LOGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
         pub static ref SPONSOR_TAGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
@@ -39,7 +43,7 @@ pub mod global {
 }
 
 pub mod routing {
-    use std::time::Instant;
+    use tokio::time::Instant;
 
     use super::global::*;
     use super::*;
@@ -129,8 +133,8 @@ pub mod routing {
         show_scoreboard: bool,
         show_sponsors: bool,
         ocr_api: bool,
-        game_clock: usize,
-        countdown_clock: usize,
+        game_clock: u64,
+        countdown_clock: u64,
     }
 
     impl AppStateSerde {

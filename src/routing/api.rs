@@ -49,7 +49,7 @@ pub async fn ocr_handler(
                         let time_vec: Vec<u32> =
                             time_vec.iter().map(|x| x.parse::<u32>().unwrap()).collect();
 
-                        *GAME_CLOCK.lock().await = (time_vec[0] * 60 + time_vec[1]) as usize;
+                        *GAME_CLOCK.lock().await = (time_vec[0] * 60 + time_vec[1]) as u64;
                     }
                 }
 
