@@ -86,11 +86,27 @@ pub async fn index_js_handler() -> impl IntoResponse {
         .unwrap()
 }
 
+pub async fn overlay_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("../html/js/overlay.js")))
+        .unwrap()
+}
+
 pub async fn teaminfo_js_handler() -> impl IntoResponse {
     Response::builder()
         .status(StatusCode::OK)
         .header(CONTENT_TYPE, "application/javascript")
         .body(String::from(include_str!("../html/js/index.js")))
+        .unwrap()
+}
+
+pub async fn sanitize_js_handler() -> impl IntoResponse {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/javascript")
+        .body(String::from(include_str!("../html/js/sanitize.js")))
         .unwrap()
 }
 
