@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
-    <title>Dashboard</title>
+    <title>Logs</title>
     <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link rel="preload" href="styles.css" as="style">
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script> <!--Licensed with MIT-->
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js" integrity="sha512-kWH92pHUC/rcjpSMu19lT+H6TlZwZCAftg9AuSw+AVYSdEKSlXXB8o6g12mg5f+Pj5xO40A7ju2ot/VdodCthw==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
     <meta http-equiv="Referrer-Policy" content="no-referrer">
     <script src="/htmx.js"></script>
     <script src="/app.js" defer></script>
@@ -68,8 +68,6 @@
     </div>
     <div class="content">
       <main>
-          <div id="popup-content" class="popup-content">
-            <div id="log-content" hx-put="/logs" hx-trigger="load, every 1000ms"></div>
           <div id="popup-content" class="popup-content">
             <div id="log-content" hx-put="/logs" hx-trigger="load, every 1000ms"></div>
           </div>

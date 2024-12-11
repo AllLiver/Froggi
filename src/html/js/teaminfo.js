@@ -1,6 +1,3 @@
-const $ = (selector) => document.querySelector(selector);
-const $$ = (selector) => document.querySelectorAll(selector);
-    $('.hamburger-menu')?.addEventListener('click', toggleMenu);
 document.addEventListener('DOMContentLoaded', () => {
     function handleTeamInput(event) {
         console.log("Input event triggered!");
@@ -34,12 +31,3 @@ document.addEventListener('DOMContentLoaded', () => {
         inputElement.value = sanitizedValue;
     });
 });
-
-function toggleMenu() {
-    try {
-        $('.hamburger-menu')?.classList.toggle('active');
-        $('.sidenavbar')?.classList.toggle('active');
-    } catch (error) {
-        console.error('005', 'Error toggling menu', error);
-    }
-}

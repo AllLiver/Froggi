@@ -2,11 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, shrink-to-fit=no">
     <title>Dashboard</title>
     <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="white" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="white"/>
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="black"/>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
@@ -14,13 +14,12 @@
     <link rel="preload" href="styles.css" as="style">
     <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js" integrity="sha512-kWH92pHUC/rcjpSMu19lT+H6TlZwZCAftg9AuSw+AVYSdEKSlXXB8o6g12mg5f+Pj5xO40A7ju2ot/VdodCthw==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
     <script src="https://unpkg.com/sanitize-html@2.13.1/index.js" integrity="sha512-wmecYPj53t22fg3RXuWA/dCMhXvxclEz/pqKwHkDkklNuUG5RID+mSe+AMN5+oh/zIjP8GA2fSrInbxA1Fl5UA==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <script src="/htmx.js"></script>
     <script src="/app.js" defer></script>
     <script src="/index.js" defer></script>
+    <script src="/sanitize.js" defer></script>
     <script src="/ws.js" defer></script>
-       </head>
+  </head>
   <body id="index"hx-ext="ws" ws-connect="/dashboard-websocket">
     <!--TODO: Standardize head & secure has fonts in css aswell as combine them, and seperate app.js-->
     <div id="backend-css-index"></div>
@@ -262,7 +261,7 @@
                     </div>
                     <div class="countdown-title-container">
                       <form class="countdown-form-grid" id="countdown-form" hx-post="/countdown/text/set" hx-swap="none" style="display: grid; grid-template-columns: 1fr 1fr;">
-                        <input type="text" id="set-countdown-clock-text" maxlength="25" oninput="handleCountdownInput(event)" placeholder="The title to display on overlay" name="text">
+                        <input type="text" id="set-countdown-clock-text" maxlength="25" oninput="handleSecureInput(event)" placeholder="The title to display on overlay" name="text">
                         <input type="submit" value="Submit" id="countdown-submit">
                       </form>
                     </div>

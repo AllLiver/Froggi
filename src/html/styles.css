@@ -1875,6 +1875,7 @@ button:hover {
 .ol-container {
     display: flex;
     align-items: center;
+    justify-content: center;
     width: 100%;
     max-width: 41.67vw;
     margin: 0 auto;
@@ -2335,20 +2336,21 @@ input:checked + .slider:before {
 /* Logs */
 
 #logs-body {
-    margin: 0;
     font-family: Arial, sans-serif;
     background-color: #000000;
     color: #f0f0f0;
-  }
+    height: 100%;
+    overflow: auto; 
+}
 
-  .logs-page {
+.logs-page {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    overflow: hidden;
-  }
+    overflow: auto;
+}
 
-  .header {
+.header {
     padding: 20px;
     background-color: #282b2f;
     border-bottom: 2px solid #333;
@@ -2356,43 +2358,25 @@ input:checked + .slider:before {
     justify-content: space-between;
     align-items: center;
   }
-  
+ 
   .header h1 {
     margin: 0;
     font-size: 24px;
   }
-  
-  .status {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
-  .status-indicator {
-    padding: 5px 10px;
-    border-radius: 12px;
-    font-size: 14px;
-  }
-  
-  .status-indicator.success {
-    background-color: #28a745;
-    color: #fff;
-  }
-  
-  .last-updated {
-    color: #aaa;
-  }
-  
-  .content {
+ 
+.popup-content {
     display: flex;
     flex: 1;
-    overflow: hidden;
-  }
+    overflow-y: auto; 
+}
 
-  #log-content {
+#log-content {
     margin-left: 0.5vw;
     margin-top: 0.5vh;
-  }
+    overflow-y: auto;
+    width: 100%;
+    height: auto; 
+}
 
 /* 404 */
 

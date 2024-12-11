@@ -25,7 +25,7 @@ function pingServer() {
         })
         .catch(error => {
             pingValue.textContent = 'Configure IP E003.5';
-            console.error('003', 'Ping request failed', error);
+            handleError('003', 'Ping request failed', error);
         });
 }
 
@@ -34,7 +34,7 @@ function toggleMenu() {
         $('.hamburger-menu')?.classList.toggle('active');
         $('.sidenavbar')?.classList.toggle('active');
     } catch (error) {
-        console.error('005', 'Error toggling menu', error);
+        handleError('005', 'Error toggling menu', error);
     }
 }
 
@@ -88,7 +88,7 @@ function initializeButtonIndicators(startButtonId, stopButtonId, storageKey) {
     const stopButton = document.getElementById(stopButtonId);
 
     if (!startButton || !stopButton) {
-        console.error('008', `Button elements not found for: ${startButtonId}, ${stopButtonId}`);
+        handleError('008', `Button elements not found for: ${startButtonId}, ${stopButtonId}`);
         return;
     }
 
@@ -297,9 +297,6 @@ function applyCooldown(button) {
     }, 7500);
 }
 
-let modes = ["High School", "Professional", "Jason Mode", "Custom"];
-let currentModeIndex = 0;
-
 function toggleButtonGroup() {
     currentModeIndex = (currentModeIndex + 1) % modes.length;
     let currentMode = modes[currentModeIndex];
@@ -315,67 +312,6 @@ function toggleButtonGroup() {
         currentMode === "Custom" ? "block" : "none";
 
     applyCooldown(document.getElementById('toggle-mode'));
-}
-
-function loadDefaultDistances(mode) {
-    let defaultDistances = {
-        "High School": [0, 10, 20, 30, 40, 50],
-        "Professional": [0, 15, 25, 35, 45, 55],
-        "Jason Mode": [0, 3, 6, 9, 13, 17],
-        "Custom": [0, 0, 0, 0, 0, 0]
-    };
-
-    let distances;
-    if (mode === "Custom") {
-        try {
-            distances = JSON.parse(localStorage.getItem('customDistances')) || defaultDistances["Custom"];
-        } catch (error) {
-            console.error('Error parsing custom distances:', error);
-            distances = defaultDistances["Custom"];
-        }
-    } else {
-        distances = defaultDistances[mode] || defaultDistances["High School"];
-    }
-
-    updateToGoButtons(distances);
-}
-
-function updateToGoButtons(distances) {
-    for (let i = 0; i < 6; i++) {
-        let button = document.getElementById(`togo-button-${i + 1}`);
-        if (button) {
-            button.textContent = distances[i];
-            button.setAttribute('hx-post', `/downs/togo/set/${distances[i]}`);
-        }
-    }
-    if (modes[currentModeIndex] === "Custom") {
-        for (let i = 0; i < 6; i++) {
-            let input = document.getElementById(`input${i + 1}`);
-            if (input) {
-                input.value = distances[i];
-            }
-        }
-    }
-}
-
-let saveTimeout;
-function saveDistances() {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(() => {
-        let distances = [];
-        for (let i = 1; i <= 6; i++) {
-            let inputValue = parseInt(document.getElementById(`input${i}`).value);
-            distances.push(isNaN(inputValue) ? 0 : inputValue);
-        }
-        try {
-            localStorage.setItem('customDistances', JSON.stringify(distances));
-            updateToGoButtons(distances);
-            alert('Distances saved!');
-        } catch (error) {
-            console.error('Error saving custom distances:', error);
-            alert('Error saving distances. Please try again.');
-        }
-    }, 500);
 }
 
 window.addEventListener('load', function () {
@@ -410,4 +346,5 @@ document.addEventListener('DOMContentLoaded', (event) => {
     });
 });
 
+pingServer();
 loadPresets()
