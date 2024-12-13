@@ -210,6 +210,7 @@ body::-webkit-scrollbar {
     --color-away: #ff8601;
     --color-green: #27a644;
     --color-red: #f64747;
+    --color-yellow: #f6e547;
     --color-selected: #f64747;
     --color-background-contrast: #1d1e22;
     --color-background: #000000;
@@ -2378,6 +2379,82 @@ input:checked + .slider:before {
     height: auto; 
 }
 
+.settings-opacity-parent {
+    display: flex
+}
+
+.status-settings-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.check-circle {
+    fill: var(--color-green, #27a644);
+    margin-left: 0.5vw
+}
+
+.x-circle {
+    fill: var(--color-red, #f64747);
+    margin-left: 0.5vw
+}
+
+.error-circle {
+    fill: var(--color-yellow, #f6e547);
+    margin-left: 0.5vw
+}
+
+.check-circle:hover {
+    transform: scale(1.1);
+}
+
+.status-tooltip {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 5px;
+    position: absolute;
+    bottom: 125%; 
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 12px;
+    z-index: 1;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.status-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%; 
+    left: 50%;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+.status-settings-icon:hover .status-tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.number-input {
+    width: 9.5vw;
+}
+
+.settings-submit {
+    background-color: var(--text-color, #fff);
+    color: var(--text-color-contrast, #000);
+    border: none;
+    cursor: pointer;
+    height: 4vh;
+    width: 10vw;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 0.8vh;
+}
+
 /* 404 */
 
 #body-not-found {
@@ -2441,7 +2518,7 @@ a:visited {
     display: inline-block;
 }
 
-.tooltiptext {
+.info-tooltip {
     visibility: hidden;
     width: auto;
     background-color: #555;
@@ -2461,7 +2538,7 @@ a:visited {
     text-overflow: ellipsis; 
 }
 
-.info-container:hover .tooltiptext {
+.info-container:hover .info-tooltip {
     visibility: visible;
     opacity: 1;
 }
@@ -2481,7 +2558,7 @@ a:visited {
     position: relative; 
 }
 
-.settings-info-container:hover .tooltiptext {
+.settings-info-container:hover .info-tooltip {
     visibility: visible;
     opacity: 1;
 }

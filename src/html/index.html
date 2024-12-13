@@ -21,7 +21,7 @@
     <script src="/ws.js" defer></script>
   </head>
   <body id="index"hx-ext="ws" ws-connect="/dashboard-websocket">
-    <!--TODO: Standardize head & secure has fonts in css aswell as combine them, and seperate app.js-->
+    <!--TODO: Standardize head & secure has fonts in css aswell as combine them, and seperate app.js, favicon spinner-->
     <div id="backend-css-index"></div>
     <div hx-put="/teaminfo/button-css" hx-trigger="load"></div>
     <nav>
@@ -364,7 +364,7 @@
                         <h3>Counters now allow custom number inputs!</h3>
                         <div class="info-parent">
                           <box-icon name='info-circle' class="info-circle"></box-icon>
-                          <span class="tooltiptext">Custom values can now be entered into counter fields, such as score & clock.</span>
+                          <span class="info-tooltip">Custom values can now be entered into counter fields, such as score & clock.</span>
                         </div>
                       </div>
                 </section>
