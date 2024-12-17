@@ -3,18 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1,user-scalable=0" />
     <title>Sponsors & Teaminfo</title>
-    <meta name="description" content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
+    <meta name="description"
+        content="Froggi Is a self-hosted & a portable scoreboard solution that aims to provide a free and intuitive sports broadcasting overlay.">
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="/favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
     <link rel="preload" href="/teaminfo.js" as="script">
     <link rel="preload" href="styles.css" as="style">
-    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js" integrity="sha512-kWH92pHUC/rcjpSMu19lT+H6TlZwZCAftg9AuSw+AVYSdEKSlXXB8o6g12mg5f+Pj5xO40A7ju2ot/VdodCthw==" crossorigin="anonymous"></script> <!--Licensed with MIT-->
-    <script src="https://unpkg.com/sanitize-html@2.13.1/index.js" integrity="sha512-wmecYPj53t22fg3RXuWA/dCMhXvxclEz/pqKwHkDkklNuUG5RID+mSe+AMN5+oh/zIjP8GA2fSrInbxA1Fl5UA==" crossorigin="anonymous"></script> <!--Licensed with MIT-->    <meta http-equiv="Referrer-Policy" content="no-referrer">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"
+        integrity="sha512-kWH92pHUC/rcjpSMu19lT+H6TlZwZCAftg9AuSw+AVYSdEKSlXXB8o6g12mg5f+Pj5xO40A7ju2ot/VdodCthw=="
+        crossorigin="anonymous"></script> <!--Licensed with MIT-->
+    <script src="https://unpkg.com/sanitize-html@2.13.1/index.js"
+        integrity="sha512-wmecYPj53t22fg3RXuWA/dCMhXvxclEz/pqKwHkDkklNuUG5RID+mSe+AMN5+oh/zIjP8GA2fSrInbxA1Fl5UA=="
+        crossorigin="anonymous"></script> <!--Licensed with MIT-->
     <script src="/app.js" defer></script>
     <script src="/htmx.js"></script>
     <script src="/sanitize.js" defer></script>
@@ -32,33 +36,34 @@
         <ul class="sidenavbar">
             <li>
                 <div class="navbar-content-container">
-                <box-icon type='solid' name='dashboard' class="ico-white"></box-icon>
-                <a href="/" class="nav-text">Dashboard</a>
+                    <box-icon type='solid' name='dashboard' class="ico-white"></box-icon>
+                    <a href="/" class="nav-text">Dashboard</a>
                 </div>
             </li>
             <li>
                 <div class="navbar-content-container">
-                <box-icon name='group' class="ico-white"></box-icon>
-                <a href="/teaminfo" class="nav-text nav-active">Sponsors & Teaminfo</a>
+                    <box-icon name='group' class="ico-white"></box-icon>
+                    <a href="/teaminfo" class="nav-text nav-active">Sponsors & Teaminfo</a>
                 </div>
             </li>
             <li>
                 <div class="navbar-content-container">
-                <box-icon name='layer' class="ico-white"></box-icon>
-                <a href="/overlay" target="_blank" rel="noopener noreferrer" class="nav-text">Overlay</a>
-            </div></div>
+                    <box-icon name='layer' class="ico-white"></box-icon>
+                    <a href="/overlay" target="_blank" rel="noopener noreferrer" class="nav-text">Overlay</a>
+                </div>
+                </div>
             </li>
             <li>
                 <div class="navbar-content-container">
-                <box-icon name='cog' class="ico-white"></box-icon>
-                <a href="/settings" class="nav-text">Settings</a>
+                    <box-icon name='cog' class="ico-white"></box-icon>
+                    <a href="/settings" class="nav-text">Settings</a>
                 </div>
             </li>
             <li>
                 <div class="navbar-content-container">
                     <box-icon name='align-justify' class="ico-white"></box-icon>
-                <a href="/logs" id="open-logs" class="nav-text">Open Logs</a>
-            </div>
+                    <a href="/logs" id="open-logs" class="nav-text">Open Logs</a>
+                </div>
             </li>
             <li>
                 <div class="navbar-content-container">
@@ -72,36 +77,49 @@
     <div class="ti-container">
         <div class="ti-rectangle">
             <h1>Team Preset Creation</h1>
-            <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data"
-                onsubmit="return handleInput(event);">
-                <div class="ti-home-section">
-                    <label for="home_name">Home name:</label> <br>
-                    <input type="text" id="home_name" name="home_name" required maxlength="25"
-                        oninput="handleSecureInput(event)"><br>
-                    <div class="icon-container"></div>
-                    <label for="home_img">Home icon:</label> <br>
-                    <input type="file" id="home_img" name="home_img" accept=".png,.jpeg,.jpg" required><br>
-                    <label for="home_color">Home jersey color:</label><br>
-                    <input type="color" id="home_color" name="home_color" value="#007BFF" required><br>
+            <form hx-post="/teaminfo/create" hx-swap="none" enctype="multipart/form-data">
+                <div class="ti-preset-grid">
+                    <div class="team-section">
+                        <div class="ti-form-row">
+                            <label>Home Name:</label>
+                            <input class="ti-text-input" id="home_name" name="home_name" required maxlength="25" type="text" placeholder="Enter home team name">
+                        </div>
+                        <div class="ti-form-row">
+                            <label>Home Icon:</label>
+                            <input class="ti-image-input" id="home_img" name="home_img" required type="file" accept=".png,.jpeg,.jpg">
+                        </div>
+                        <div class="ti-form-row">
+                            <label>Home Jersey Color:</label>
+                            <input class="ti-color-input" id="home_color" name="home" required type="color" value="#007BFF">
+                        </div>
+                    </div>
+                    <div class="team-section">
+                        <div class="ti-form-row">
+                            <label>Away Name:</label>
+                            <input class="ti-text-input" id="away_name" name="away_name" required maxlength="25" type="text" placeholder="Enter away team name">
+                        </div>
+                        <div class="ti-form-row">
+                            <label>Away Icon:</label>
+                            <input class="ti-image-input" id="away_img" name="away_img" required type="file" accept=".png,.jpeg,.jpg">
+                        </div>
+                        <div class="ti-form-row">
+                            <label>Away Jersey Color:</label>
+                            <input class="ti-color-input" id="away_color" name="away_color" required type="color" value="#ff8601">
+                        </div>
+                    </div>
                 </div>
-
-                <div class="ti-away-section">
-                    <label for="away_name">Away name:</label> <br>
-                    <input type="text" id="away_name" name="away_name" required maxlength="25" oninput="handleSecureInput(event)"><br>
-                    <div class="icon-container"></div>
-                    <label for="away_img">Away icon:</label> <br>
-                    <input type="file" id="away_img" name="away_img" accept=".png,.jpeg,.jpg" required><br>
-                    <label for="away_color">Away jersey color:</label> <br>
-                    <input type="color" id="away_color" name="away_color" value="#ff8601" required><br>
+                <div class="ti-form-row">
+                    <input type="submit" value="Submit" class="ti-submit">
+                    <img class="htmx-indicator" src="/favicon.png">
                 </div>
-
-                <input type="submit" value="Submit" class="ti-submit">
-                <img class="htmx-indicator" src="/favicon.png">
             </form>
-        </div>
-
-        <div class="ti-presets-rectangle">
-            <h2>Team Presets</h2>
+            <h1>Team Presets</h1>
+            <div class="ti-match-selector">
+                <div class="ti-manage-presets">
+                    <button class="button ti-import">Import Teampresets</button>
+                    <button class="button ti-export">Export Teampresets</button>
+                </div>
+            </div>
             <div class="team-selector" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body"></div>
         </div>
 
@@ -110,7 +128,12 @@
             <form hx-post="/sponsors/upload" hx-swap="none" enctype="multipart/form-data">
                 <div class="label-container">
                     <label for="sponsor-img">Sponsor images:</label>
-                    <i id="subtext-multiple">You can upload multiple images at once</i>
+                    <div class="info-container">
+                        <div class="info-parent">
+                           <box-icon name='info-circle' class="info-circle"></box-icon>
+                           <span class="info-tooltip">Upload 1 or more images to rotate through</span>
+                        </div>
+                     </div>
                 </div>
                 <input type="file" id="sponsor-img" name="sponsor-img" accept=".png,.jpeg,.jpg" multiple required>
                 <input type="submit" value="Submit" class="ti-sponsor-submit">
@@ -118,7 +141,6 @@
             </form>
             <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body"></div>
         </div>
-    </div>
 </body>
 
 </html>
