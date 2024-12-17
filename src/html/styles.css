@@ -1196,6 +1196,19 @@ iframe {
     margin: 0.5vh;
 }
 
+.trigger-generic-popup {
+    background-color: var(--color-green, #00b140);
+    color: white;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 80%;
+    padding: 0.93vh;
+    border-radius: 5px;
+    text-wrap: nowrap;
+    margin: 0.5vh;
+}
+
 .trigger-away-popup {
     background-color: var(--color-away, #ff8601);
     color: white;
