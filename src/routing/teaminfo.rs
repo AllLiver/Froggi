@@ -176,7 +176,7 @@ pub async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
             let id = d.file_name().to_string_lossy().to_string();
 
             html += &format!(
-            "<div class=\"match-selector\">
+            "<div class=\"ti-match-selector\">
                 <img class=\"home-logo\" src=\"data:image/{};base64,{}\" alt=\"home-img\" height=\"30px\" width=\"auto\" style=\"border-color: {}; border-style: solid; border-radius: 3px; border-width: 2px\">
                 <p class=\"teampreset-title\">{} vs {}</p>
                 <img class=\"away-logo\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\" style=\"border-color: {}; border-style: solid; border-radius: 3px; border-width: 2px;\">
