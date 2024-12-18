@@ -12,6 +12,7 @@ axum = { version = "0.7.5", features = ["macros", "multipart", "tokio", "ws"] }
 axum-extra = { version = "0.9.3", features = ["cookie"] }
 base64 = "0.22.1"
 cookie = "0.18.1"
+flate2 = "1.0.35"
 git2 = "0.19.0"
 jsonwebtoken = "9.3.0"
 lazy_static = "1.4.0"
@@ -20,8 +21,10 @@ rand = "0.8.5"
 reqwest = "0.12.8"
 serde = { version = "1.0.203", features = ["derive"] }
 serde_json = "1.0.117"
+tar = "0.4.43"
 tokio = { version = "1.38.0", features = ["full"] }
 tokio-stream = "0.1.15"
+tokio-util = "0.7.13"
 tower = "0.5.1"
 tower-http = { version = "0.5.2", features = ["cors"] }
 uuid = { version = "1.8.0", features = ["v4"] }

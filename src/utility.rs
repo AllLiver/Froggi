@@ -292,7 +292,7 @@ pub struct Config {
     pub popup_opacity: f32,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Teaminfo {
     pub home_name: String,
     pub home_color: String,
