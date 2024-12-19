@@ -1634,7 +1634,7 @@ button:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--text-color-conterast, #fff);
+    color: var(--text-color-contrast, #fff);
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -1735,7 +1735,7 @@ button:hover {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2rem;
-    color: var(--text-color-conterast, #fff);
+    color: var(--text-color-contrast, #fff);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -1834,7 +1834,7 @@ button:hover {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1.2rem;
-    color: var(--text-color-conterast, #fff);
+    color: var(--text-color-contrast, #fff);
     box-shadow: rgba(65, 252, 106, 0.2) 0 15px 30px -5px;
     border: none;
     border-radius: 5px;
@@ -1845,7 +1845,7 @@ button:hover {
     align-items: center;
     justify-content: center; 
     background-image: linear-gradient(144deg, #6dff40, #3f995d 50%, #00eb14);
-    fill: var(--text-color-conterast, #fff);
+    fill: var(--text-color-contrast, #fff);
 }
 
 .create-login-submit span {
@@ -1960,7 +1960,7 @@ button:hover {
     width: 12vw;
     height: 6vw;
     background-color: #111111;
-    color: white;
+    color: var(--text-color, #ffffff);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -2113,9 +2113,8 @@ form label {
 .sponsor-wrapper {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    border-radius: 5px;
     background-color: #fff;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 0.5rem;
@@ -2128,6 +2127,14 @@ form label {
     width: 1.5vw;
     height: 1.5vw;
     object-fit: cover;
+}
+
+.home-logo {
+    margin-right: 0.5vw
+}
+
+.away-logo {
+    margin-left: 0.5vw;
 }
 
 .ti-import,
@@ -2144,8 +2151,9 @@ form label {
     height: 4vh;
 }
 
-.select-button,
-.remove-button {
+.ti-select-button,
+.ti-remove-button,
+.ti-download-button {
     background-color: var(--color-green);
     color: #fff;
     border: none;
@@ -2154,15 +2162,26 @@ form label {
     font-size: 0.875rem;
     cursor: pointer;
     transition: background-color 0.3s;
-    margin-left: 0.5rem;
     height: 4vh;
+    margin-left: 2vw;
 }
 
-.select-button:hover {
+.ti-teampreset-title {
+    color: var(--text-color-contrast, #000000);
+}
+
+.ti-download-button {
+    background-color: var(--color-away);
+    height: 2.4vh;
+    text-decoration: none;
+}
+
+
+.ti-select-button:hover {
     background-color: #2fce69;
 }
 
-.remove-button {
+.ti-remove-button {
     background-color: var(--color-selected);
 }
 
@@ -2173,7 +2192,7 @@ form label {
 .htmx-request .htmx-indicator {
     height: 4vh;
     width: 4vh; 
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
