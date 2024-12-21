@@ -104,6 +104,7 @@ pub fn froggi_router(state: &AppState) -> Router {
         .route("/teaminfo/select/:id", post(teaminfo_preset_select_handler))
         .route("/teaminfo/remove/:id", post(teaminfo_preset_remove_handler))
         .route("/teaminfo/download-preset/:id", get(teaminfo_download_preset_handler))
+        .route("/teaminfo/import-preset", post(teaminfo_import_preset_handler))
         .route(
             "/sponsors/upload",
             post(upload_sponsors_handler).layer(DefaultBodyLimit::max(2000000000)),

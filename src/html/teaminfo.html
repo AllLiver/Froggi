@@ -141,6 +141,13 @@
             </form>
             <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body"></div>
         </div>
+        
+        <form hx-post="/teaminfo/import-preset" hx-swap="none" enctype="multipart/form-data">
+            <label for="file">Import Preset:</label>
+            <input type="file" name="file" accept=".tar.gz" required>
+            <input type="submit" value="Submit" class="ti-sponsor-submit">
+            <img class="htmx-indicator" src="/favicon.png">
+        </form>
 </body>
 
 </html>

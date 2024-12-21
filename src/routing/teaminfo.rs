@@ -4,9 +4,10 @@ use axum::{
     body::Body, extract::{Multipart, Path, State}, http::{HeaderName, HeaderValue, StatusCode}, response::{Html, IntoResponse, Response}
 };
 use base64::prelude::*;
-use flate2::{Compression, GzBuilder};
+use flate2::{bufread::GzDecoder, Compression, GzBuilder};
 use reqwest::header::CONTENT_DISPOSITION;
-use std::{io::Write, path::PathBuf};
+use tar::Archive;
+use std::{io::{Read, Write}, path::PathBuf};
 use tokio_util::io::ReaderStream;
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, File},
@@ -404,5 +405,49 @@ pub async fn teaminfo_download_preset_handler(Path(a): Path<String>) -> impl Int
         .header(CONTENT_DISPOSITION, format!("attachment; filename=\"{}-{}.tar.gz\"", ti.home_name, ti.away_name))
         .header("content-type", "application/octet-stream")
         .body(Body::from_stream(teaminfo_archive))
+        .unwrap();
+}
+
+pub async fn teaminfo_import_preset_handler(mut multipart: Multipart) -> impl IntoResponse {
+    while let Some(f) = multipart.next_field().await.expect("Failed to get next field of multipart") {
+        if f.name().expect("Failed to get field name") == "file" {
+            let id = id_create(12);
+            let gz_bytes = f.bytes().await.expect("Failed to get field bytes");
+            
+            spawn_blocking(move || {
+                let gz = GzDecoder::new(gz_bytes.as_ref());
+                
+                let mut tar = Archive::new(gz);
+                std::fs::create_dir_all(format!("./team-presets/{}", id)).expect("Failed to create imported preset archive");
+                
+                for file in tar.entries().expect("Failed to get file entires in tar archive") {
+                    let mut file = file.expect("IO error when accessing file entry in tar archive");
+                    let file_name = file.path().expect("Failed to get file path of entry in tar archive").file_name().expect("Failed to get file name of entry in tar archive").to_string_lossy().to_string();
+                    let mut file_write = std::fs::File::create(format!("./team-presets/{}/{}", id, file_name)).expect("Failed to create file from tar archive");
+                    
+                    let mut write_buf = Vec::new();
+                    file.read_to_end(&mut write_buf).expect("Failed to write file bytes into buffer");
+                    
+                    file_write.write_all(write_buf.as_ref()).expect("Failed to write buffered bytes to file");
+                }
+                
+                println!("Imported preset: {}", id);
+                
+            }).await.expect("Failed to import preset");
+            
+            return Response::builder()
+                .status(StatusCode::OK)
+                .header(
+                    HeaderName::from_static("hx-trigger"),
+                    HeaderValue::from_static("reload-selector"),
+                )
+                .body(String::new())
+                .unwrap();
+        }
+    }
+    
+    return Response::builder()
+        .status(StatusCode::BAD_REQUEST)
+        .body(String::from("Request did not contain file"))
         .unwrap();
 }
