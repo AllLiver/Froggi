@@ -412,6 +412,7 @@ pub async fn teaminfo_import_preset_handler(mut multipart: Multipart) -> impl In
     while let Some(f) = multipart.next_field().await.expect("Failed to get next field of multipart") {
         if f.name().expect("Failed to get field name") == "file" {
             let id = id_create(12);
+            printlg!("IMPORT preset: {}", id);
             let gz_bytes = f.bytes().await.expect("Failed to get field bytes");
             
             spawn_blocking(move || {
@@ -430,8 +431,6 @@ pub async fn teaminfo_import_preset_handler(mut multipart: Multipart) -> impl In
                     
                     file_write.write_all(write_buf.as_ref()).expect("Failed to write buffered bytes to file");
                 }
-                
-                println!("Imported preset: {}", id);
                 
             }).await.expect("Failed to import preset");
             
