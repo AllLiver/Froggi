@@ -183,7 +183,7 @@ pub async fn teaminfo_preset_selector_handler() -> impl IntoResponse {
                 <img class=\"away-logo\" src=\"data:image/{};base64,{}\" alt=\"away-img\" height=\"30px\" width=\"auto\" style=\"border-color: {}; border-style: solid; border-radius: 3px; border-width: 2px;\">
                 <button class=\"ti-select-button\" hx-post=\"/teaminfo/select/{}\" hx-swap=\"none\">Select</button>
                 <button class=\"ti-remove-button\" hx-post=\"/teaminfo/remove/{}\" hx-swap=\"none\">Remove</button>
-                <a class=\"ti-download-button\" href=\"/teaminfo/download-preset/{}\">Download</button>
+                <a class=\"ti-download-button\" href=\"/teaminfo/download-preset/{}\">Download</a>
             </div>",
                 home_tag_type,
                 BASE64_STANDARD.encode(home_img_bytes),
