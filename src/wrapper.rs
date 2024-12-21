@@ -1,31 +1,30 @@
 // Froggi wrapper
-
-use git2::Repository;
 #[cfg(unix)]
 use nix::{sys::signal::Signal::SIGTERM, unistd::Pid};
+
+use anyhow::Result;
+use git2::Repository;
 use tokio::{process::Command, signal};
 
 const FROGGI_REMOTE_URL: &'static str = "https://github.com/AllLiver/Froggi.git";
 const BUILD_TMP_DIR: &'static str = "./tmp/froggi";
 
 #[tokio::main]
-async fn main() {
-    let mut worker_exe = std::env::current_exe().expect("Failed to get current directory");
-    let cwd = std::env::current_dir().expect("Failed to get current working directory");
+async fn main() -> Result<()> {
+    let mut worker_exe = std::env::current_exe()?;
+    let cwd = std::env::current_dir()?;
 
     worker_exe.pop();
 
     worker_exe = worker_exe.join("froggi-worker");
 
     let exit_code: i32 = loop {
-        let mut froggi_process = Command::new(worker_exe.clone())
-            .spawn()
-            .expect("Failed to start froggi-worker");
+        let mut froggi_process = Command::new(worker_exe.clone()).spawn()?;
 
         tokio::select! {
             // If the process finishes by itself, then handle the exit code
             p = froggi_process.wait() => {
-                if let Some(code) = p.expect("Failed to get froggi-worker exit status").code() {
+                if let Some(code) = p?.code() {
                     match code {
                         // Exit code 10 is to restart
                         10 => {
@@ -41,7 +40,7 @@ async fn main() {
 
                                 match std::env::set_current_dir(BUILD_TMP_DIR) {
                                     Ok(_) => {
-                                        println!("{}", std::env::current_dir().expect("Failed to get current working directory").to_string_lossy());
+                                        println!("{}", std::env::current_dir()?.to_string_lossy());
                                         println!("Compiling update...");
 
                                         let p = Command::new("cargo").args(&["build", "--release"]).spawn();
@@ -125,7 +124,7 @@ async fn main() {
 
                             println!("Cleaning up...");
 
-                            tokio::fs::remove_dir_all(BUILD_TMP_DIR).await.expect("Failed to remove temp build directory");
+                            tokio::fs::remove_dir_all(BUILD_TMP_DIR).await?;
 
                             println!("Restarting froggi...");
 

@@ -8,7 +8,10 @@ use axum::{
 use reqwest::StatusCode;
 use serde::Deserialize;
 
-use crate::{appstate::global::*, printlg, set_countdown_clock, set_game_clock, start_countdown_clock, start_game_clock, stop_countdown_clock, stop_game_clock, AppState};
+use crate::{
+    appstate::global::*, printlg, set_countdown_clock, set_game_clock, start_countdown_clock,
+    start_game_clock, stop_countdown_clock, stop_game_clock, AppState,
+};
 
 pub async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse {
     if a == "start" {
@@ -23,7 +26,10 @@ pub async fn game_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResponse 
         }
     }
 
-    printlg!("UPDATE game_clock_start: {}", *GAME_CLOCK_START.lock().await);
+    printlg!(
+        "UPDATE game_clock_start: {}",
+        *GAME_CLOCK_START.lock().await
+    );
 
     return StatusCode::OK;
 }
@@ -57,9 +63,7 @@ pub async fn game_clock_set_secs_handler(Path(secs): Path<u64>) -> impl IntoResp
     return StatusCode::OK;
 }
 
-pub async fn game_clock_update_handler(
-    Path((mins, secs)): Path<(i64, i64)>,
-) -> impl IntoResponse {
+pub async fn game_clock_update_handler(Path((mins, secs)): Path<(i64, i64)>) -> impl IntoResponse {
     let mut game_clock = GAME_CLOCK.lock().await;
     let time_diff = mins * 60 * 1000 + secs * 1000;
 
@@ -110,7 +114,10 @@ pub async fn countdown_clock_ctl_handler(Path(a): Path<String>) -> impl IntoResp
         }
     }
 
-    printlg!("UPDATE countdown_clock_start: {}", *COUNTDOWN_CLOCK_START.lock().await);
+    printlg!(
+        "UPDATE countdown_clock_start: {}",
+        *COUNTDOWN_CLOCK_START.lock().await
+    );
 
     return StatusCode::OK;
 }

@@ -1,18 +1,25 @@
 // Froggi routing (teaminfo)
 
 use axum::{
-    body::Body, extract::{Multipart, Path, State}, http::{HeaderName, HeaderValue, StatusCode}, response::{Html, IntoResponse, Response}
+    body::Body,
+    extract::{Multipart, Path, State},
+    http::{HeaderName, HeaderValue, StatusCode},
+    response::{Html, IntoResponse, Response},
 };
 use base64::prelude::*;
 use flate2::{bufread::GzDecoder, Compression, GzBuilder};
 use reqwest::header::CONTENT_DISPOSITION;
+use std::{
+    io::{Read, Write},
+    path::PathBuf,
+};
 use tar::Archive;
-use std::{io::{Read, Write}, path::PathBuf};
-use tokio_util::io::ReaderStream;
 use tokio::{
     fs::{create_dir_all, read_dir, remove_dir_all, File},
-    io::{AsyncReadExt, AsyncWriteExt, BufReader}, task::spawn_blocking,
+    io::{AsyncReadExt, AsyncWriteExt, BufReader},
+    task::spawn_blocking,
 };
+use tokio_util::io::ReaderStream;
 
 use crate::appstate::global::*;
 use crate::{hex_to_rgb, id_create, printlg, rgb_to_hex, utility::Teaminfo, AppState};
@@ -297,10 +304,12 @@ pub async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl 
                 .unwrap(),
         ) {
             let home_rgb = hex_to_rgb(&teaminfo.home_color);
-            let home_text_color = rgb_to_hex(&(255 - home_rgb.0, 255 - home_rgb.1,  255 - home_rgb.2));
+            let home_text_color =
+                rgb_to_hex(&(255 - home_rgb.0, 255 - home_rgb.1, 255 - home_rgb.2));
 
             let away_rgb = hex_to_rgb(&teaminfo.away_color);
-            let away_text_color = rgb_to_hex(&(255 - away_rgb.0, 255 - away_rgb.1,  255 - away_rgb.2));
+            let away_text_color =
+                rgb_to_hex(&(255 - away_rgb.0, 255 - away_rgb.1, 255 - away_rgb.2));
 
             return Html::from(format!(
                 "
@@ -363,79 +372,137 @@ pub async fn teaminfo_button_css_handler(State(state): State<AppState>) -> impl 
 }
 
 pub async fn teaminfo_download_preset_handler(Path(a): Path<String>) -> impl IntoResponse {
-    let ti: Teaminfo = serde_json::from_str(&tokio::fs::read_to_string(&format!("./team-presets/{}/teams.json", a)).await.expect("Failed to read team preset file")).expect("Failed to serialize team preset file");
-    
+    let ti: Teaminfo = serde_json::from_str(
+        &tokio::fs::read_to_string(&format!("./team-presets/{}/teams.json", a))
+            .await
+            .expect("Failed to read team preset file"),
+    )
+    .expect("Failed to serialize team preset file");
+
     let teaminfo: Teaminfo = ti.clone();
     let id = a.clone();
-    
-    spawn_blocking(move || {    
+
+    spawn_blocking(move || {
         let tar_archive_path = format!("./tmp/{}.tar", id);
-        
-        let tar_archive = std::fs::File::create(&tar_archive_path).expect("Failed to create team preset tar file");
+
+        let tar_archive = std::fs::File::create(&tar_archive_path)
+            .expect("Failed to create team preset tar file");
         let mut builder = tar::Builder::new(tar_archive);
-        
-        let mut dir = std::fs::read_dir(format!("./team-presets/{}", id)).expect("Failed to read team preset directory");
-        
+
+        let mut dir = std::fs::read_dir(format!("./team-presets/{}", id))
+            .expect("Failed to read team preset directory");
+
         while let Some(Ok(f)) = dir.next() {
-            let mut file: std::fs::File = std::fs::File::open(f.path()).expect("Failed to open team preset file");
-            
-            builder.append_file(format!("./{}", f.file_name().to_string_lossy().to_string()), &mut file).expect("Failed to append team preset file to team preset archive");
+            let mut file: std::fs::File =
+                std::fs::File::open(f.path()).expect("Failed to open team preset file");
+
+            builder
+                .append_file(
+                    format!("./{}", f.file_name().to_string_lossy().to_string()),
+                    &mut file,
+                )
+                .expect("Failed to append team preset file to team preset archive");
         }
-        
-        builder.finish().expect("Failed to write team preset archive");
-        
+
+        builder
+            .finish()
+            .expect("Failed to write team preset archive");
+
         let gz_path = format!("{}.gz", tar_archive_path);
-        
+
         let gz_file = std::fs::File::create(&gz_path).expect("Failed to create team preset gzip");
         let mut gz = GzBuilder::new()
-            .filename(format!("{}-{}.tar", teaminfo.home_name.clone(), teaminfo.away_name.clone()))
+            .filename(format!(
+                "{}-{}.tar",
+                teaminfo.home_name.clone(),
+                teaminfo.away_name.clone()
+            ))
             .write(gz_file, Compression::default());
-        
-        gz.write_all(&std::fs::read(tar_archive_path).expect("Failed to read preset tar file (for compression)")).expect("Failed to write tar archive to team preset gzip");
+
+        gz.write_all(
+            &std::fs::read(tar_archive_path)
+                .expect("Failed to read preset tar file (for compression)"),
+        )
+        .expect("Failed to write tar archive to team preset gzip");
         gz.finish().expect("Failed to finish gz archive");
-        
-    }).await.expect("Failed to create team preset archive");
-    
-    let teaminfo_archive = ReaderStream::new(tokio::fs::File::open(format!("./tmp/{}.tar.gz", a)).await.expect("Failed to open gz preset archive"));
-    
-    tokio::fs::remove_file(format!("./tmp/{}.tar.gz", a)).await.expect("Failed to remove gz preset archive (remove from /tmp asap)");
-    tokio::fs::remove_file(format!("./tmp/{}.tar", a)).await.expect("Failed to remove tar preset archive (remove from /tmp asap)");
+    })
+    .await
+    .expect("Failed to create team preset archive");
+
+    let teaminfo_archive = ReaderStream::new(
+        tokio::fs::File::open(format!("./tmp/{}.tar.gz", a))
+            .await
+            .expect("Failed to open gz preset archive"),
+    );
+
+    tokio::fs::remove_file(format!("./tmp/{}.tar.gz", a))
+        .await
+        .expect("Failed to remove gz preset archive (remove from /tmp asap)");
+    tokio::fs::remove_file(format!("./tmp/{}.tar", a))
+        .await
+        .expect("Failed to remove tar preset archive (remove from /tmp asap)");
 
     return Response::builder()
-        .header(CONTENT_DISPOSITION, format!("attachment; filename=\"{}-{}.tar.gz\"", ti.home_name, ti.away_name))
+        .header(
+            CONTENT_DISPOSITION,
+            format!(
+                "attachment; filename=\"{}-{}.tar.gz\"",
+                ti.home_name, ti.away_name
+            ),
+        )
         .header("content-type", "application/octet-stream")
         .body(Body::from_stream(teaminfo_archive))
         .unwrap();
 }
 
 pub async fn teaminfo_import_preset_handler(mut multipart: Multipart) -> impl IntoResponse {
-    while let Some(f) = multipart.next_field().await.expect("Failed to get next field of multipart") {
+    while let Some(f) = multipart
+        .next_field()
+        .await
+        .expect("Failed to get next field of multipart")
+    {
         if f.name().expect("Failed to get field name") == "file" {
             let id = id_create(12);
             printlg!("IMPORT preset: {}", id);
             let gz_bytes = f.bytes().await.expect("Failed to get field bytes");
-            
+
             spawn_blocking(move || {
                 let gz = GzDecoder::new(gz_bytes.as_ref());
-                
+
                 let mut tar = Archive::new(gz);
-                std::fs::create_dir_all(format!("./team-presets/{}", id)).expect("Failed to create imported preset archive");
-                
-                for file in tar.entries().expect("Failed to get file entires in tar archive") {
+                std::fs::create_dir_all(format!("./team-presets/{}", id))
+                    .expect("Failed to create imported preset archive");
+
+                for file in tar
+                    .entries()
+                    .expect("Failed to get file entires in tar archive")
+                {
                     let mut file = file.expect("IO error when accessing file entry in tar archive");
-                    let file_name = file.path().expect("Failed to get file path of entry in tar archive").file_name().expect("Failed to get file name of entry in tar archive").to_string_lossy().to_string();
-                    let mut file_write = std::fs::File::create(format!("./team-presets/{}/{}", id, file_name)).expect("Failed to create file from tar archive");
-                    
+                    let file_name = file
+                        .path()
+                        .expect("Failed to get file path of entry in tar archive")
+                        .file_name()
+                        .expect("Failed to get file name of entry in tar archive")
+                        .to_string_lossy()
+                        .to_string();
+                    let mut file_write =
+                        std::fs::File::create(format!("./team-presets/{}/{}", id, file_name))
+                            .expect("Failed to create file from tar archive");
+
                     let mut write_buf = Vec::new();
-                    file.read_to_end(&mut write_buf).expect("Failed to write file bytes into buffer");
-                    
-                    file_write.write_all(write_buf.as_ref()).expect("Failed to write buffered bytes to file");
+                    file.read_to_end(&mut write_buf)
+                        .expect("Failed to write file bytes into buffer");
+
+                    file_write
+                        .write_all(write_buf.as_ref())
+                        .expect("Failed to write buffered bytes to file");
                 }
-                
-            }).await.expect("Failed to import preset");
+            })
+            .await
+            .expect("Failed to import preset");
         }
     }
-    
+
     return Response::builder()
         .status(StatusCode::OK)
         .header(

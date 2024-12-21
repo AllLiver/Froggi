@@ -73,19 +73,24 @@ pub async fn sponsor_ticker() {
 
 pub async fn countdown_clock_process() {
     let now = Instant::now();
-    *COUNTDOWN_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*COUNTDOWN_CLOCK.lock().await as u64);
-    
+    *COUNTDOWN_CLOCK_END_INSTANT.lock().await =
+        now + std::time::Duration::from_millis(*COUNTDOWN_CLOCK.lock().await as u64);
+
     loop {
         let mut countdown_clock_start = COUNTDOWN_CLOCK_START.lock().await;
         if *countdown_clock_start {
-            let new_time = COUNTDOWN_CLOCK_END_INSTANT.lock().await.duration_since(Instant::now()).as_millis() as u64;
-            
+            let new_time = COUNTDOWN_CLOCK_END_INSTANT
+                .lock()
+                .await
+                .duration_since(Instant::now())
+                .as_millis() as u64;
+
             if new_time == 0 {
                 *countdown_clock_start = false;
             }
-            
+
             *COUNTDOWN_CLOCK.lock().await = new_time;
-            
+
             tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         }
     }
@@ -93,17 +98,19 @@ pub async fn countdown_clock_process() {
 
 pub async fn set_countdown_clock(mutex: &mut MutexGuard<'_, u64>, millis: u64) {
     if *COUNTDOWN_CLOCK_START.lock().await {
-        *COUNTDOWN_CLOCK_END_INSTANT.lock().await = Instant::now() + std::time::Duration::from_millis(millis);
+        *COUNTDOWN_CLOCK_END_INSTANT.lock().await =
+            Instant::now() + std::time::Duration::from_millis(millis);
     } else {
         **mutex = millis;
-    }   
+    }
 }
 
 pub async fn start_countdown_clock() {
     let now = Instant::now();
-    
-    *COUNTDOWN_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*COUNTDOWN_CLOCK.lock().await as u64);
-    
+
+    *COUNTDOWN_CLOCK_END_INSTANT.lock().await =
+        now + std::time::Duration::from_millis(*COUNTDOWN_CLOCK.lock().await as u64);
+
     *COUNTDOWN_CLOCK_START.lock().await = true;
 }
 
@@ -113,19 +120,24 @@ pub async fn stop_countdown_clock() {
 
 pub async fn game_clock_process() {
     let now = Instant::now();
-    *GAME_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*GAME_CLOCK.lock().await as u64);
-    
+    *GAME_CLOCK_END_INSTANT.lock().await =
+        now + std::time::Duration::from_millis(*GAME_CLOCK.lock().await as u64);
+
     loop {
         let mut game_clock_start = GAME_CLOCK_START.lock().await;
         if *game_clock_start {
-            let new_time = GAME_CLOCK_END_INSTANT.lock().await.duration_since(Instant::now()).as_millis() as u64;
-            
+            let new_time = GAME_CLOCK_END_INSTANT
+                .lock()
+                .await
+                .duration_since(Instant::now())
+                .as_millis() as u64;
+
             if new_time == 0 {
                 *game_clock_start = false;
             }
-            
+
             *GAME_CLOCK.lock().await = new_time;
-            
+
             tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         }
     }
@@ -133,17 +145,19 @@ pub async fn game_clock_process() {
 
 pub async fn set_game_clock(mutex: &mut MutexGuard<'_, u64>, millis: u64) {
     if *GAME_CLOCK_START.lock().await {
-        *GAME_CLOCK_END_INSTANT.lock().await = Instant::now() + std::time::Duration::from_millis(millis);
+        *GAME_CLOCK_END_INSTANT.lock().await =
+            Instant::now() + std::time::Duration::from_millis(millis);
     } else {
         **mutex = millis;
-    }   
+    }
 }
 
 pub async fn start_game_clock() {
     let now = Instant::now();
-    
-    *GAME_CLOCK_END_INSTANT.lock().await = now + std::time::Duration::from_millis(*GAME_CLOCK.lock().await as u64);
-    
+
+    *GAME_CLOCK_END_INSTANT.lock().await =
+        now + std::time::Duration::from_millis(*GAME_CLOCK.lock().await as u64);
+
     *GAME_CLOCK_START.lock().await = true;
 }
 

@@ -38,7 +38,7 @@ pub async fn upload_sponsors_handler(mut form: Multipart) -> impl IntoResponse {
             .await
             .expect("Could not write to sponsor file");
 
-        println!("ADD sponsor: {}", id);
+        printlg!("ADD sponsor: {}", id);
     }
 
     load_sponsors().await;

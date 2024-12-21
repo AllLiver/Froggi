@@ -12,9 +12,9 @@ use tokio::{
     sync::oneshot,
 };
 
+mod app_time;
 mod appstate;
 mod routing;
-mod app_time;
 mod utility;
 
 use crate::appstate::global::*;

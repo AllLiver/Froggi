@@ -12,10 +12,12 @@ pub mod global {
 
     lazy_static! {
         pub static ref GAME_CLOCK: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
-        pub static ref GAME_CLOCK_END_INSTANT: Arc<Mutex<Instant>> = Arc::new(Mutex::new(Instant::now()));
+        pub static ref GAME_CLOCK_END_INSTANT: Arc<Mutex<Instant>> =
+            Arc::new(Mutex::new(Instant::now()));
         pub static ref GAME_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
         pub static ref COUNTDOWN_CLOCK: Arc<Mutex<u64>> = Arc::new(Mutex::new(0));
-        pub static ref COUNTDOWN_CLOCK_END_INSTANT: Arc<Mutex<Instant>> = Arc::new(Mutex::new(Instant::now()));
+        pub static ref COUNTDOWN_CLOCK_END_INSTANT: Arc<Mutex<Instant>> =
+            Arc::new(Mutex::new(Instant::now()));
         pub static ref COUNTDOWN_CLOCK_START: Arc<Mutex<bool>> = Arc::new(Mutex::new(false));
         pub static ref LOGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
         pub static ref SPONSOR_TAGS: Arc<Mutex<Vec<String>>> = Arc::new(Mutex::new(Vec::new()));
