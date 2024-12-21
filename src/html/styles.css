@@ -2119,7 +2119,7 @@ form label {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 0.5rem;
     overflow: hidden;
-    width: 58.8vw;
+    width: 28.4vw;
 }
 
 .ti-match-selector .home-logo,
@@ -2139,7 +2139,7 @@ form label {
 
 .ti-import,
 .ti-export {
-    width: 29.2vw;
+    width: 31.2vw;
     background-color: var(--color-green);
     color: #fff;
     border: none;
@@ -2148,6 +2148,20 @@ form label {
     font-size: 0.875rem;
     cursor: pointer;
     transition: background-color 0.3s;
+    height: 4vh;
+    margin-left: 0.3vw;
+    margin-right: 0.3vw;
+}
+
+.ti-match-controls {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    background-color: #fff;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+    width: 58.8vw;
     height: 4vh;
 }
 
