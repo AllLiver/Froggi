@@ -433,20 +433,15 @@ pub async fn teaminfo_import_preset_handler(mut multipart: Multipart) -> impl In
                 }
                 
             }).await.expect("Failed to import preset");
-            
-            return Response::builder()
-                .status(StatusCode::OK)
-                .header(
-                    HeaderName::from_static("hx-trigger"),
-                    HeaderValue::from_static("reload-selector"),
-                )
-                .body(String::new())
-                .unwrap();
         }
     }
     
     return Response::builder()
-        .status(StatusCode::BAD_REQUEST)
-        .body(String::from("Request did not contain file"))
+        .status(StatusCode::OK)
+        .header(
+            HeaderName::from_static("hx-trigger"),
+            HeaderValue::from_static("reload-selector"),
+        )
+        .body(String::new())
         .unwrap();
 }
