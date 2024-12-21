@@ -296,55 +296,5 @@ function applyCooldown(button) {
         button.classList.remove('popup-cooldown');
     }, 7500);
 }
-
-function toggleButtonGroup() {
-    currentModeIndex = (currentModeIndex + 1) % modes.length;
-    let currentMode = modes[currentModeIndex];
-    try {
-        localStorage.setItem('currentMode', currentMode);
-    } catch (error) {
-        console.error('Error saving mode to localStorage:', error);
-    }
-    document.getElementById('current-mode').textContent = `Mode: ${currentMode}`;
-    loadDefaultDistances(currentMode);
-
-    document.getElementById('custom-togo-inputs').style.display =
-        currentMode === "Custom" ? "block" : "none";
-
-    applyCooldown(document.getElementById('toggle-mode'));
-}
-
-window.addEventListener('load', function () {
-    let savedMode;
-    try {
-        savedMode = localStorage.getItem('currentMode') || "High School";
-    } catch (error) {
-        console.error('Error reading mode from localStorage:', error);
-        savedMode = "High School";
-    }
-    currentModeIndex = modes.indexOf(savedMode);
-    document.getElementById('current-mode').textContent = `Mode: ${savedMode}`;
-    loadDefaultDistances(savedMode);
-
-    document.getElementById('custom-togo-inputs').style.display =
-        savedMode === "Custom" ? "block" : "none";
-});
-
-document.addEventListener('DOMContentLoaded', (event) => {
-    const toggle = document.getElementById('professional-mode-toggle');
-
-    const professionalMode = localStorage.getItem('professionalMode') === 'true';
-    toggle.checked = professionalMode;
-
-    function updateProfessionalMode(isEnabled) {
-        localStorage.setItem('professionalMode', isEnabled);
-        console.log(`Professional Mode set to ${isEnabled}`);
-    }
-
-    toggle.addEventListener('change', (event) => {
-        updateProfessionalMode(event.target.checked);
-    });
-});
-
 pingServer();
 loadPresets()
