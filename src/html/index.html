@@ -58,8 +58,8 @@
             </li>
             <li>
                <div class="navbar-content-container">
-                  <box-icon name='align-justify' class="ico-white"></box-icon>
-                  <a href="/logs" id="open-logs" class="nav-text">Open Logs</a>
+                  <box-icon name='list-ul' class="ico-white"></box-icon>
+                  <a href="/logs" id="open-logs" class="nav-text">Logs</a>
                </div>
             </li>
             <li>
@@ -81,7 +81,10 @@
          </div>
          <div class="score-container">
             <div class="score-rectangle">
-               <h2 class="score-title">Score</h2>
+               <div class="icon-group">
+                  <span class="score-title">Score</hspan>
+                  <box-icon name="flag-alt" class="icon-fill" type="solid"></box-icon>
+                </div>                
                <div class="section home-section">
                   <div class="counter-container">
                      <button class="button-decrement-home" hx-post="/home-points/update/-1" hx-swap="none">-</button>

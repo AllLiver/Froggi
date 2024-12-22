@@ -47,15 +47,15 @@
         <div class="create-login-form" id="createLoginForm">
             <canvas id="background"></canvas>
             <div class="create-login-rectangle">
-                <h1>Create Froggi Login</h1>
+                <h1 class="create-login-header">Create Froggi Login</h1>
                 <form id="create-login-form" hx-post="/login/create" hx-swap="innerHTML" hx-target="#message_create_login" onsubmit="return validateForm()">
-                    <label for="username">Username:</label>
+                    <label class="create-login-header" for="username">Username:</label>
                     <input class="create-login-input" id="create-login-username" type="text" id="username" name="username" oninput="handleInput(event)">
 
-                    <label for="password">Password:</label>
+                    <label class="create-login-header" for="password">Password:</label>
                     <input class="create-login-input" type="password" id="password" name="password" oninput="handleInput(event)">
 
-                    <label for="confirm_password">Confirm Password:</label>
+                    <label class="create-login-header" for="confirm_password">Confirm Password:</label>
                     <input class="create-login-input" type="password" id="confirm_password" name="confirm_password" oninput="handleInput(event)">
                     <div id="password_error" class="error"></div>
 

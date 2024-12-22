@@ -61,8 +61,8 @@
             </li>
             <li>
                 <div class="navbar-content-container">
-                    <box-icon name='align-justify' class="ico-white"></box-icon>
-                    <a href="/logs" id="open-logs" class="nav-text">Open Logs</a>
+                    <box-icon name='list-ul' class="ico-white"></box-icon>
+                    <a href="/logs" id="open-logs" class="nav-text">Logs</a>
                 </div>
             </li>
             <li>
@@ -113,16 +113,22 @@
                     <img class="htmx-indicator" src="/favicon.png">
                 </div>
             </form>
-            <h1>Team Presets</h1>
-            <div class="ti-match-controls">
-                <div class="ti-match-controls">
-                    <button class="button ti-import">Import all teampresets</button>
-                    <button class="button ti-export">Export all teampresets</button>
+            <div class="ti-manage-section">
+                <div class="ti-selector-container">
+                  <h2>Select team Presets</h2>
+                  <div class="team-selector" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body"></div>
                 </div>
-            </div>
-            <div class="team-selector" hx-put="/teaminfo/selector" hx-trigger="load, reload-selector from:body"></div>
-        </div>
-
+                <div class="ti-import-container">
+                  <h2>Import Preset</h2>
+                  <form class="ti-import-parent" hx-post="/teaminfo/import-preset" hx-swap="none" enctype="multipart/form-data">
+                    <label for="file">Import Preset Files:</label>
+                    <input type="file" name="file" accept=".tar.gz" multiple required>
+                    <input type="submit" value="Submit" class="ti-sponsor-submit">
+                    <img class="htmx-indicator" src="/favicon.png">
+                  </form>
+                </div>
+              </div>
+            </div>      
         <div class="sponsor-rectangle">
             <h1>Sponsors</h1>
             <form hx-post="/sponsors/upload" hx-swap="none" enctype="multipart/form-data">
@@ -141,13 +147,7 @@
             </form>
             <div hx-put="/sponsors/manage" hx-trigger="load, reload-sponsor from:body"></div>
         </div>
-        
-        <form hx-post="/teaminfo/import-preset" hx-swap="none" enctype="multipart/form-data">
-            <label for="file">Import Preset:</label>
-            <input type="file" name="file" accept=".tar.gz" multiple required>
-            <input type="submit" value="Submit" class="ti-sponsor-submit">
-            <img class="htmx-indicator" src="/favicon.png">
-        </form>
+
 </body>
 
 </html>
