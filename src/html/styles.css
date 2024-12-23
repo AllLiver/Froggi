@@ -2426,7 +2426,6 @@ input:checked + .slider:before {
 /* Logs */
 
 #logs-body {
-    font-family: Arial, sans-serif;
     background-color: #000000;
     color: #f0f0f0;
     height: 100%;
