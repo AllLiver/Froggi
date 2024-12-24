@@ -4,6 +4,9 @@
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
 Is a portable self-hosted scoreboard overlay software that aims to provide an easy-to-use overlay for sports broadcasting!
 
+> [!WARNING]
+> Froggi 1.0 is no longer maintained. The new Froggi 2.0 features a complete frontend/backend rewrite and is released under the permissive MIT license. Exercise caution when using older versions, as they may not adhere to modern security practices.
+
 # Usage
 When you run the binary for the first time it should generate all the files and folders it needs  
 Here is what each of those files/folders do.
