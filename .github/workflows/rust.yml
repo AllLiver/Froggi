@@ -1,51 +1,22 @@
-name: Build Latest Release
+name: Rust
 
 on:
   push:
-    branches: [master, main, dev]
-  workflow_dispatch:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   build:
-    runs-on: macos-latest
-    
+
+    runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-
-    - name: Fetch latest release
-      run: |
-        LATEST_RELEASE=$(curl -s https://api.github.com/repos/<OWNER>/<REPO>/releases/latest | jq -r '.tarball_url')
-        echo "Latest release URL: $LATEST_RELEASE"
-        curl -L $LATEST_RELEASE -o latest-release.tar.gz
-        mkdir release-source
-        tar -xzf latest-release.tar.gz -C release-source --strip-components=1
-        cd release-source
-
-    - name: Install Rust
-      uses: actions-rs/toolchain@v1
-      with:
-        toolchain: stable
-
-    - name: Ensure C build tools are installed
-      run: |
-        if ! xcode-select --install 2>/dev/null; then
-          echo "Xcode command line tools are already installed"
-        fi
-
-    - name: Build the project
-      run: |
-        cd release-source
-        cargo build --release
-
-    - name: Archive compiled binary
-      run: |
-        cd release-source
-        mkdir -p build
-        mv target/release/<your-binary-name> build/
-
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: macos-build
-        path: release-source/build/
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
