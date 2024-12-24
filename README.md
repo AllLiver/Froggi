@@ -10,6 +10,7 @@ Is a self-hosted & portable scoreboard solution that aims to provide an intuitiv
  - ✨ Authentication through an API key in an HTTP header (allowing for authentication for use with Bitfocus Companion, and other use cases with http)
  - ✨ An (optional) sponsor logo slideshow
  - ✨ Easily transferrable team presets
+ - ✨ Cross platform (Supports Windows, MacOS, Linux, and Docker)
 
 # Installation
 Froggi is on [Docker Hub](https://hub.docker.com/repository/docker/allliver/froggi/general)  
