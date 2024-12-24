@@ -3,19 +3,19 @@
 ![Version](https://img.shields.io/badge/version-2.0.0-blue) ![GitHub License](https://img.shields.io/github/license/allliver/froggi)
 
 **F**lexible **R**eal-time **O**verlay for **G**ame **G**raphics and **I**nformation  
-Is a self-hosted portable scoreboard solution that aims to provide an intuitive and simple sports broadcasting overlay.
+Is a self-hosted & portable scoreboard solution that aims to provide an intuitive and simple sports broadcasting overlay.
 
 # Features
  - ✨ Optical character recognition (OCR) using [froggi-ocr](https://github.com/AllLiver/froggi-ocr) and [scoresight-ocr](https://github.com/locaal-ai/scoresight)
- - ✨ Authentication through an API key in an HTTP header (allowing for authentication for Bitfocus Companion, and other use cases)
- - ✨ An optional sponsor logo slideshow
- - ✨ Game presets
+ - ✨ Authentication through an API key in an HTTP header (allowing for authentication for use with Bitfocus Companion, and other use cases with http)
+ - ✨ An (optional) sponsor logo slideshow
+ - ✨ Easily transferrable team presets
 
 # Installation
 Froggi is on [Docker Hub](https://hub.docker.com/repository/docker/allliver/froggi/general)  
 Alternatively, Docker image archives can be found under [releases](https://github.com/AllLiver/Froggi/releases)  
   
-If you would like to run Froggi as a standalone executable, then follow the guide on how to [compile from source](https://github.com/AllLiver/Froggi/#compilation)
+To run Froggi as a standalone executable, then follow the guide on how to [compile from source](https://github.com/AllLiver/Froggi/#compilation)
 
 # Usage
 If running as a standalone executable, make sure to start the "froggi" binary, not the "froggi-worker" binary.  
@@ -31,30 +31,30 @@ Modifications to config.json are automatically applied upon restarting Froggi, t
 # Roadmap
 Froggi is an indev project so changes are very likley.
 Here are some features/updates planned in no particular order
- - [] 🗺️ Support for more sports
+ - [] 🗺️ Options for sport-specific features and customizations.
  - [] 🗺️ Pop-up animations, and support for .gif animations (in an 16:9 or 1920x1080 aspect ratio)
  - [] 🗺️ A first party bitfocus companion plugin
  - [] 🗺️ Frontend settings saving via the backend
 
 # Platform support
-## Windows
+### Windows
 Froggi has full Windows support (with one exception stated later), and binaries under [releases](https://github.com/AllLiver/Froggi/releases).  
 However due to the way Windows signals work, you should _never_ stop Froggi by simply doing Ctrl+c in the terminal, instead stop Froggi through the program controls at the bottom of settings in the web interface.  
 It is heavily suggested to run Froggi under WSL or Docker due to froggi being developed & maintained for linux.
 
-## MacOS
+### MacOS
 Froggi has full MacOS support, however due to the difficulty in cross-compiling for MacOS precompiled binaries are not offered. Detailed instructions on how to [compile from source](https://github.com/AllLiver/Froggi/#compilation) are found below.  
-If you would not like to compile the binaries from source, use Docker.
+If you are unable/unwanting to compile binaries from the source, it is reccomended to use the docker distribution.
 
-## Linux
+### Linux
 Froggi has full Linux support, and binaries under [releases](https://github.com/AllLiver/Froggi/releases).
 
-## Docker
+### Docker
 Froggi has full Docker support, and an image on [Docker Hub](https://hub.docker.com/repository/docker/allliver/froggi/general).  
-Docker is the best & intended way to run froggi.
+Linux using docker is the reccomended way to run froggi.
 
 # Updating
-Froggi includes self-updating capabilities, allowing for easy updates directly through the Settings page whenever a new version is available.
+Froggi has self-updating capabilities, allowing for easy updates directly through the Settings page whenever a new version is available.
 Updates are compiled from source, and in order to update Froggi needs all [build dependencies](https://github.com/AllLiver/Froggi/#dependencies) installed.  
 The Docker image comes with everything needed to compile updates from source.
 
@@ -88,7 +88,7 @@ cargo run --release --bin froggi
 
 # Tech Stack
  - Rust and Axum for the backend
- - HTML, CSS, JavaScript, and the HTMX library for the frontend
+ - HTML, CSS, JavaScript, and the [HTMX](https://htmx.org/) library for the frontend
 
 # Licence
-Froggi is licenced under the permissive [MIT Licence](https://mit-license.org/).
+Froggi is distributed under the [MIT Licence](https://mit-license.org/)., a permissive open-source license. 
